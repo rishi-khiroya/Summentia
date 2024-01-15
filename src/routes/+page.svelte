@@ -88,18 +88,19 @@
 
 
 
-    <form method="post" use:enhance enctype="multipart/form-data" action="?/transcribe">
+    <form method="post" use:enhance enctype="multipart/form-data" action="?/transcribe" class="flex-row">
 
-        <div class="group">
-        <label for="file">Upload your file</label>
-        <input
-            type="file"
-            id="file"
-            name="fileToUpload"
-            required
-        />
+        <div class="flex-row space-y-2 space-x-2"> 
+            <Label for="file">Upload your file</Label>
+            <input
+                type="file"
+                id="file"
+                name="fileToUpload"
+                class="flex"
+                required
+            />
         </div>
-        <button type="submit">Submit</button>
+        <Button type="submit" color="dark" class="m-2 mt-5 p-2 text-white">Transcribe</Button>
     
     </form>
     
