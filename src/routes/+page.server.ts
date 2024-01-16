@@ -1,25 +1,30 @@
-import type { Actions } from "./$types";
+import type { Actions } from './$types';
 import { fail } from '@sveltejs/kit';
 
-
 export const actions = {
-    transcribe: async ({ request }) => {
+	submit: async ({ request }) => {
+		const form = await request.formData();
+		// const form = Object.fromEntries(await request.formData());
 
-        const formData = Object.fromEntries(await request.formData());
+		// console.log(form);
+		// console.log(formData);
 
-        if (
+		let lecture: File;
 
-            !(formData.fileToUpload as File).name ||
-            (formData.fileToUpload as File).name === 'undefined'
-          ) {
-            return fail(400, {
-              error: true,
-              message: 'You must provide a file to upload.'
-            });
-          }
+		if (form.get("isLectureFile")) {
+			// handle file upload
+			let files: File[] = [];
+			const noFiles: number = parseInt(form.get("noLectureFiles").toString());
+			for (let i = 0; i < noFiles; i++) {
+				let file = form.get(`lectureFile${i}`);
+				if (!!file) files.push(file as File);
+			}
 
-        const file: File = formData.fileToUpload as File;
-        console.log(file.name);
+			if (files.length) lecture = files[0];
+		} else {
+			// handle file from url
+		}
 
-    }
+
+	}
 } satisfies Actions;
