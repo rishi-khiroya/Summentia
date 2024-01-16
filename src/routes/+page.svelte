@@ -24,14 +24,10 @@
 	}
 </script>
 
-<div class="sticky flex flex-row justify-center top-0 p-5">
-	<h1 class="text-5xl text-center font-sans rounded-lg p-8 px-28 bg-slate-200">Summentia</h1>
-</div>
-
 <div class="flex-1 p-5">
 	<LectureUpload bind:lectureFile bind:doLectureUpload bind:lectureURL />
-</div>
 
-<Button type="submit" on:click={() => submit()} color="dark" class="text-white m-5 p-4"
-	>Submit</Button
->
+	<Button type="submit" on:click={() => submit()} color="dark" class="text-white m-5 p-4"
+		>Submit</Button
+	>
+</div>
