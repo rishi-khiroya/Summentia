@@ -90,6 +90,6 @@
 		</Dropzone>
 	{:else}
 		<h1 class="text-lg">Upload from URL:</h1>
-		<Input type="text" placeholder="Enter lecture URL" bind:value={lectureURL}/>
+		<Input type="url" placeholder="Enter lecture URL" bind:value={lectureURL}/>
 	{/if}
 </div>
