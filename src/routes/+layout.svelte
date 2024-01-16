@@ -1,14 +1,18 @@
 <script>
 	import '../app.css';
+	import Footer from './(components)/Footer.svelte';
+	import Navbar from './(components)/Navbar.svelte';
 </script>
-  
+
 <div
 	class="flex flex-col bg-gradient-to-br
         from-white via-slate-200 to-slate-600
         dark:from-black dark:via-slate-800 dark:to-slate-700
         bg-animate min-h-screen h-max justify-between"
 >
-    <slot />
+	<Navbar />
+	<slot />
+	<Footer />
 </div>
 
 <style>
