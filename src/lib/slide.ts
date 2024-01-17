@@ -12,20 +12,15 @@ class Slide {
         this.endTimeStamp = endTimeStamp;
     }
 }
-class Slide_Transcript {
-    //title of the lecture
-    private title: String;
-    //date of lecture
-    private date: Date;
+class Slide_Transcript extends Transcript{
     // map of slide numbers to their corresponding transcript summaries
     private slideSummaries : Map<number, Array<String>>;
     public constructor(title: String, date: Date) {
-        this.title = title;
-        this.date = date;
+        super(title, date);
         this.slideSummaries = new Map();
     }
 
-    public putSlide(key: number, value: String){
+    public putSlide(key: number, value: String): void{
         let transcripts = this.slideSummaries.get(key);
         if (transcripts != undefined){
             transcripts?.push(value);
@@ -33,9 +28,18 @@ class Slide_Transcript {
         }
     }
 
-    public getSlide(key: number, value: String){
+    public getSlide(key: number, value: String): Array<String>{
         let transcripts = this.slideSummaries.get(key);
+        if (transcripts === undefined){
+            return [];
+        }
         return transcripts;
+    }
+
+    getText(): String {
+        //not sure how we want this to be configured and where we will store what slides 
+        //occur in what order so this method is pending. 
+        return ""
     }
 
 }
