@@ -1,3 +1,4 @@
+import {Transcript} from "./transcript";
 export class Lecture extends Transcript {
     //transcript of lecture
     private text: String;

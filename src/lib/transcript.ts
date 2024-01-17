@@ -1,4 +1,4 @@
-abstract class Transcript {
+export abstract class Transcript {
     //title of the lecture
     private title: String;
     //date of lecture
