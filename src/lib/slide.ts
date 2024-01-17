@@ -1,3 +1,4 @@
+import {Transcript} from "./transcript";
 class Slide {
     private slide_no : number;
     //assuming that the screenshot of the slide is a file
