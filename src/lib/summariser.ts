@@ -10,8 +10,9 @@ export class Summariser{
           messages: [{ role: "system", content: "Please can you summarise this: " + transcript}],
           model: "gpt-3.5-turbo",
         });
+
         let summary = completion.choices[0]["message"]["content"];
-        console.log(summary);
+        
         return summary;
       }
 }

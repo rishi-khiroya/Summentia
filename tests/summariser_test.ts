@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {Lecture} from "../src/lib/lecture";
-import {Summariser} from "../src/lib/Summariser"
+import {Summariser} from "../src/lib/summariser";
 
 let lecture1 = new Lecture("Preesha's intro", new Date(), `I'm Preesha Gehlot, currently in my third year studying Computing at Imperial College London. Nestled near Chelsea in the heart of London, I'm deeply engaged in a captivating software engineering project focused on the auto summarization of lectures. 
 This endeavor allows me to blend my passion for technology with the dynamic world of education. Within my academic journey, I've found particular joy in exploring the intricacies of data processing, concurrency, and compilers. These modules have not only broadened my understanding but also fueled my curiosity for 
@@ -11,20 +11,13 @@ diverse landscapes and cultures of Asia. This upcoming journey embodies my insat
 test('accurate summary of short transcript', async () => {
 	let text = lecture1.getText();
     let summariser = new Summariser();
-    let summary = summariser.summarise(text);
+    let summary = await summariser.summarise(text);
     const keyWords = new Set<string>(['Preesha', 'Gehlot', 'Computing', 'Imperial', 'London', 'data', 'processing', 'concurrency', 'compilers', 'running', 'tennis', 'Nick', 'Kyrgios', 'travelling', 'Asia', 'reading', 'graduation', 'Good', 'Will', 'Hunting']);
-    
-    Promise.resolve(summary);
-    let string_summary = "";
-    summary.then((value) => {
-        if (value != null){
-            string_summary = value;
-        }
-      });
 
-    var splitted = string_summary.split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );
+    var splitted = (summary == null ? "" : summary).split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );
     let count = 0;
     for (var split in splitted){
+        console.log(split);
         if (keyWords.has(split)){
             count += 1;
         }
