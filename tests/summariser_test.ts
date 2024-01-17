@@ -12,15 +12,19 @@ test('accurate summary of short transcript', async () => {
 	let text = lecture1.getText();
     let summariser = new Summariser();
     let summary = await summariser.summarise(text);
-    const keyWords = new Set<string>(['Preesha', 'Gehlot', 'Computing', 'Imperial', 'London', 'data', 'processing', 'concurrency', 'compilers', 'running', 'tennis', 'Nick', 'Kyrgios', 'travelling', 'Asia', 'reading', 'graduation', 'Good', 'Will', 'Hunting']);
+    const keyWords = new Set<String>(['preesha', 'gehlot', 'computing', 'imperial', 'london', 'data', 'processing', 'concurrency', 'compilers', 'running', 'tennis', 'nick', 'kyrgios', 'travelling', 'asia', 'reading', 'graduation', 'good', 'will', 'hunting']);
 
     var splitted = (summary == null ? "" : summary).split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );
+
     let count = 0;
-    for (var split in splitted){
-        console.log(split);
-        if (keyWords.has(split)){
-            count += 1;
-        }
+    function update_count(item: String){
+            console.log(item);
+            if (keyWords.has(item.toLowerCase())){
+                count += 1;
+            }
     }
+
+    splitted.forEach(update_count);
+    
     expect(count).toBeGreaterThan(16);
 });
