@@ -1,4 +1,4 @@
-class Lecture extends Transcript {
+export class Lecture extends Transcript {
     //transcript of lecture
     private text: String;
 
