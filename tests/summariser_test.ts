@@ -13,7 +13,16 @@ test('accurate summary of short transcript', async () => {
     let summariser = new Summariser();
     let summary = summariser.summarise(text);
     const keyWords = new Set<string>(['Preesha', 'Gehlot', 'Computing', 'Imperial', 'London', 'data', 'processing', 'concurrency', 'compilers', 'running', 'tennis', 'Nick', 'Kyrgios', 'travelling', 'Asia', 'reading', 'graduation', 'Good', 'Will', 'Hunting']);
-    var splitted = summary.split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );
+    
+    Promise.resolve(summary);
+    let string_summary = "";
+    summary.then((value) => {
+        if (value != null){
+            string_summary = value;
+        }
+      });
+
+    var splitted = string_summary.split(/(\s+)/).filter( function(e) { return e.trim().length > 0; } );
     let count = 0;
     for (var split in splitted){
         if (keyWords.has(split)){
