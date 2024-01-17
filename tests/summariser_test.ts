@@ -18,7 +18,6 @@ test('accurate summary of short transcript', async () => {
 
     let count = 0;
     function update_count(item: String){
-            console.log(item);
             if (keyWords.has(item.toLowerCase())){
                 count += 1;
             }
