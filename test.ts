@@ -39,7 +39,7 @@ async function run_query(filename) {
 }
 
 try {
-    const file = "door_tier_list";
+    const file = "30_sec_vid";
     extract_audio(file);
     console.log("EXTRACTION COMPLETE");
     await run_query(file);
