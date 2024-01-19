@@ -1,27 +1,27 @@
 import * as fs from 'fs';
 import ffmpegStatic from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
-import { Stream } from 'stream';
+// import { Stream } from 'stream';
 // import * as https from 'node:https';
 
-async function extract_audio() {
-    let data;
+async function extract_audio(filename: string) {
+    // let data;
 
-    const outStream = new Stream.Writable({
-        write(chunk, encoding, next) {
-            // console.log(chunk.toString())
-            next()
-        }
-    });
+    // const outStream = new Stream.Writable({
+    //     write(chunk, encoding, next) {
+    //         // console.log(chunk.toString())
+    //         next()
+    //     }
+    // });
 
-    const inStream = new Stream.Readable({
-        read() {}
-    });
+    // const inStream = new Stream.Readable({
+    //     read() {}
+    // });
 
     ffmpeg.setFfmpegPath(ffmpegStatic);
 
     ffmpeg()
-        .input("./src/static/door_tier_list.mp4")
+        .input("./src/static/" + filename + ".mp4")
         .outputOptions('-ab', '192k')
         .on('progress', (progress) => {
             if (progress.percent) {
@@ -34,21 +34,21 @@ async function extract_audio() {
         .on('error', (error) => {
             console.error(error);
         })
-        .format('wav')
-        .save("./src/static/door_tier_list.wav")
+        .format('mp3')
+        .save("./src/static/" + filename + ".mp3")
         // .stream(outStream);
 
-    inStream.pipe(outStream);
-    inStream.on('data', (d) => {
-        data = d;
-    })
-    return data;
+    // inStream.pipe(outStream);
+    // inStream.on('data', (d) => {
+    //     data = d;
+    // })
+    // return data;
 }
 
 // const testVid: string = "https://y7ceexhkahxpnqji.public.blob.vercel-storage.com/test.mp4";
 // const url: URL = new URL(testVid);
 
-async function run_query(data) {
+async function run_query(filename) {
     // let data;
     // https.get(filename, (res) => {
     //     res.on('data', (d) => {
@@ -58,6 +58,8 @@ async function run_query(data) {
     //     });
     // });
 
+    const data = fs.readFileSync("./src/static/" + filename + ".mp3");
+    console.log(data);
     const response = await fetch(
         "https://api-inference.huggingface.co/models/openai/whisper-large-v3",
         {
@@ -66,16 +68,18 @@ async function run_query(data) {
             body: data,
         }
     );
-    console.log(response);
-    // const result = await response.json();
-    // console.log(result);
+    // console.log(response);
+    const result = await response.json();
+    console.log(result);
     // return result;
 }
 
-let data;
 try {
-    data = await extract_audio();
-    await run_query(data);
+    // TODO: extract name so simpler
+    const file = "door_tier_list";
+    extract_audio(file);
+    console.log("EXTRACTION COMPLETE");
+    await run_query(file);
 } catch (error) {
     console.log(error);
 }
