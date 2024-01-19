@@ -1,9 +1,14 @@
 <script lang="ts">
+    import {summarise} from "../../lib/summariser";
+
     let textTranscript = new String("Enter transcript here");
 
-    function someFunction() {
+    async function processSummary(){
         // Modify later to process summary, alerts now to ensure text value correctly extracted
-        alert(textTranscript);
+        let summary = await summarise(textTranscript);
+        if (summary != null){
+            textTranscript = summary;
+        }
     }
 </script>
 
@@ -16,5 +21,5 @@
 </div>
 
 <div class="sticky flex flex-row justify-center top-9 p-5">
-    <button on:click={someFunction} style="color: white;">Summarise</button>
+    <button on:click={processSummary} style="color: white;">Summarise</button>
 </div>
