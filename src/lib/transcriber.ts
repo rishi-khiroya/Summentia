@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
 
-async function extract_audio(filePath: string) {
+function extract_audio(filePath: string) {
     ffmpeg()
         .input(filePath + ".mp4")
         .outputOptions('-ab', '192k')
@@ -32,14 +32,18 @@ async function run_query(filePath: string) {
         }
     );
     const result = await response.json();
-    console.log(result);
+    // console.log(result);
+    return result
 }
 
-try {
-    const filePath = "./src/static/30_sec_vid";
-    extract_audio(filePath);
-    console.log("EXTRACTION COMPLETE");
-    await run_query(filePath);
-} catch (error) {
-    console.log(error);
+export async function transcribe(filePath: string) {
+    try {
+        extract_audio(filePath);
+        const transcript = await run_query(filePath);
+        return transcript;
+    } catch (error) {
+        console.log(error);
+    }
 }
+
+
