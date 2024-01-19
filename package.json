@@ -20,6 +20,8 @@
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "8.56.0",
+		"@types/fluent-ffmpeg": "^2.1.24",
+		"@types/node": "^20.11.5",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"@vercel/blob": "^0.18.0",
@@ -43,6 +45,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"fluent-ffmpeg": "^2.1.2",
 		"vercel": "^33.1.0"
 	}
 }
