@@ -1,12 +1,9 @@
 import * as fs from 'fs';
-import ffmpegStatic from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
 
-async function extract_audio(filename: string) {
-    ffmpeg.setFfmpegPath(ffmpegStatic);
-
+async function extract_audio(filePath: string) {
     ffmpeg()
-        .input("./src/static/" + filename + ".mp4")
+        .input(filePath + ".mp4")
         .outputOptions('-ab', '192k')
         .on('progress', (progress) => {
             if (progress.percent) {
@@ -20,11 +17,11 @@ async function extract_audio(filename: string) {
             console.error(error);
         })
         .format('mp3')
-        .save("./src/static/" + filename + ".mp3")
+        .save(filePath + ".mp3")
 }
 
-async function run_query(filename) {
-    const data = fs.readFileSync("./src/static/" + filename + ".mp3");
+async function run_query(filePath: string) {
+    const data = fs.readFileSync(filePath + ".mp3");
     console.log(data);
     const response = await fetch(
         "https://api-inference.huggingface.co/models/openai/whisper-large-v3",
@@ -39,10 +36,10 @@ async function run_query(filename) {
 }
 
 try {
-    const file = "30_sec_vid";
-    extract_audio(file);
+    const filePath = "./src/static/30_sec_vid";
+    extract_audio(filePath);
     console.log("EXTRACTION COMPLETE");
-    await run_query(file);
+    await run_query(filePath);
 } catch (error) {
     console.log(error);
 }
