@@ -6,7 +6,7 @@ const openai = new OpenAI();
   1 indicates standard summary
   2 indicates extensive summary */
 
-export async function summarise(transcript: String, level: number){
+export async function summarise(transcript: String, level: number = 1){
   let specification = "";
   switch (level) {
     case 0:
