@@ -8,16 +8,15 @@ const openai = new OpenAI();
 
 export async function summarise(transcript: String, level: number = 1){
   let specification = "";
-  switch (level) {
-    case 0:
-      specification = " in 2 sentences or less: ";
-    case 1:
-      specification = ": ";
-    case 2:
-      specification = " in great detail: ";
+  if (level == 0){
+    specification = " in 3 sentences or less: ";
+  } else if (level == 1){
+    specification = ": ";
+  } else if (level == 2){
+    specification = " in great detail: ";
   }
+
   const completion = await openai.chat.completions.create({
-      
     messages: [{ role: "system", content: "Please can you summarise this" + specification + transcript}],
       model: "gpt-3.5-turbo",
   });

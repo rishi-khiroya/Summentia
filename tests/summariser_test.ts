@@ -11,6 +11,7 @@ diverse landscapes and cultures of Asia. This upcoming journey embodies my insat
 test('accurate summary of short transcript', async () => {
 	let text = lecture1.getText();
     let summary = await summarise(text, 1);
+
     const keyWords = new Set<String>(['preesha', 'gehlot', 'computing', 'imperial', 'london', 'data', 'processing', 'concurrency', 'compilers', 'running', 'tennis', 'nick', 'kyrgios', 'travelling', 'asia', 'reading', 'graduation', 'good', 'will', 'hunting']);
 
     var splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
