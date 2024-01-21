@@ -7,7 +7,7 @@
 
 	export let fileList: FileList;
 
-	const dropHandle = (event) => {
+	const dropHandle = (event: any) => {
 		lectureFile = [];
 		event.preventDefault();
 		if (event.dataTransfer.items) {
@@ -25,7 +25,7 @@
 		}
 	};
 
-	const handleChange = (event) => {
+	const handleChange = (event: auto) => {
 		const files = event.target.files;
 		if (files.length > 0) {
 			lectureFile.push(files[0].name);
