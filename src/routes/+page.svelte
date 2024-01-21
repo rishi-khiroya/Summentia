@@ -4,11 +4,13 @@
     import LectureUpload from './(components)/LectureUpload.svelte';
 	import { fromJSON } from 'postcss';
 	import SlidesUpload from './(components)/SlidesUpload.svelte';
+	import SupplementaryUpload from './(components)/SupplementaryUpload.svelte';
 
-	let lectureFile:File = [];
+	let lectureFile:File[] = [];
 	let doLectureUpload = false;
 	let lectureURL: string;
-	let slidesFile: File[] = [];
+	let slidesFile: File;
+	let supplementaryFiles: File[] = [];
 
 	async function submit() {
 		const form = new FormData();
@@ -26,6 +28,9 @@
 			body: form
 		});
 		form.append('slidesFile', slidesFile);
+		supplementaryFiles.forEach((file, i) => {
+				form.append(`supplementaryFiles${i}`, file);
+			});
 	}
 </script>
 
@@ -43,8 +48,8 @@
 		  </AccordionItem>
 		
 		  <AccordionItem>
-			<span slot="header">Supplementary Info</span>
-			
+			<span slot="header">Add Supplementary Info</span>
+			<SupplementaryUpload bind:supplementaryFiles />
 		  </AccordionItem>
 		  <AccordionItem>
 			<span slot="header">Customisation</span>
