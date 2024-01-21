@@ -1,16 +1,17 @@
 import type { Actions } from './$types';
 import { error } from '@sveltejs/kit';
 import { put } from "@vercel/blob";
-// import { writeFile } from 'fs/promises';
+import { writeFile, rm } from 'node:fs/promises';
 
 import { BLOB_READ_WRITE_TOKEN } from '$env/static/private'
+import { transcribe } from '$lib/transcriber';
 
 export const actions = {
 	submit: async ({ request }) => {
 		const form = await request.formData();
 		let lectureURL: URL;
 
-		const uploadToBlob = async (file: File) => {
+		const uploadToBlob = async (file: File): Promise<URL> => {
 			console.log(`Uploading ${file.name} to BLOB store.`)
 			const { url: urlPath } = await put(file.name, file, { access: "public", token: BLOB_READ_WRITE_TOKEN });
 
@@ -22,34 +23,39 @@ export const actions = {
 			}
 			console.log(`Successfully uploaded ${file.name} to BLOB store.`)
 
-			lectureURL = url;
-		}	
+			return url;
+		}
 
 		const process = async (file: File) => {
+
+			// TODO: write file to some temp dir
+			const path: string = `static/${file.name}`;
+			await writeFile(path, Buffer.from(await file.arrayBuffer()));
+
 			// TODO: implement pipeline
-			// const transcript: string = await transcribe(...);
+			const extlessPath = path.substring(0, path.lastIndexOf('.'));
+			const transcript: string | null = await transcribe(extlessPath);
 			// const lecture: Lecture = new Lecture(...);
 			// const summary: Sumamry = summarise(lecture);
-			console.log("process: ", file.name)
-			return;
+			console.log("transcript:", transcript)
+
+			await rm(path);
 		}
 
 		if (form.get('isLectureFile') === "true") {
 
 			// handle file upload
 			const file: File = form.get(`lectureFile`) as File;
-			console.log(file);
-
-			// TODO: write file to some temp dir
-			// await writeFile(`./files/${file.name}`,new Uint8Array(await  file.arrayBuffer()));		
-			// console.log("file written to: ", file.name);	
+			// console.log(file);
 
 			if (file) {
-				const uploadTask: Promise<void> = uploadToBlob(file);
+
+				const uploadTask: Promise<URL> = uploadToBlob(file);
 				const processTask: Promise<void> = process(file);
-				
+
 				// wait for async tasks to finish
-				Promise.all([uploadTask, processTask]);
+				const completedTasks = await Promise.all([uploadTask, processTask]);
+				lectureURL = completedTasks[0];
 			}
 
 		} else {
