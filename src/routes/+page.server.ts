@@ -5,6 +5,8 @@ import { writeFile, rm } from 'node:fs/promises';
 
 import { BLOB_READ_WRITE_TOKEN } from '$env/static/private'
 import { transcribe } from '$lib/transcriber';
+// import { Lecture } from '$lib/lecture';
+import { summarise } from '$lib/summariser';
 
 export const actions = {
 	submit: async ({ request }) => {
@@ -28,18 +30,21 @@ export const actions = {
 
 		const process = async (file: File) => {
 
-			// TODO: write file to some temp dir
 			const path: string = `static/${file.name}`;
 			await writeFile(path, Buffer.from(await file.arrayBuffer()));
 
-			// TODO: implement pipeline
 			const extlessPath = path.substring(0, path.lastIndexOf('.'));
 			const transcript: string | null = await transcribe(extlessPath);
-			// const lecture: Lecture = new Lecture(...);
-			// const summary: Sumamry = summarise(lecture);
-			console.log("transcript:", transcript)
-
 			await rm(path);
+
+			if (!transcript) {
+				console.error("Unable to transcribe this lecture.");
+				return;
+			}
+
+			// const lecture: Lecture = new Lecture(extlessPath, new Date(), transcript); // TODO
+			const summary = await summarise(transcript);
+			console.log(summary);
 		}
 
 		if (form.get('isLectureFile') === "true") {
