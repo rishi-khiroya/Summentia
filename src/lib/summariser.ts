@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+
 const openai = new OpenAI();
 
 /* For the level parameter:
@@ -6,22 +7,22 @@ const openai = new OpenAI();
   1 indicates standard summary
   2 indicates extensive summary */
 
-export async function summarise(transcript: String, level: number = 1){
+export async function summarise(transcript: string, level: number = 1) {
   let specification = "";
-  if (level == 0){
+  if (level == 0) {
     specification = " in 3 sentences or less: ";
-  } else if (level == 1){
+  } else if (level == 1) {
     specification = ": ";
-  } else if (level == 2){
+  } else if (level == 2) {
     specification = " in great detail: ";
   }
 
   const completion = await openai.chat.completions.create({
-    messages: [{ role: "system", content: "Please can you summarise this" + specification + transcript}],
-      model: "gpt-3.5-turbo",
+    messages: [{ role: "system", content: "Please can you summarise this" + specification + transcript }],
+    model: "gpt-3.5-turbo",
   });
 
-  let summary = completion.choices[0]["message"]["content"];
-        
+  const summary = completion.choices[0]["message"]["content"];
+
   return summary;
 }

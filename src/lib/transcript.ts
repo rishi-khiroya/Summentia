@@ -1,15 +1,15 @@
 export abstract class Transcript {
     //title of the lecture
-    private title: String;
+    private title: string;
     //date of lecture
     private date: Date;
 
-    public constructor(title: String, date: Date){
+    public constructor(title: string, date: Date) {
         this.title = title;
         this.date = date;
     }
 
-    getTitle(): String {
+    getTitle(): string {
         return this.title;
     }
 
@@ -17,5 +17,5 @@ export abstract class Transcript {
         return this.date;
     }
 
-    abstract getText(): String;
+    abstract getText(): string;
 }

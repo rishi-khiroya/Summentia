@@ -1,14 +1,14 @@
-import {Transcript} from "./transcript";
+import { Transcript } from "./transcript";
 export class Lecture extends Transcript {
     //transcript of lecture
-    private text: String;
+    private text: string;
 
-    public constructor(title: String, date: Date, text: String) {
+    public constructor(title: string, date: Date, text: string) {
         super(title, date);
         this.text = text;
     }
 
-    getText(): String {
+    getText(): string {
         return this.text;
     }
 }
