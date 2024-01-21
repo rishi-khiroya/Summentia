@@ -25,7 +25,7 @@
 		}
 	};
 
-	const handleChange = (event: auto) => {
+	const handleChange = (event: any) => {
 		const files = event.target.files;
 		if (files.length > 0) {
 			lectureFile.push(files[0].name);
