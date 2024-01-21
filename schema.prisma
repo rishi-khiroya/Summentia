@@ -1,0 +1,30 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+    directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model User {
+    id        Int       @id @default(autoincrement())
+    name      String
+    email     String    @unique
+    createdAt DateTime  @default(now())
+    projects  Project[]
+}
+
+model Project {
+    id         Int       @id @default(autoincrement())
+    title      String
+    user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    userId     Int
+    date       DateTime?
+    createdAt  DateTime  @default(now())
+    videoUrl   String?
+    audioUrl   String?
+    transcript String?
+    summary    String?
+}
