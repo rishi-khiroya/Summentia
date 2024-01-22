@@ -12,7 +12,8 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest"
+		"test:unit": "vitest",
+		"py-update": "poetry export -f requirements.txt --output requirements.txt --without-hashes; node ./node_modules/sveltekit-python-vercel/esm/src/vite/sveltekit_python_vercel/bin.mjs"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.28.1",
