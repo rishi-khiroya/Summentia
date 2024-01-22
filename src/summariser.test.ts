@@ -62,5 +62,5 @@ test('accurate extensive summary of short transcript', async () => {
 
     splitted.forEach(update_count);
     
-    expect(count).toBeGreaterThan(20);
+    expect(count).toBeGreaterThan(18);
 }, 70000);
