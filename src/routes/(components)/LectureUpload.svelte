@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { Dropzone, Input, Toggle } from 'flowbite-svelte';
 
-	export let lectureFile: File[];
-    export let doLectureUpload: boolean;
-    export let lectureURL: string;
+	let lectureFile: File[] = [];
+	export let doLectureUpload: boolean;
+	export let lectureURL: string;
 
-	const dropHandle = (event) => {
+	export let fileList: FileList;
+
+	const dropHandle = (event: any) => {
 		lectureFile = [];
 		event.preventDefault();
 		if (event.dataTransfer.items) {
-			[...event.dataTransfer.items].forEach((item, i) => {
+			[...event.dataTransfer.items].forEach((item) => {
 				if (item.kind === 'file') {
 					const file = item.getAsFile();
 					lectureFile.push(file.name);
@@ -17,18 +19,19 @@
 				}
 			});
 		} else {
-			[...event.dataTransfer.files].forEach((file, i) => {
+			[...event.dataTransfer.files].forEach((file) => {
 				lectureFile = file.name;
 			});
 		}
 	};
 
-	const handleChange = (event) => {
+	const handleChange = (event: any) => {
 		const files = event.target.files;
 		if (files.length > 0) {
 			lectureFile.push(files[0].name);
 			lectureFile = lectureFile;
 		}
+		fileList = files;
 	};
 
 	const showFiles = (files: Blob[]) => {
@@ -81,15 +84,13 @@
 				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
 					<span class="font-semibold">Click to upload</span> or drag and drop
 				</p>
-				<p class="text-xs text-gray-500 dark:text-gray-400">
-					SVG, PNG, JPG or GIF (MAX. 800x400px)
-				</p>
+				<p class="text-xs text-gray-500 dark:text-gray-400">.mp4 files only</p>
 			{:else}
 				<p>{showFiles(lectureFile)}</p>
 			{/if}
 		</Dropzone>
 	{:else}
 		<h1 class="text-lg">Upload from URL:</h1>
-		<Input type="url" placeholder="Enter lecture URL" bind:value={lectureURL}/>
+		<Input type="url" placeholder="Enter lecture URL" bind:value={lectureURL} />
 	{/if}
 </div>
