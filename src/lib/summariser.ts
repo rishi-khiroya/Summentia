@@ -7,13 +7,20 @@ const openai = new OpenAI();
   2 indicates extensive summary */
 
 export async function summarise(transcript: String, level: number = 1){
-  let specification = "";
-  if (level == 0){
-    specification = " in 3 sentences or less: ";
-  } else if (level == 1){
-    specification = ": ";
-  } else if (level == 2){
-    specification = " in great detail: ";
+  
+  let specification;
+  switch (level){
+    case 0:
+      specification = " in 3 sentences or less: ";
+      break;
+    case 1:
+      specification = "";
+      break;
+    case 2:
+      specification = " in great detail: ";
+      break;
+    default:
+      break;
   }
 
   const completion = await openai.chat.completions.create({
