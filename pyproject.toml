@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "summentia-slide-transitions"
+version = "0.1.0"
+description = ""
+authors = ["Gabriel de Olim Gaul <gabdeolimgaul@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.95.2"
+uvicorn = "^0.26.0"
+numpy = "^1.26.3"
+torch = "^2.1.2"
+torchvision = "^0.16.2"
+opencv-python = "^4.9.0.80"
+decord = "^0.6.0"
+
+[tool.poetry.group.dev.dependencies]
+watchfiles = "^0.19.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
