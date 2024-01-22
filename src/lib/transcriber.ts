@@ -26,11 +26,16 @@ function extract_audio(filePath: string): boolean {
                 console.log('FFmpeg has finished.');
             })
             .on('error', (error) => {
-                console.error(error);
+                throw error;
             })
+            // .on('exit', (code, signal) => {
+            //     if (signal) console.log("it killed with " + signal);
+            //     else if (code) console.log("it exited with " + code);
+            // })
             .format('mp3')
             .save(filePath + ".mp3")
-    } catch (_) {
+    } catch (error) {
+        console.log(error);
         return false;
     }
 
@@ -53,7 +58,10 @@ async function run_query(filePath: string) {
 
 export async function transcribe(filePath: string): Promise<string | null> {
     try {
-        if (!extract_audio(filePath)) return null;
+        if (!extract_audio(filePath)) {
+            console.log("WWOOOOOO\n\n");
+            return null;
+        }
         while (!fs.existsSync(filePath + ".mp3")) {
             // spin every 1000ms
             await new Promise(resolve => setTimeout(resolve, SPIN_TIMER_MS));

@@ -1,7 +1,7 @@
-import { OPENAI_API_KEY } from "$env/static/private";
+//import { OPENAI_API_KEY } from "$env/static/private";
 import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: "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" });
 
 /* For the level parameter:
   0 indicates brief summary (2 sentences or less)
