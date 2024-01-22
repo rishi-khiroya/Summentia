@@ -12,7 +12,7 @@ export async function summarise(transcript: String, level: number = 1, latex_fla
   if (latex_flag){
     latex = " in LaTeX format "
   }
-  
+
   let specification = "";
   switch (level){
     case 0:
@@ -29,7 +29,7 @@ export async function summarise(transcript: String, level: number = 1, latex_fla
   }
 
   const completion = await openai.chat.completions.create({
-    messages: [{ role: "system", content: "Please can you summarise this" + specification + transcript}],
+    messages: [{ role: "system", content: "Please can you summarise this" + latex + specification + transcript}],
       model: "gpt-3.5-turbo",
   });
 
