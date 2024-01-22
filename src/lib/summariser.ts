@@ -6,9 +6,14 @@ const openai = new OpenAI();
   1 indicates standard summary
   2 indicates extensive summary */
 
-export async function summarise(transcript: String, level: number = 1){
+export async function summarise(transcript: String, level: number = 1, latex_flag: boolean = true){
   
-  let specification;
+  let latex = "";
+  if (latex_flag){
+    latex = " in LaTeX format "
+  }
+  
+  let specification = "";
   switch (level){
     case 0:
       specification = " in 3 sentences or less: ";
