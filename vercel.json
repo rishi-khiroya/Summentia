@@ -1,0 +1,14 @@
+{
+    "buildCommand": "node ./node_modules/sveltekit-python-vercel/esm/src/vite/sveltekit_python_vercel/bin.mjs; vite build",
+    "functions": {
+      "api/**/*.py": {
+        "runtime": "@vercel/python@3.0.7"
+      }
+    },
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "api/index.py"
+      }
+    ]
+  }
