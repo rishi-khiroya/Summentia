@@ -9,17 +9,32 @@ const openai = new OpenAI();
       - Generate revision question/answer section
 */
 
-// NOTES : LaTeX format is also variable but not a customisation and will be true by default.
-//       : detail_level should always be set to something so concat at end.
-//       : detail_level may become redundant at summariser is integrated.
-//       : I advise to only use detail_level when latex_flag is false, and use length when latex_flag is true (for now)
+// NOTE : use detail_level when latex_flag is false, and use length when latex_flag is true
+// because (length involves num. of pages)
 
-export async function summarise(transcript: String, detail_level: number = -1, latex_flag: boolean = true, length: number = 1){
+export async function summarise(transcript: String, latex_flag: boolean = true, 
+  highlight_keywords: boolean = false, bullet_points: boolean = false, 
+  questions: boolean = false, length: number = 1, detail_level: number = -1){
   
   // adds LaTeX format prompt if the latex_flag has been set to true
   let latex_phrase = "";
   if (latex_flag){
-    latex_phrase = " in LaTeX format "
+    latex_phrase = " in LaTeX format ";
+  }
+
+  let highlight_phrase = "";
+  if (highlight_keywords){
+    highlight_phrase = " with the keywords highlighted ";
+  }
+
+  let bullet_point_phrase = "";
+  if (bullet_points){
+    bullet_point_phrase = " as bullet points ";
+  }
+
+  let questions_phrase = "";
+  if (questions){
+    questions_phrase = " with a question and answer revision section at the end "
   }
 
   // adds length prompt for length upper bound in pages, default set to 1
@@ -40,29 +55,31 @@ export async function summarise(transcript: String, detail_level: number = -1, l
     case 2:
       length_phrase = " in under 6 pages ";
       break;
-    
-      default:
+
+    default:
         break;
   }
 
   // Adds prompt the level parameter for the extent of a given summary
-  let specification_phrase = "";
+  // Use for intermediate summaries (non LaTeX), and testing
+  let detail_phrase = "";
   switch (detail_level){
     case 0:
-      specification_phrase = " in 3 sentences or less: ";
+      detail_phrase = " in 3 sentences or less: ";
       break;
     case 1:
-      specification_phrase = ": ";
+      detail_phrase = ": ";
       break;
     case 2:
-      specification_phrase = " in great detail: ";
+      detail_phrase = " in great detail: ";
       break;
     default:
       break;
   }
 
   const completion = await openai.chat.completions.create({
-    messages: [{ role: "system", content: "Please can you summarise this" + latex_phrase + specification_phrase + transcript}],
+    messages: [{ role: "system", content: "Please can you summarise this" + bullet_point_phrase + highlight_phrase + questions_phrase +
+    latex_phrase + detail_phrase + length_phrase + transcript}],
       model: "gpt-3.5-turbo",
   });
 
