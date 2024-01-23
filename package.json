@@ -51,6 +51,7 @@
 	"type": "module",
 	"dependencies": {
 		"fluent-ffmpeg": "^2.1.2",
+		"rollup": "^4.9.6",
 		"vercel": "^32.3.0"
 	}
 }
