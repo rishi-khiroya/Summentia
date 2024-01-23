@@ -2,11 +2,11 @@ export abstract class URLHandler {
 
     url: URL;
 
-    constructor(url: URL) {
+    public constructor(url: URL) {
         this.url = url;
     }
 
-    abstract process(): boolean;
+    public abstract toStream();
 
     static create(url: URL): URLHandler {
         const name = url.hostname.replaceAll('.', '');
@@ -19,19 +19,19 @@ export abstract class URLHandler {
 }
 
 class UnknownHandler extends URLHandler {
-    process(): boolean {
-        return false;
+    public toStream() {
+        throw new Error("Method not implemented.");
     }
 }
 
 class YoutubeHandler extends URLHandler {
-    process(): boolean {
-        throw new Error("Method not implemented."); // TODO
+    public toStream() {
+        throw new Error("Method not implemented.");
     }
 }
 
 class PanoptoHandler extends URLHandler {
-    process(): boolean {
-        throw new Error("Method not implemented."); // TODO
+    public toStream() {
+        throw new Error("Method not implemented.");
     }
 }
