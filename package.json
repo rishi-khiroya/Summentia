@@ -45,6 +45,9 @@
 		"vite": "^5.0.3",
 		"vitest": "^1.2.1"
 	},
+	"optionalDependencies": {
+		"@rollup/rollup-linux-x64-gnu": "4.6.1"
+	},
 	"type": "module",
 	"dependencies": {
 		"fluent-ffmpeg": "^2.1.2",
