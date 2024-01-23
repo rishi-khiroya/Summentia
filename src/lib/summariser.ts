@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 const openai = new OpenAI();
 
-/* Customisations to implement:
+/* Customisations implemented:
       - size : Small (under 1 page), Medium (under 3 pages), Large (under 6 pages) 
       - highlight keywords
       - normal text or bullet points
@@ -9,12 +9,16 @@ const openai = new OpenAI();
       - Generate revision question/answer section
 */
 
-// NOTE : use detail_level when latex_flag is false, and use length when latex_flag is true
-// because (length involves num. of pages)
+/* NOTES FOR ARGUMENT USE: 
+   -  use detail_level when qlatex_flag is false, and use length when latex_flag is true
+      because length involves num. of pages
+   -  only set highlight_keywords or bullet_points to true when latex_flag is true
+*/
 
-export async function summarise(transcript: String, latex_flag: boolean = true, 
-  highlight_keywords: boolean = false, bullet_points: boolean = false, 
-  questions: boolean = false, length: number = 1, detail_level: number = -1){
+export async function summarise(transcript: String, detail_level: number = -1, 
+  latex_flag: boolean = true, length: number = -1, 
+  highlight_keywords: boolean = false, 
+  bullet_points: boolean = false, questions: boolean = false){
   
   // adds LaTeX format prompt if the latex_flag has been set to true
   let latex_phrase = "";
