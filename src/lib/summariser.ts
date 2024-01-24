@@ -8,7 +8,7 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
   1 indicates standard summary
   2 indicates extensive summary */
 
-export async function summarise(transcript: string, level: number = 1) {
+export async function summarise(transcript: string, level: number = 1): Promise<string | null> {
   let specification = "";
   if (level == 0) {
     specification = " in 3 sentences or less: ";
