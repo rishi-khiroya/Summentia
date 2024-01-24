@@ -26,7 +26,8 @@ from data.data_utils import *
 from data.test_video_clip_dataset import BasicTransform
 
 
-def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, roi, load_size_roi, out_dir, opt):
+def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, roi, load_size_roi, patch_size, 
+                                                        in_gray=True, slide_thresh=8, video_thresh=13):
     # load video file
     vr = VideoReader(videofile, width=load_size_roi[1], height=load_size_roi[0]) 
     
@@ -41,12 +42,12 @@ def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, ro
     frame_ids_1 = []
     frame_ids_2 = []
     
-    if opt.in_gray:
+    if in_gray:
         data_shape = "2_channel"
-        opt.input_nc = 2
+        input_nc = 2
     else:
         data_shape = "6_channel"
-        opt.input_nc = 6
+        input_nc = 6
     my_transform = BasicTransform(data_shape = data_shape) #, blur = opt.blur)
     activation = nn.Sigmoid()
     
@@ -54,9 +55,9 @@ def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, ro
 
         frame = vr[i]
  
-        imgs = torch.zeros((2,opt.patch_size,opt.patch_size,int(opt.input_nc/2)))
+        imgs = torch.zeros((2,patch_size,patch_size,int(input_nc/2)))
             
-        if opt.in_gray: #opencv rgb2gray for torch
+        if in_gray: #opencv rgb2gray for torch
             frame = 0.299*frame[...,0]+0.587*frame[...,1]+0.114*frame[...,2]
             frame = frame.unsqueeze(2)
         
@@ -64,7 +65,7 @@ def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, ro
         frame = crop_frame(frame,roi[0],roi[1],roi[2],roi[3]) 
         #scale to max size (in case patch size changed)
         img_max_size = max(frame.shape[0], frame.shape[1])
-        scaling_factor = opt.patch_size / img_max_size
+        scaling_factor = patch_size / img_max_size
         if scaling_factor != 1:            
             frame = cv2.resize(frame, (round(frame.shape[1] * scaling_factor), round(frame.shape[0] * scaling_factor)), interpolation = cv2.INTER_NEAREST)
             H,W,C = frame.shape
@@ -91,9 +92,9 @@ def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, ro
             pred = activation(pred)
             #print(pred)
             if pred<0.5: #transition (class 0)
-                if (i - anchor_frame_idx) > opt.slide_thresh: #static frame
+                if (i - anchor_frame_idx) > slide_thresh: #static frame
                     if video_frame_idx is not None: 
-                        if (video_frame_idx - prev_video_frame_idx) > opt.video_thresh:
+                        if (video_frame_idx - prev_video_frame_idx) > video_thresh:
                             print("video frame {} at {} to {}".format(-1,prev_video_frame_idx+1, video_frame_idx+1))
                             slide_ids.append(-1)
                             frame_ids_1.append(prev_video_frame_idx+1)
@@ -119,51 +120,44 @@ def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, ro
     print(len(frame_ids_1)) 
     frame_ids_1 = np.array(frame_ids_1)
     frame_ids_2 = np.array(frame_ids_2)
-    
-    #write to file
-    logfile_path = os.path.join(out_dir, base + "_results.txt")
-    f = open(logfile_path, "w")
-    f.write('Slide No, FrameID0, FrameID1\n')
-    f.close()    
 
+    transitions = {}
     for slide_id,frame_id_1,frame_id_2 in zip(slide_ids,frame_ids_1,frame_ids_2):               
-        f = open(logfile_path, "a")
-        f.write("{}, {}, {}\n".format(slide_id,frame_id_1,frame_id_2))
-        f.close() 
+        transitions[slide_id] = (frame_id_1, frame_id_2)
+    
+    return transitions
             
-def test_resnet2d(opt):
+def test_resnet2d(weights_path="./weights/Frame_similarity_ResNet18_gray.pth",
+                  video_dir="./videos/", patch_size=256):
     torch.manual_seed(0)
     random.seed(0)
-
-    if os.path.exists(opt.out_dir)==False:
-        os.makedirs(opt.out_dir)
     
     ####### Create model
     # --------------------------------------------------------------- 
-    net = define_resnet2d(opt)       
+    net = define_resnet2d()       
     # net = net.cuda()
-    net = loadNetwork(net, opt.model_path, checkpoint=opt.load_checkpoint, prefix='')
+    net = loadNetwork(net, weights_path, checkpoint=False, prefix='')
     net.eval()
 
     #### Create dataloader
-    # ---------------------------------------------------------------  
-    video_dir = opt.dataset_dir + "/videos/" + opt.phase   
-
+    # ---------------------------------------------------------------    
     videoFilenames = []
     videoFilenames.extend(os.path.join(video_dir, x)
                                          for x in sorted(os.listdir(video_dir)) if is_video_file(x))
     
-    roi_path = os.path.join(opt.dataset_dir,"videos", opt.phase+'_bounding_box_list.txt')
-    rois = read_labels(roi_path)
+    # TODO: Replace with boundary box detection function
+    # rois = read_labels(roi_path)
+    rois = dict()
+    
 
     decord.bridge.set_bridge('torch')
     
     for k,videofile in enumerate(videoFilenames):
         print("Processing video No. {}: {}".format(k+1, videofile))
         
-        base, roi, load_size_roi = determine_load_size_roi(videofile, rois, opt.patch_size)
+        base, roi, load_size_roi = determine_load_size_roi(videofile, rois, patch_size)
          
-        detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, roi, load_size_roi, opt.out_dir, opt)
+        detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, roi, load_size_roi, patch_size)
 
             
                   
@@ -183,6 +177,6 @@ if __name__ == '__main__':
     parser.add_argument('--phase', type=str, default='test', help='train, val, test, etc')
 
 
-    opt = parser.parse_args()  
+    # opt = parser.parse_args()  
 
-    test_resnet2d(opt)   
+    test_resnet2d()   
