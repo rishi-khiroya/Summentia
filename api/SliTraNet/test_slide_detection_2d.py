@@ -127,8 +127,7 @@ def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, ro
     
     return transitions
             
-def test_resnet2d(weights_path="./weights/Frame_similarity_ResNet18_gray.pth",
-                  video_dir="./videos/", patch_size=256):
+def test_resnet2d(video_path, weights_path="./weights/Frame_similarity_ResNet18_gray.pth", patch_size=256):
     torch.manual_seed(0)
     random.seed(0)
     
@@ -141,25 +140,22 @@ def test_resnet2d(weights_path="./weights/Frame_similarity_ResNet18_gray.pth",
 
     #### Create dataloader
     # ---------------------------------------------------------------    
-    videoFilenames = []
-    videoFilenames.extend(os.path.join(video_dir, x)
-                                         for x in sorted(os.listdir(video_dir)) if is_video_file(x))
+    if not is_video_file(video_path):
+        raise Exception("File is an unsupported type of video")
     
     # TODO: Replace with boundary box detection function
     # rois = read_labels(roi_path)
-    rois = dict()
-    
+    rois = dict()    
 
     decord.bridge.set_bridge('torch')
     
-    for k,videofile in enumerate(videoFilenames):
-        print("Processing video No. {}: {}".format(k+1, videofile))
+    print("Processing video {}".format(video_path))
+    
+    base, roi, load_size_roi = determine_load_size_roi(video_path, rois, patch_size)
         
-        base, roi, load_size_roi = determine_load_size_roi(videofile, rois, patch_size)
-         
-        detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, roi, load_size_roi, patch_size)
+    return detect_initial_slide_transition_candidates_resnet2d(net, video_path, base, roi, load_size_roi, patch_size)
 
-            
+    
                   
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('slide_detection') 
