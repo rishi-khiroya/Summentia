@@ -31,7 +31,7 @@ export async function summarise(transcript: String, detail_level: number = -1,
     highlight_phrase = " with the keywords highlighted ";
   }
 
-  let summary_format_phrase = summary_format;
+  const summary_format_phrase = summary_format;
   
   let questions_phrase = "";
   if (questions){
