@@ -63,6 +63,5 @@ export class Project {
     public log(): void {
         if (this.transcript) console.log(`Transcript:\n${this.transcript.text}\n`);
         if (this.summary) console.log(`Summary:\n${this.summary.text}\n`);
-        return this;
     }
 }
