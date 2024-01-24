@@ -117,7 +117,7 @@ test('accurate 2 page summary of realistic transcript', async () => {
     expect(count).toBeGreaterThan(20);
 }, 70000);
 
-test('accurate 1 page summary of short transcript in LaTeX format', async () => {
+test('1 page summary of short transcript in LaTeX format', async () => {
 	const text = lecture1.getText();
     const summary = await summarise(text, -1, true, 2);
 
