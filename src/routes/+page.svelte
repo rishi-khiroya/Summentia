@@ -45,7 +45,7 @@
 <div class="flex-1 p-5">
 	<div class="flex-1">
 		<Accordion>
-			<AccordionItem>
+			<AccordionItem open>
 				<span slot="header">Upload Lecture</span>
 				<LectureUpload bind:fileList={lectureFileList} bind:doLectureUpload bind:lectureURL />
 			</AccordionItem>
