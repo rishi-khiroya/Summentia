@@ -127,7 +127,7 @@ def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, ro
     
     return transitions
             
-def test_resnet2d(video_path, weights_path="./weights/Frame_similarity_ResNet18_gray.pth", patch_size=256):
+def test_resnet2d(video_path, weights_path="../../static/Frame_similarity_ResNet18_gray.pth", patch_size=256):
     torch.manual_seed(0)
     random.seed(0)
     
