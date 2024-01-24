@@ -9,7 +9,7 @@
 
 <div class="customization">
 	<div>
-		<Label for="first_name" class="mb-2">Enter max number of pages for the summary</Label>
+		<Label for="number_pages" class="mb-2">Enter max number of pages for the summary</Label>
 		<Input
 			type="number"
 			id="nr-pages"
@@ -21,8 +21,8 @@
 	<Checkbox checked={areKeyWordsHighlighted}>Highlight Key Words</Checkbox>
 	<div>
 		<Label for="summary-types" class="mb-2">Types of Summary:</Label>
-		<Radio name="type" value={"normal text format"} bind:group={typeOfSummary}>Text Format</Radio>
-		<Radio name="type" value={"bullet points"} bind:group={typeOfSummary}>Bullet Points</Radio>
+		<Radio name="type" value={""} bind:group={typeOfSummary}>Text Format</Radio>
+		<Radio name="type" value={" as bullet points"} bind:group={typeOfSummary}>Bullet Points</Radio>
 	</div>
     <div>
         <Label for="extra-features" class="mb-2">Extra Features:</Label>
