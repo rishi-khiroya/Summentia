@@ -42,9 +42,9 @@ export async function summarise(transcript: String, detail_level: number = -1,
   let length_phrase = "";
   if (length != -1){
     if (length == 1){
-      length_phrase = " in under 1 page ";
+      length_phrase = " in 1 page ";
     } else {
-      length_phrase = " in under " + length + " pages ";
+      length_phrase = " in " + length + " pages ";
     }
     
   }

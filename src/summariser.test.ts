@@ -8,10 +8,12 @@ the ever-evolving landscape of computing. Beyond the realm of code and algorithm
 and my favorite movie, "Good Will Hunting," mirrors my appreciation for compelling narratives. On the tennis court, my admiration extends to Nick Kyrgios, whose mischievous on-court persona adds a touch of spontaneity to the game. Looking ahead, post-graduation holds the promise of adventure as I dream of traversing the 
 diverse landscapes and cultures of Asia. This upcoming journey embodies my insatiable curiosity and eagerness to explore the world beyond the confines of academia.`);
 
+const lecture1_keywords = new Set<String>(['preesha', 'gehlot', 'computing', 'imperial', 'london', 'data', 'processing', 'concurrency', 'compilers', 'running', 'tennis', 'nick', 'kyrgios', 'travelling', 'asia', 'reading', 'graduation', 'good', 'will', 'hunting']);
+
 test('accurate summary of short transcript', async () => {
 	let text = lecture1.getText();
-    let summary = await summarise(text, 1, false);
-    const keyWords = new Set<String>(['preesha', 'gehlot', 'computing', 'imperial', 'london', 'data', 'processing', 'concurrency', 'compilers', 'running', 'tennis', 'nick', 'kyrgios', 'travelling', 'asia', 'reading', 'graduation', 'good', 'will', 'hunting']);
+    let summary = await summarise(text, -1, false, 1);
+    const keyWords = lecture1_keywords;
 
     var splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
 
@@ -29,8 +31,8 @@ test('accurate summary of short transcript', async () => {
 
 test('accurate brief summary of short transcript', async () => {
 	let text = lecture1.getText();
-    let summary = await summarise(text, 0, false);
-    const keyWords = new Set<String>(['preesha', 'gehlot', 'computing', 'imperial', 'london', 'data', 'processing', 'concurrency', 'compilers', 'running', 'tennis', 'nick', 'kyrgios', 'travelling', 'asia', 'reading', 'graduation', 'good', 'will', 'hunting']);
+    let summary = await summarise(text, -1, false, 2);
+    const keyWords = lecture1_keywords;
 
     var splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
 
@@ -48,8 +50,8 @@ test('accurate brief summary of short transcript', async () => {
 
 test('accurate extensive summary of short transcript', async () => {
 	let text = lecture1.getText();
-    let summary = await summarise(text, 2, false);
-    const keyWords = new Set<String>(['preesha', 'gehlot', 'computing', 'imperial', 'london', 'data', 'processing', 'concurrency', 'compilers', 'running', 'tennis', 'nick', 'kyrgios', 'travelling', 'asia', 'reading', 'graduation', 'good', 'will', 'hunting']);
+    let summary = await summarise(text, -1, false, 3);
+    const keyWords = lecture1_keywords;
 
     var splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
 
