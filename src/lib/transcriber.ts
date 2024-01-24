@@ -1,12 +1,14 @@
 import * as fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
-import pkg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
 import { createReadStream } from 'fs';
 import { rm } from 'node:fs/promises';
+import pkg from 'fluent-ffmpeg';
+
+const { setFfmpegPath } = pkg;
 
 const SPIN_TIMER_MS: number = 1000;
-const { setFfmpegPath } = pkg;
+const MAX_SPINS = 10;
 
 function extract_audio(filePath: string): boolean {
 
@@ -54,8 +56,10 @@ async function run_query(filePath: string) {
 export async function transcribe(filePath: string): Promise<string | null> {
     try {
         if (!extract_audio(filePath)) return null;
-        while (!fs.existsSync(filePath + ".mp3")) {
+        let attempts: number = 0;
+        while (!fs.existsSync(filePath + ".mp3") && attempts <= MAX_SPINS) {
             // spin every 1000ms
+            attempts++;
             await new Promise(resolve => setTimeout(resolve, SPIN_TIMER_MS));
         }
         const transcript = await run_query(filePath);
