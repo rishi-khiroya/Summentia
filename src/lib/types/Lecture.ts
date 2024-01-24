@@ -1,27 +1,55 @@
+import { rm, writeFile } from "node:fs/promises";
 import type { SupplementaryInfo } from "./SupplementaryInfo";
 import { URLHandler } from "./URLHandler";
 
 // TODO: complete definition
 export abstract class Lecture {
 
-    supplementaryInfo: SupplementaryInfo | undefined;
+    path: string;
+    public supplementaryInfo: SupplementaryInfo | undefined;
 
-    // TODO: correctly type these
-    public abstract toStream(): void;
-    public abstract guessTitleDate(): void;
+    public constructor(fileName: string) {
+        this.path = `static/${fileName}`;
+    }
+
+    public abstract toFilePath(): Promise<string>;
+    public abstract saveToUrl(): URL;
+
+    public async cleanup(): Promise<void> {
+        await rm(this.path);
+    }
+
+    static fromForm(form: FormData): Lecture {
+        if (form.get('isLectureFile') === "true") {
+            return new LectureFromFile(form.get(`lectureFile`) as File);
+        } else {
+            const data = form.get('lectureURL');
+            if (!data) throw new Error("Invalid URL");
+            return new LectureFromUrl(new URL(data.toString()));
+        }
+    }
+
+    static fromFile(file: File): Lecture {
+        return new LectureFromFile(file);
+    }
 
 }
 
 class LectureFromFile extends Lecture {
 
-    private file: File;
+    private readonly file: File;
 
     public constructor(file: File) {
-        super();
+        super(file.name);
         this.file = file;
     }
 
-    public toStream() {
+    public async toFilePath(): Promise<string> {
+        await writeFile(this.path, Buffer.from(await this.file.arrayBuffer()));
+        return this.path;
+    }
+
+    public saveToUrl(): URL {
         throw new Error("Method not implemented.");
     }
 }
@@ -32,12 +60,17 @@ class LectureFromUrl extends Lecture {
     private urlHandler: URLHandler;
 
     public constructor(url: URL) {
-        super();
+        super(`temp${url.origin}`); // TODO
         this.urlHandler = URLHandler.create(url);
     }
 
-    public toStream() {
-        return this.urlHandler.toStream();
+    public async toFilePath(): Promise<string> {
+        this.urlHandler.download();
+        return this.path;
+    }
+
+    public saveToUrl(): URL {
+        throw new Error("Method not implemented.");
     }
 
 }

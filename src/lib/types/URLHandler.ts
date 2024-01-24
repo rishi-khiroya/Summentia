@@ -6,7 +6,7 @@ export abstract class URLHandler {
         this.url = url;
     }
 
-    public abstract toStream();
+    public abstract download(): File;
 
     static create(url: URL): URLHandler {
         const name = url.hostname.replaceAll('.', '');
@@ -19,19 +19,19 @@ export abstract class URLHandler {
 }
 
 class UnknownHandler extends URLHandler {
-    public toStream() {
+    public download(): File {
         throw new Error("Method not implemented.");
     }
 }
 
 class YoutubeHandler extends URLHandler {
-    public toStream() {
+    public download(): File {
         throw new Error("Method not implemented.");
     }
 }
 
 class PanoptoHandler extends URLHandler {
-    public toStream() {
+    public download(): File {
         throw new Error("Method not implemented.");
     }
 }
