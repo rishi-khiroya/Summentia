@@ -84,7 +84,7 @@ def detect_initial_slide_transition_candidates_resnet2d(net, videofile, base, ro
         imgs = my_transform(imgs)
         
         with torch.no_grad():
-            imgs = imgs.cuda()
+            # imgs = imgs.cuda()
              
             pred = net(imgs.unsqueeze(0))
             pred = pred.squeeze(1)            
@@ -141,7 +141,7 @@ def test_resnet2d(opt):
     ####### Create model
     # --------------------------------------------------------------- 
     net = define_resnet2d(opt)       
-    net = net.cuda()
+    # net = net.cuda()
     net = loadNetwork(net, opt.model_path, checkpoint=opt.load_checkpoint, prefix='')
     net.eval()
 
