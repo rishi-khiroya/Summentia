@@ -19,32 +19,26 @@ export async function summarise(transcript: String, detail_level: number = -1,
   latex_flag: boolean = true, length: number = -1, 
   highlight_keywords: boolean = false, 
   summary_format: string = "", questions: boolean = false){
-  
-  // adds LaTeX format prompt if the latex_flag has been set to true
-  let latex_phrase = "";
-  if (latex_flag){
-    latex_phrase = " in LaTeX format ";
-  }
 
   let highlight_phrase = "";
   if (highlight_keywords){
-    highlight_phrase = " with the keywords highlighted ";
+    highlight_phrase = " with the keywords highlighted";
   }
 
   const summary_format_phrase = summary_format;
   
   let questions_phrase = "";
   if (questions){
-    questions_phrase = " with a question and answer revision section at the end "
+    questions_phrase = " with a question and answer revision section at the end"
   }
 
   // adds length prompt for length upper bound in pages, default set to 1
   let length_phrase = "";
   if (length != -1){
     if (length == 1){
-      length_phrase = " in 1 page ";
+      length_phrase = " in 1 page";
     } else {
-      length_phrase = " in " + length + " pages ";
+      length_phrase = " in " + length + " pages";
     }
     
   }
@@ -65,14 +59,19 @@ export async function summarise(transcript: String, detail_level: number = -1,
     default:
       break;
   }
+  let prompt;
+  if (latex_flag){
+    prompt = "Please summarise the following text" + summary_format_phrase + highlight_phrase + questions_phrase + length_phrase + " of LaTeX code (it MUST be in LaTeX code) : '" + transcript + "'";
+  } else {
+    prompt = "Please summarise this" +  detail_phrase + transcript;
+  }
 
   const completion = await openai.chat.completions.create({
-    messages: [{ role: "system", content: "Please can you summarise this" + summary_format_phrase + highlight_phrase + questions_phrase +
-    latex_phrase + detail_phrase + length_phrase + transcript}],
+    messages: [{ role: "system", content: prompt}],
       model: "gpt-3.5-turbo",
   });
 
-  let summary = completion.choices[0]["message"]["content"];
+  const summary = completion.choices[0]["message"]["content"];
         
   return summary;
 }
