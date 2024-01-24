@@ -5,7 +5,7 @@
 	import SlidesUpload from './(components)/SlidesUpload.svelte';
 	import SupplementaryUpload from './(components)/SupplementaryUpload.svelte';
 	import Customisation from './(components)/Customisation.svelte';
-
+	
 	let doLectureUpload = false;
 	let lectureURL: string;
 	let lectureFileList: FileList;
@@ -35,10 +35,28 @@
 		form.append('typeOfSummary', typeOfSummary);
 		form.append('hasQandAns', hasQandAns?.toString());
 
-		const response = await fetch('?/submit', {
+		const response: Response = await fetch('?/submit', {
 			method: 'POST',
 			body: form
 		});
+
+		const data = JSON.parse((await response.json()).data);
+
+		if (data[data[0].success]) {
+			// Create a Blob with the LaTeX content
+			const blob = new Blob([data[data[0].summary]], { type: 'application/x-latex' });
+
+			// Create a link element
+			const link = document.createElement('a');
+			link.download = 'summary.tex';
+			link.href = window.URL.createObjectURL(blob);
+			document.body.appendChild(link);
+
+			// Trigger a click event on the link to start the download
+			link.click();
+
+			document.body.removeChild(link);
+		}
 	}
 </script>
 

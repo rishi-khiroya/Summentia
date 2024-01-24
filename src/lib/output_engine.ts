@@ -11,9 +11,9 @@ function generateAndDownloadLatex(latexCode: string, fileName: string = DEFAULT_
     // Create a Blob with the LaTeX content
     const blob = new Blob([latexCode], { type: 'application/x-latex' });
 
-    // Create a link element
+// Create a link element
     const link = document.createElement('a');
-    link.download = fileName + ".tex";
+        link.download = fileName + ".tex";
     link.href = window.URL.createObjectURL(blob);
     document.body.appendChild(link);
 
@@ -30,7 +30,8 @@ export enum OutputType {
     TXT
 }
 
-export function output(latexCode: string, fileName: string = DEFAULT_FILE_NAME, outputType: OutputType = OutputType.PDF, save: boolean = false) {
+// TODO: change default type to PDF.
+export function output(latexCode: string, fileName: string = DEFAULT_FILE_NAME, outputType: OutputType = OutputType.TEX, save: boolean = false) {
     switch (outputType) {
         case OutputType.PDF:
             // TODO

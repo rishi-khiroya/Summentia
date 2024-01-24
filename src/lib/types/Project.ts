@@ -1,8 +1,11 @@
+import { OutputType, output } from "$lib/output_engine";
 import { summarise } from "$lib/summariser";
 import { transcribe } from "$lib/transcriber";
 import { Lecture } from "./Lecture";
 import type { Summary } from "./Summary";
 import type { Transcript } from "./Transcript";
+
+const MAX_PATH_LENGTH = 16;
 
 export class Project {
 
@@ -56,12 +59,24 @@ export class Project {
         return true;
     }
 
-    public output(): boolean {
-        return false;
-    }
-
     public log(): void {
         if (this.transcript) console.log(`Transcript:\n${this.transcript.text}\n`);
         if (this.summary) console.log(`Summary:\n${this.summary.text}\n`);
+    }
+
+    public output(): Summary | undefined {
+
+        // const sanitiseFileName = (title: string) => {
+        //     let fileName: string = title.substring(0, MAX_PATH_LENGTH); // take first MAX_PATH_LENGTH chars
+        //     fileName = fileName.replace(/ /g, "_"); // replaces whitespace with underscores
+        //     fileName = fileName.replace(/[^a-zA-Z0-9]/g, ""); // remove all non-alphanumeric chars
+        //     return fileName;
+        // }
+
+        // if (!this.summary) return false;
+
+        // output(this.summary.text, sanitiseFileName(this.title), OutputType.TEX);
+        // return true;
+        return this.summary;
     }
 }
