@@ -155,7 +155,26 @@ def test_resnet2d(video_path, weights_path="./weights/Frame_similarity_ResNet18_
         
     return detect_initial_slide_transition_candidates_resnet2d(net, video_path, base, roi, load_size_roi, patch_size)
 
+# Identifies the initial timestamp of each slide, taken from a lecture video
+def get_slide_timestamps(slides_path, lecture_path):
+    # Attempt to find the initial slide transitions using the neural network
+    try:
+        slide_transitions = test_resnet2d(lecture_path)
+    except:
+        return False, None
     
+    # TODO: Add code to compare each slide to the actual slides
+    # updated_transitions = verify_slides(slides_path, slide_transitions)
+    
+    # Find the fps of the lecture video
+    cap = cv2.VideoCapture(lecture_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    
+    # Map the dictionary values to be the initial timestamp of the slide
+    for slide_no, (initial, _) in slide_transitions.items():
+        slide_transitions[slide_no] = initial / fps
+    
+    return True, slide_transitions
                   
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('slide_detection') 
