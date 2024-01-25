@@ -16,24 +16,29 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
       because length involves num. of pages
    -  only set highlight_keywords or bullet_points to true when latex_flag is true
 */
+/* Customisations implemented:
+      - size : Small (under 1 page), Medium (under 3 pages), Large (under 6 pages) 
+      - highlight keywords
+      - normal text or bullet points
+    Extra features:
+      - Generate revision question/answer section
+*/
+
+/* NOTES FOR ARGUMENT USE: 
+   -  use detail_level when qlatex_flag is false, and use length when latex_flag is true
+      because length involves num. of pages
+   -  only set highlight_keywords or bullet_points to true when latex_flag is true
+*/
 
 export async function summarise(transcript: string, detail_level: number = -1, 
   latex_flag: boolean = true, length: number = -1, 
   highlight_keywords: boolean = false, 
   summary_format: string = "", questions: boolean = false){
-  
-  // adds LaTeX format prompt if the latex_flag has been set to true
-  let latex_phrase = "";
-  if (latex_flag){
-    latex_phrase = " in LaTeX format ";
-  }
 
   let highlight_phrase = "";
   if (highlight_keywords){
     highlight_phrase = " with the keywords highlighted ";
   }
-
-  const summary_format_phrase = summary_format;
   
   let questions_phrase = "";
   if (questions){
@@ -67,14 +72,33 @@ export async function summarise(transcript: string, detail_level: number = -1,
     default:
       break;
   }
+  let prompt;
+  if (latex_flag){
+    prompt = "Please summarise the following text" + length_phrase + " of LaTeX code (it MUST be in LaTeX code) : " + transcript;
+  } else {
+    prompt = "Please summarise this" +  detail_phrase + transcript;
+  }
 
-  const completion = await openai.chat.completions.create({
-    messages: [{ role: "system", content: "Please can you summarise this" + summary_format_phrase + highlight_phrase + questions_phrase +
-    latex_phrase + detail_phrase + length_phrase + transcript}],
+  let completion = await openai.chat.completions.create({
+    messages: [{ role: "system", content: prompt}],
       model: "gpt-3.5-turbo",
   });
 
-  const summary = completion.choices[0]["message"]["content"];
+  let summary = completion.choices[0]["message"]["content"];
 
+  if (highlight_phrase || summary_format || questions_phrase){
+    prompt = "please give me the following LaTeX code " + highlight_phrase + summary_format + questions_phrase + ": " + summary
+    completion = await openai.chat.completions.create({
+      messages: [{ role: "system", content: prompt}],
+        model: "gpt-3.5-turbo",
+    });
+  }
+  summary = completion.choices[0]["message"]["content"];
+
+  console.log("Prompt : ");
+  console.log(prompt);
+  console.log("Summary : ");
+  console.log(summary);
+        
   return summary;
 }
