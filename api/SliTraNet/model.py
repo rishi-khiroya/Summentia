@@ -11,14 +11,14 @@ import torch.nn as nn
 from backbones import resnet2d, resnet3d
 
 
-def define_resnet2d(cfg):
+def define_resnet2d(backbone_2D="resnet18", n_class=1, input_nc=2):
     """
     Network for Stage 1: Detection of initial slide-slide or slide-video transition candidates
     """    
-    if cfg.backbone_2D == 'resnet18':
-        net = resnet2d.resnet18(num_classes=cfg.n_class, input_nc=cfg.input_nc)   
-    elif cfg.backbone_2D == 'resnet50':
-        net = resnet2d.resnet50(num_classes=cfg.n_class, input_nc=cfg.input_nc) 
+    if backbone_2D == 'resnet18':
+        net = resnet2d.resnet18(num_classes=n_class, input_nc=input_nc)   
+    elif backbone_2D == 'resnet50':
+        net = resnet2d.resnet50(num_classes=n_class, input_nc=input_nc) 
     else:    
         raise ValueError("Wrong backbone_2d model is requested. Please select it from [resnet18, resnet50]")     
     return net
