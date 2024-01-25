@@ -61,17 +61,27 @@ export async function summarise(transcript: String, detail_level: number = -1,
   }
   let prompt;
   if (latex_flag){
-    prompt = "Please summarise the following text" + summary_format_phrase + highlight_phrase + questions_phrase + length_phrase + " of LaTeX code (it MUST be in LaTeX code) : '" + transcript + "'";
+    prompt = "Please summarise the following text" + length_phrase + " of LaTeX code (it MUST be in LaTeX code) : '" + transcript + "'";
   } else {
     prompt = "Please summarise this" +  detail_phrase + transcript;
   }
 
-  const completion = await openai.chat.completions.create({
+  let completion = await openai.chat.completions.create({
     messages: [{ role: "system", content: prompt}],
       model: "gpt-3.5-turbo",
   });
 
-  const summary = completion.choices[0]["message"]["content"];
+  let summary = completion.choices[0]["message"]["content"];
+
+  if (latex_flag){
+    prompt = "please give me the following LaTeX code " + highlight_phrase + summary_format + questions_phrase + ": " + summary
+    completion = await openai.chat.completions.create({
+      messages: [{ role: "system", content: prompt}],
+        model: "gpt-3.5-turbo",
+    });
+  }
+  summary = completion.choices[0]["message"]["content"];
+  console.log(summary);
         
   return summary;
 }
