@@ -61,7 +61,7 @@ export async function summarise(transcript: String, detail_level: number = -1,
   }
   let prompt;
   if (latex_flag){
-    prompt = "Please summarise the following text" + length_phrase + " of LaTeX code (it MUST be in LaTeX code) : '" + transcript + "'";
+    prompt = "Please summarise the following text" + length_phrase + " of LaTeX code (it MUST be in LaTeX code) : " + transcript;
   } else {
     prompt = "Please summarise this" +  detail_phrase + transcript;
   }
@@ -81,6 +81,10 @@ export async function summarise(transcript: String, detail_level: number = -1,
     });
   }
   summary = completion.choices[0]["message"]["content"];
+
+  console.log("Prompt : ");
+  console.log(prompt);
+  console.log("Summary : ");
   console.log(summary);
         
   return summary;
