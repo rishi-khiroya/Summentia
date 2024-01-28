@@ -1,4 +1,4 @@
-interface Customisation{
+export interface Customisation{
     latex_flag: boolean;           // default false
     highlight_keywords: boolean;   // default false
     questions: boolean;            // default false
