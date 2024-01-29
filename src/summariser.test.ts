@@ -28,7 +28,7 @@ const default_LaTeX_customisation = {latex_flag: true, highlight_keywords: false
     summary_format: "", length: 1, detail_level: 1};
 
 test('accurate summary of short transcript', async () => {
-    const summary = await summarise(lecture1, default_customisaion);
+    const summary = await summarise(lecture1);
     const keyWords = lecture1_keywords;
 
     const splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
@@ -47,10 +47,7 @@ test('accurate summary of short transcript', async () => {
 
 test('accurate brief summary of short transcript', async () => {
 
-    const brief_customisation = default_customisaion;
-    brief_customisation.detail_level = 0;
-
-    const summary = await summarise(lecture1, brief_customisation);
+    const summary = await summarise(lecture1, 0);
     const keyWords = lecture1_keywords;
 
     const splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
@@ -69,10 +66,7 @@ test('accurate brief summary of short transcript', async () => {
 
 test('accurate extensive summary of short transcript', async () => {
 
-    const extensive_customisation = default_customisaion;
-    extensive_customisation.detail_level = 1;
-
-    const summary = await summarise(lecture1, extensive_customisation);
+    const summary = await summarise(lecture1, 2);
     const keyWords = lecture1_keywords;
 
     const splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
