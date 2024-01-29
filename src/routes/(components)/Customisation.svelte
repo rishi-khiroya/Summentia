@@ -21,13 +21,13 @@
 	<Checkbox checked={areKeyWordsHighlighted}>Highlight Key Words</Checkbox>
 	<div>
 		<Label for="summary-types" class="mb-2">Types of Summary:</Label>
-		<Radio name="type" value={""} bind:group={typeOfSummary}>Text Format</Radio>
-		<Radio name="type" value={" as bullet points"} bind:group={typeOfSummary}>Bullet Points</Radio>
+		<Radio name="type" value={''} bind:group={typeOfSummary}>Text Format</Radio>
+		<Radio name="type" value={' as bullet points'} bind:group={typeOfSummary}>Bullet Points</Radio>
 	</div>
-    <div>
-        <Label for="extra-features" class="mb-2">Extra Features:</Label>
-        <Checkbox checked={hasQandAns}>Generate Questions and Answers</Checkbox>
-    </div>
+	<div>
+		<Label for="extra-features" class="mb-2">Extra Features:</Label>
+		<Checkbox checked={hasQandAns}>Generate Questions and Answers</Checkbox>
+	</div>
 </div>
 
 <style>
