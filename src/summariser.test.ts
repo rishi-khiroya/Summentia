@@ -21,11 +21,8 @@ Now there are other verbal pneumonic techniques as well. `;
 
 const lecture2_keywords = new Set<string>(['memory', 'factors', 'influence', 'overlearning', 'study', 'recall', 'perfectly', 'topic', 'continue', 'easier', 'organization', 'material', 'strategies', 'clustering', 'recognize', 'probability', 'groups', 'pneumonic', 'acrostics'])
 
-const default_customisaion = {latex_flag: false, highlight_keywords: false,  questions: false, 
-                           summary_format: "", length: -1, detail_level: 1};
-
-const default_LaTeX_customisation = {latex_flag: true, highlight_keywords: false,  questions: false, 
-    summary_format: "", length: 1, detail_level: 1};
+const default_customisaion = {highlight_keywords: false,  questions: false, 
+                           summary_format: "", length: 1};
 
 test('accurate summary of short transcript', async () => {
     const summary = await summarise(lecture1);
