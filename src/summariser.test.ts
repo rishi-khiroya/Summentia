@@ -21,7 +21,7 @@ Now there are other verbal pneumonic techniques as well. `;
 
 const lecture2_keywords = new Set<string>(['memory', 'factors', 'influence', 'overlearning', 'study', 'recall', 'perfectly', 'topic', 'continue', 'easier', 'organization', 'material', 'strategies', 'clustering', 'recognize', 'probability', 'groups', 'pneumonic', 'acrostics'])
 
-const default_customisaion = {highlight_keywords: false,  questions: false, 
+const default_customisation = {highlight_keywords: false,  questions: false, 
                            summary_format: "", length: 1};
 
 test('accurate summary of short transcript', async () => {
@@ -82,7 +82,7 @@ test('accurate extensive summary of short transcript', async () => {
 
 test('accurate 1 page summary of realistic transcript', async () => {
 
-    const summary = await summarise(lecture2, default_LaTeX_customisation);
+    const summary = await summarise(lecture2, default_customisation);
     const keyWords = lecture2_keywords;
 
     const splitted = (summary == null ? "" : summary).split(/[ .,{}]/).filter((item)=> item.length > 0);
@@ -101,7 +101,7 @@ test('accurate 1 page summary of realistic transcript', async () => {
 
 test('accurate 2 page summary of realistic transcript', async () => {
 
-    const two_page_customisation = default_LaTeX_customisation;
+    const two_page_customisation = default_customisation;
     two_page_customisation.length = 2;
 
     const summary = await summarise(lecture2, two_page_customisation);
@@ -122,7 +122,7 @@ test('accurate 2 page summary of realistic transcript', async () => {
 }, 70000);
 
 test('1 page summary of short transcript in LaTeX format', async () => {
-    const summary = await summarise(lecture1, default_LaTeX_customisation);
+    const summary = await summarise(lecture1, default_customisation);
 
     let is_latex = false;
     if (summary != null){
@@ -134,7 +134,7 @@ test('1 page summary of short transcript in LaTeX format', async () => {
 
 test('1 page summary of short transcript in LaTeX format with highlighted keywords', async () => {
     
-    const hightlight_customisation = default_LaTeX_customisation;
+    const hightlight_customisation = default_customisation;
     hightlight_customisation.highlight_keywords = true;
 
     const summary = await summarise(lecture1, hightlight_customisation);
