@@ -45,7 +45,7 @@ export async function summarise(transcript: string, Customisations: Customisatio
   }
   let prompt;
   if (Customisations.latex_flag){
-    prompt = "Please summarise the following text" + length_phrase + " of LaTeX code (it MUST be in LaTeX code) : " + transcript;
+    prompt = "Please summarise the following text as LaTeX code, " + length_phrase + " of LaTeX code (it MUST be in LaTeX code) : " + transcript;
   } else {
     prompt = "Please summarise this" +  detail_phrase + transcript;
   }
