@@ -1,4 +1,4 @@
-from face_detection import FaceDetector
+from .face_detection import FaceDetector
 
 async def POST():
     return {"text": "placeholder"}
