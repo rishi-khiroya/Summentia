@@ -1,7 +1,8 @@
 <script>
 	import { page } from '$app/stores';
-	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
+	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Button } from 'flowbite-svelte';
 	import { DarkMode } from 'flowbite-svelte';
+	import { signIn, signOut } from '@auth/sveltekit/client';
 	$: activeUrl = $page.url.pathname;
 </script>
 
@@ -13,11 +14,43 @@
 				>Summentia</span
 			>
 		</NavBrand>
-		<NavUl {activeUrl}>
+		<!-- <NavUl {activeUrl}>
 			<NavLi href="/">Add New Project</NavLi>
 			<NavLi href="/projects">Past Project</NavLi>
-			<NavLi href="/">Logout</NavLi>
-		</NavUl>
-		<DarkMode class="text-primary-500 dark:text-primary-600 border dark:border-gray-800" />
+		</NavUl> -->
+		<div class="flex space-x-5">
+			<DarkMode class="text-primary-500 dark:text-primary-600 border dark:border-gray-800" />
+			{#if $page.data.session}
+				<Button
+					outline
+					color="light"
+					on:click={() => signOut()}
+					class="text-primary-500 dark:text-primary-600 border dark:border-gray-800 dark:hidden"
+					>Logout</Button
+				>
+				<Button
+					outline
+					color="dark"
+					on:click={() => signOut()}
+					class="text-primary-500 dark:text-primary-600 border dark:border-gray-800 hidden dark:block"
+					>Logout</Button
+				>
+			{:else}
+				<Button
+					outline
+					color="light"
+					on:click={() => signIn("auth0")}
+					class="text-primary-500 dark:text-primary-600 border dark:border-gray-800 dark:hidden"
+					>Login</Button
+				>
+				<Button
+					outline
+					color="dark"
+					on:click={() => signIn("auth0")}
+					class="text-primary-500 dark:text-primary-600 border dark:border-gray-800 dark:block hidden"
+					>Login</Button
+				>
+			{/if}
+		</div>
 	</Navbar>
 </div>
