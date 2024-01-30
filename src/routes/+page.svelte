@@ -5,7 +5,7 @@
 	import SlidesUpload from './(components)/SlidesUpload.svelte';
 	import SupplementaryUpload from './(components)/SupplementaryUpload.svelte';
 	import Customisation from './(components)/Customisation.svelte';
-	
+
 	let doLectureUpload = false;
 	let lectureURL: string;
 	let lectureFileList: FileList;
