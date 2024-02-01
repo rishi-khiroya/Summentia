@@ -9,7 +9,7 @@ export abstract class Lecture {
     public supplementaryInfo: SupplementaryInfo | undefined;
 
     public constructor(fileName: string) {
-        this.path = `static/${fileName}`;
+        this.path = `tmp/${fileName}`;
     }
 
     public abstract toFilePath(): Promise<string>;
@@ -60,12 +60,12 @@ class LectureFromUrl extends Lecture {
     private urlHandler: URLHandler;
 
     public constructor(url: URL) {
-        super(`temp${url.origin}`); // TODO
+        super(`${url.origin}`); // TODO
         this.urlHandler = URLHandler.create(url);
     }
 
     public async toFilePath(): Promise<string> {
-        this.urlHandler.download();
+        this.path = await this.urlHandler.download();
         return this.path;
     }
 
