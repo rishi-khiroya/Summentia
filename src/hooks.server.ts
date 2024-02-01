@@ -21,6 +21,6 @@ export const handle = SvelteKitAuth({
             issuer: AUTH0_ISSUER_BASE_URL,
         })
     ],
-    trustHost: true,
     secret: AUTH0_SECRET,
+    debug: true
 }) satisfies Handle;
