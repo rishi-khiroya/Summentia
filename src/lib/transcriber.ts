@@ -4,11 +4,7 @@ import ffmpegPath from 'ffmpeg-static';
 import { createReadStream } from 'fs';
 import { rm } from 'node:fs/promises';
 import pkg from 'fluent-ffmpeg';
-
-import { OPENAI_API_KEY } from '$env/static/private';
-import OpenAI from 'openai';
-
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+import { openai } from './openai_clinet';
 
 const { setFfmpegPath } = pkg;
 

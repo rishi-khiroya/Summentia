@@ -1,7 +1,4 @@
-import { OPENAI_API_KEY } from '$env/static/private';
-import OpenAI from 'openai';
-
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+import { openai } from './openai_clinet';
 
 /* Customisations implemented:
       - size : Small (under 1 page), Medium (under 3 pages), Large (under 6 pages) 
