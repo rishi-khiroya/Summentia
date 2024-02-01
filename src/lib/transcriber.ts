@@ -5,6 +5,11 @@ import { createReadStream } from 'fs';
 import { rm } from 'node:fs/promises';
 import pkg from 'fluent-ffmpeg';
 
+import { OPENAI_API_KEY } from '$env/static/private';
+import OpenAI from 'openai';
+
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
 const { setFfmpegPath } = pkg;
 
 const SPIN_TIMER_MS: number = 1000;
@@ -38,18 +43,11 @@ function extract_audio(filePath: string): boolean {
 	return true;
 }
 
-async function run_query(filePath: string) {
-	const data = fs.readFileSync(filePath + '.mp3');
-	const response = await fetch(
-		'https://api-inference.huggingface.co/models/openai/whisper-large-v3',
-		{
-			headers: { Authorization: 'Bearer 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' },
-			method: 'POST',
-			body: data
-		}
-	);
-	const result = await response.json();
-	return result;
+async function get_transcription(filePath: string) {
+	return await openai.audio.transcriptions.create({
+		file: fs.createReadStream(filePath + '.mp3'),
+		model: 'whisper-1'
+	});
 }
 
 export async function transcribe(filePath: string): Promise<string | null> {
@@ -61,8 +59,8 @@ export async function transcribe(filePath: string): Promise<string | null> {
 			attempts++;
 			await new Promise((resolve) => setTimeout(resolve, SPIN_TIMER_MS));
 		}
-		const transcript = await run_query(filePath);
-		return transcript.text;
+		const transcription = await get_transcription(filePath);
+		return transcription.text;
 	} catch (error) {
 		console.log(error);
 		return null;
