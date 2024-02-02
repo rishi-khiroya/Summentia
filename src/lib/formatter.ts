@@ -9,12 +9,12 @@ export async function format(transcript_code: string, Customisations: Customisat
 
   let highlight_phrase = "";
   if (Customisations.highlight_keywords){
-    highlight_phrase = " with the keywords highlighted ";
+    highlight_phrase = " highlight keywords ";
   }
   
   let questions_phrase = "";
   if (Customisations.questions){
-    questions_phrase = " with a question and answer revision section at the end "
+    questions_phrase = " with a revision question answer section"
   }
 
   // adds length prompt for length upper bound in pages, default set to 1
@@ -27,7 +27,7 @@ export async function format(transcript_code: string, Customisations: Customisat
     } 
   }
   
-  const prompt = "Plase give me the following LaTeX code, " + length_phrase + highlight_phrase + Customisations.summary_format + questions_phrase +" :" + transcript_code;
+  const prompt = "Plase give me this LaTeX code, " + length_phrase + highlight_phrase + Customisations.summary_format + questions_phrase +" :" + transcript_code;
 
   const completion = await openai.chat.completions.create({
     messages: [{ role: "system", content: prompt}],
