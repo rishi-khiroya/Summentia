@@ -28,7 +28,7 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
 
       - name: SSH into server and run 'whoami'
-        run: ssh staging 'whoami' # expect root back
+        run: ssh prod 'whoami' # expect root back
         
         # run: npm ci && npm run build && pm2 restart server
 
