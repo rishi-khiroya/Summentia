@@ -25,5 +25,5 @@ export const actions = {
 export const load = async (event) => {
 	const session: Session | null = await event.locals.auth();
 	if (!session?.user) throw redirect(303, '/');
-	return { userId: session.user.id };
+	return {};
 }

@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { Button } from 'flowbite-svelte';
+	import { page } from '$app/stores';
+	import { Button, Spinner } from 'flowbite-svelte';
 	import { AccordionItem, Accordion } from 'flowbite-svelte';
 	import LectureUpload from './LectureUpload.svelte';
 	import SlidesUpload from './SlidesUpload.svelte';
 	import SupplementaryUpload from './SupplementaryUpload.svelte';
 	import Customisation from './Customisation.svelte';
 
-	export let data;
+	let waiting: boolean = false;
 
 	let doLectureUpload = false;
 	let lectureURL: string;
@@ -36,7 +37,9 @@
 		form.append('areKeyWordsHighlighted', areKeyWordsHighlighted?.toString());
 		form.append('typeOfSummary', typeOfSummary);
 		form.append('hasQandAns', hasQandAns?.toString());
-		form.append('userId', data.userId);
+		form.append('userId', $page.data.session.user.id);
+
+		waiting = true;
 
 		const response: Response = await fetch('?/submit', {
 			method: 'POST',
@@ -60,6 +63,8 @@
 
 			document.body.removeChild(link);
 		}
+
+		waiting = false;
 	}
 </script>
 
@@ -91,8 +96,15 @@
 		</Accordion>
 	</div>
 	<div style="display: flex; justify-content: flex-end;">
-		<Button type="submit" on:click={() => submit()} color="dark" class="text-white m-5 p-4"
-			>Submit</Button
-		>
+		{#if waiting}
+			<Button color="dark" class="m-5 p-4">
+				<Spinner class="me-3" size="4" color="white" />
+				Loading ...
+			</Button>
+		{:else}
+			<Button type="submit" on:click={() => submit()} color="dark" class="text-white m-5 p-4"
+				>Submit</Button
+			>
+		{/if}
 	</div>
 </div>
