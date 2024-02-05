@@ -1,11 +1,12 @@
-import { OutputType, output } from "$lib/output_engine";
+// import { OutputType, output } from "$lib/output_engine";
 import { summarise } from "$lib/summariser";
 import { transcribe } from "$lib/transcriber";
 import { Lecture } from "./Lecture";
 import type { Summary } from "./Summary";
 import type { Transcript } from "./Transcript";
+import { error } from "@sveltejs/kit";
 
-const MAX_PATH_LENGTH = 16;
+// const MAX_PATH_LENGTH = 16;
 
 export class Project {
 
@@ -16,15 +17,19 @@ export class Project {
     private readonly lecture: Lecture;
     private transcript: Transcript | undefined;
     private summary: Summary | undefined;
+    private readonly userId: string;
 
     static from(title: string, date: Date, form: FormData): Project {
-        return new Project(title, date, Lecture.fromForm(form));
+        const userId = form.get('userId');
+        if (!userId) error(400, "No UserID provided.")
+        return new Project(title, date, Lecture.fromForm(form), userId.toString());
     }
 
-    public constructor(title: string, date: Date, lecture: Lecture) {
+    public constructor(title: string, date: Date, lecture: Lecture, userId: string) {
         this.title = title;
         this.date = date;
         this.lecture = lecture;
+        this.userId = userId;
     }
 
     private async transcribe(): Promise<boolean> {
