@@ -8,17 +8,17 @@ import { openai } from './openai_clinet';
 
 const { setFfmpegPath } = pkg;
 
-const SPIN_TIMER_MS: number = 1000;
-const MAX_SPINS = 10;
-
-function extract_audio(filePath: string): boolean {
+function extract_audio(
+	filePath: string,
+	resolve: { (value: void | PromiseLike<void>): void; (): void }
+): boolean {
 	if (!ffmpegPath) return false;
 
 	try {
 		setFfmpegPath(ffmpegPath);
 		ffmpeg()
 			.input(createReadStream(filePath + '.mp4'))
-			.outputOptions('-ab', '192k')
+			.outputOptions('-ab', '96k')
 			.on('progress', (progress) => {
 				if (progress.percent) {
 					console.log(`Processing: ${Math.floor(progress.percent)}% done`);
@@ -26,6 +26,7 @@ function extract_audio(filePath: string): boolean {
 			})
 			.on('end', () => {
 				console.log('FFmpeg has finished.');
+				resolve();
 			})
 			.on('error', (error) => {
 				console.error(error);
@@ -48,14 +49,15 @@ async function get_transcription(filePath: string) {
 
 export async function transcribe(filePath: string): Promise<string | null> {
 	try {
-		if (!extract_audio(filePath)) return null;
-		let attempts: number = 0;
-		while (!fs.existsSync(filePath + '.mp3') && attempts <= MAX_SPINS) {
-			// spin every 1000ms
-			attempts++;
-			await new Promise((resolve) => setTimeout(resolve, SPIN_TIMER_MS));
-		}
+		await new Promise<void>((resolve) => {
+			extract_audio(filePath, resolve);
+		});
+
+		console.log('FFMPEG is done processing.');
+
 		const transcription = await get_transcription(filePath);
+		console.log('transcription complete');
+		console.log(transcription.text);
 		return transcription.text;
 	} catch (error) {
 		console.log(error);
