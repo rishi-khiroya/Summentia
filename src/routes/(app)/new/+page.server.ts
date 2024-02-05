@@ -1,6 +1,5 @@
 import { Project } from '$lib/types/Project';
 import { error, type Actions, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
 import type { Session } from '@auth/core/types';
 
 export const actions = {
@@ -23,8 +22,8 @@ export const actions = {
 	}
 } satisfies Actions;
 
-export const load: PageServerLoad = async (event) => {
+export const load = async (event) => {
 	const session: Session | null = await event.locals.auth();
 	if (!session?.user) throw redirect(303, '/');
-	return {};
+	return { userId: session.user.id };
 }
