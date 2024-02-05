@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  connect:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,19 +15,35 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
-      - run: npm ci
-      - run: npm run build
+          
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-  test:
-    needs: build
-    runs-on: ubuntu-latest
+      - name: SSH into server
+        run: doctl compute ssh server
 
-    steps:
-      - run: npm test
+      - name: Run 'whoami'
+        run: whoami
+        # run: npm ci && npm run build && pm2 restart server
 
-  deploy:
-    needs: [build, test]
-    runs-on: ubuntu-latest
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Install project
+  #     - run: npm ci
+  
+  # test:
+  #   needs: build
+  #   runs-on: ubuntu-latest
 
-    steps:
-      -  run: node build/index.js
+  #   steps:
+  #     - run: npm test
+
+  # deploy:
+  #   needs: [build, test]
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     -  run: node build/index.js
