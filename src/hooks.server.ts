@@ -21,5 +21,18 @@ export const handle = SvelteKitAuth({
             issuer: AUTH0_ISSUER_BASE_URL,
         })
     ],
+    callbacks: {
+        jwt({ token, account, user }) {
+            if (account) {
+                token.accessToken = account.access_token
+                token.id = user?.id
+            }
+            return token
+        },
+        session({ session, user }) {
+            if (session?.user) session.user.id = user.id;
+            return session;
+        },
+    },
     secret: AUTH0_SECRET
 }) satisfies Handle;
