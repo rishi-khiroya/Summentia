@@ -28,7 +28,7 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           
       - name: Check out from source
-        run: ssh prod 'cd Summentia && git fetch && git git reset --hard origin/master'
+        run: ssh prod 'cd Summentia && git fetch && git reset --hard origin/master'
 
       - name: Install and build 
         run: ssh prod 'cd Summentia && npm ci && npm run build'
