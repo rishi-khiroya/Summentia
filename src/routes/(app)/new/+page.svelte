@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { Button } from 'flowbite-svelte';
 	import { AccordionItem, Accordion } from 'flowbite-svelte';
-	import LectureUpload from './(components)/LectureUpload.svelte';
-	import SlidesUpload from './(components)/SlidesUpload.svelte';
-	import SupplementaryUpload from './(components)/SupplementaryUpload.svelte';
-	import Customisation from './(components)/Customisation.svelte';
+	import LectureUpload from './LectureUpload.svelte';
+	import SlidesUpload from './SlidesUpload.svelte';
+	import SupplementaryUpload from './SupplementaryUpload.svelte';
+	import Customisation from './Customisation.svelte';
+
+	export let data;
 
 	let doLectureUpload = false;
 	let lectureURL: string;
@@ -34,6 +36,7 @@
 		form.append('areKeyWordsHighlighted', areKeyWordsHighlighted?.toString());
 		form.append('typeOfSummary', typeOfSummary);
 		form.append('hasQandAns', hasQandAns?.toString());
+		form.append('userId', data.userId);
 
 		const response: Response = await fetch('?/submit', {
 			method: 'POST',
