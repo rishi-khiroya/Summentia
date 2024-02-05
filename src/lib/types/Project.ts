@@ -5,6 +5,7 @@ import { Lecture } from "./Lecture";
 import type { Summary } from "./Summary";
 import type { Transcript } from "./Transcript";
 import { error } from "@sveltejs/kit";
+import { prisma } from "$lib/prisma";
 
 // const MAX_PATH_LENGTH = 16;
 
@@ -53,6 +54,18 @@ export class Project {
         return true;
     }
 
+    private async saveToDb() {
+        await prisma.project.create({
+            data: {
+                title: this.title,
+                date: this.date,
+                userId: this.userId,
+                transcript: this.transcript?.text,
+                summary: this.summary?.text
+            }
+        })
+    }
+
     public async process(withLogs: boolean = false): Promise<boolean> {
         if (withLogs) console.log("Transcribing...");
         if (!await this.transcribe()) return false;
@@ -60,6 +73,8 @@ export class Project {
         if (!await this.summarise()) return false;
         if (withLogs) console.log("Cleaning Up...");
         await this.lecture.cleanup();
+        if (withLogs) console.log("Saving to DB...");
+        await this.saveToDb();
         if (withLogs) console.log("Processed.");
         return true;
     }
