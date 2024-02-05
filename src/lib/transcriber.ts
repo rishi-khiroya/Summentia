@@ -10,11 +10,12 @@ const { setFfmpegPath } = pkg;
 
 function extract_audio(
 	filePath: string,
-	resolve: { (value: void | PromiseLike<void>): void; (): void }
-): boolean {
-	if (!ffmpegPath) return false;
-
-	try {
+	resolve: { (value: void | PromiseLike<void>): void; (): void },
+	reject: (reason?: unknown) => void
+): void {
+	if (!ffmpegPath) {
+		reject("ffmpegPath cannot be found in ffmpeg-static package");
+	} else {
 		setFfmpegPath(ffmpegPath);
 		ffmpeg()
 			.input(createReadStream(filePath + '.mp4'))
@@ -29,15 +30,12 @@ function extract_audio(
 				resolve();
 			})
 			.on('error', (error) => {
-				console.error(error);
+				reject(error);
 			})
 			.format('mp3')
 			.save(filePath + '.mp3');
-	} catch (_) {
-		return false;
 	}
-
-	return true;
+	// return true;
 }
 
 async function get_transcription(filePath: string) {
@@ -49,12 +47,10 @@ async function get_transcription(filePath: string) {
 
 export async function transcribe(filePath: string): Promise<string | null> {
 	try {
-		await new Promise<void>((resolve) => {
-			extract_audio(filePath, resolve);
+		await new Promise<void>((resolve, reject) => {
+			extract_audio(filePath, resolve, reject);
 		});
-
 		console.log('FFMPEG is done processing.');
-
 		const transcription = await get_transcription(filePath);
 		console.log('transcription complete');
 		console.log(transcription.text);
