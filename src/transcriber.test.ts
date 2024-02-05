@@ -3,9 +3,10 @@ import { test, expect } from 'vitest';
 import {transcribe} from "../src/lib/transcriber";
 
 test('able to split video from audio', async () => {
-	const transcript = await transcribe("./static/test");
+	const transcript = await transcribe("./static/test_longer");
+    // console.log(transcript);
     expect((transcript == null ? "" : transcript).length).toBeGreaterThan(0);
-}, 300000);
+}, 30000000);
 
 // test('errors with no video', async () => {
 // 	const transcript = await transcribe("./static/video_no_sound");
