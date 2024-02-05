@@ -37,4 +37,5 @@ jobs:
         run: ssh prod 'cd Summentia && npm test'
         
       - name: Restart server (deploy)
+        if: ${{ always() }} 
         run: ssh prod 'pm2 restart server'
