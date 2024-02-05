@@ -6,6 +6,7 @@ on:
       - master
 
 jobs:
+
   deploy:
     runs-on: ubuntu-latest
 
@@ -31,10 +32,11 @@ jobs:
         run: ssh prod 'cd Summentia && git fetch && git reset --hard origin/master'
 
       - name: Install and build 
+      # DOES NOT RUN PLAYWRIGHT TESTS AS PLAYWRIGHT DEPENDENCIES NOT AVAILABLE ON THE VM
         run: ssh prod 'cd Summentia && npm ci && npm run build'
         
       - name: Test project
-        run: ssh prod 'cd Summentia && npm test'
+        run: ssh prod 'cd Summentia && npm test:unit'
         
       - name: Restart server (deploy)
         if: ${{ always() }} 
