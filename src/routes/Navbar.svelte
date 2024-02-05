@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Button } from 'flowbite-svelte';
+	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Button, Dropdown, DropdownDivider, DropdownItem, Avatar, DropdownHeader } from 'flowbite-svelte';
 	import { DarkMode } from 'flowbite-svelte';
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	$: activeUrl = $page.url.pathname;
@@ -21,34 +21,34 @@
 		<div class="flex space-x-5">
 			<DarkMode class="text-primary-500 dark:text-primary-600 border dark:border-gray-800" />
 			{#if $page.data.session}
-				<Button
-					outline
-					color="light"
-					on:click={() => signOut()}
-					class="text-primary-500 dark:text-primary-600 border dark:border-gray-800 dark:hidden"
-					>Logout</Button
-				>
-				<Button
-					outline
-					color="dark"
-					on:click={() => signOut()}
-					class="text-primary-500 dark:text-primary-600 border dark:border-gray-800 hidden dark:block"
-					>Logout</Button
-				>
+				<div class="flex items-center md:order-2">
+					<Avatar id="avatar-menu" src={$page.data.session.user.image} class="hover:cursor-pointer"/>
+					<NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
+				</div>
+				<Dropdown placement="bottom" triggeredBy="#avatar-menu">
+					<DropdownHeader>
+						<span class="block truncate text-sm font-medium">{$page.data.session.user.email}</span>
+					</DropdownHeader>
+					<DropdownItem href="dashboard">Dashboard</DropdownItem>
+					<DropdownItem href="projects">Projects</DropdownItem>
+					<DropdownItem>Settings</DropdownItem>
+					<DropdownDivider />
+					<DropdownItem on:click={() => signOut()}>Sign out</DropdownItem>
+				</Dropdown>
 			{:else}
 				<Button
 					outline
 					color="light"
 					on:click={() => signIn("auth0")}
 					class="text-primary-500 dark:text-primary-600 border dark:border-gray-800 dark:hidden"
-					>Login</Button
+					>Sign in</Button
 				>
 				<Button
 					outline
 					color="dark"
 					on:click={() => signIn("auth0")}
 					class="text-primary-500 dark:text-primary-600 border dark:border-gray-800 dark:block hidden"
-					>Login</Button
+					>Sign in</Button
 				>
 			{/if}
 		</div>
