@@ -3,7 +3,6 @@
 	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Button, Dropdown, DropdownDivider, DropdownItem, Avatar, DropdownHeader } from 'flowbite-svelte';
 	import { DarkMode } from 'flowbite-svelte';
 	import { signIn, signOut } from '@auth/sveltekit/client';
-	$: activeUrl = $page.url.pathname;
 </script>
 
 <div class="shadow-slate-200 dark:shadow-gray-950 shadow-sm-light">
