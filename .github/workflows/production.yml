@@ -1,0 +1,44 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/prod.key
+          chmod 600 ~/.ssh/prod.key
+          cat >>~/.ssh/config <<END
+          Host prod
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/prod.key
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          
+      - name: Check out from source
+        run: ssh prod 'cd Summentia && git fetch && git reset --hard origin/master'
+
+      - name: Install and build 
+        run: ssh prod 'cd Summentia && npm ci && npm run build'
+        
+      # DOES NOT RUN PLAYWRIGHT TESTS AS PLAYWRIGHT DEPENDENCIES NOT AVAILABLE ON THE VM
+      # SKIP until npm run test:unit is changed to 'vitest run' (i.e. no waiitng for file changes)
+      # - name: Test project
+      #   run: ssh prod 'cd Summentia && npm run test:unit'
+        
+      - name: Restart front-end (deploy)
+        if: ${{ always() }} 
+        run: ssh prod 'pm2 restart front'
