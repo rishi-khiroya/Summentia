@@ -8,7 +8,15 @@ import { openai } from './openai_clinet';
 
 const { setFfmpegPath } = pkg;
 
-async function extract_audio(filePath: string): Promise<void> {
+function convertTimestampsToOptions(timestamps: string): [number, string] {
+	const json: [] = JSON.parse(timestamps);
+	console.log(json);
+	const segmentCount: number = json.length;
+	const options: string = json.map((timestamp) => timestamp.end).join(',');
+	return [segmentCount, options];
+}
+
+async function extract_audio(filePath: string, frames: string): Promise<void> {
 	if (!ffmpegPath) {
 		throw new Error(' cannot be found in ffmpeg-static package');
 	} else {
@@ -23,7 +31,7 @@ async function extract_audio(filePath: string): Promise<void> {
 				.addOutputOption('-map', '0')
 				.addOutputOption('-f', 'segment')
 				.addOutputOption('-segment_start_number', '1')
-				.addOutputOption('-segment_frames', '10000,20000,30000,40000,50000,65000')
+				.addOutputOption('-segment_frames', frames)
 				.on('progress', (progress) => {
 					if (progress.percent) {
 						console.log(`Processing: ${Math.floor(progress.percent)}% done`);
@@ -49,16 +57,21 @@ async function get_transcription(filePath: string) {
 	});
 }
 
-export async function transcribe(filePath: string): Promise<string | null> {
+export async function transcribe(filePath: string): Promise<string[] | null> {
 	try {
-		await extract_audio(filePath);
+		const json =
+			'[{ "id": 0, "start": 0, "end": 50000 }, { "id": 1, "start": 50001, "end": 60000 }]';
+		const [segmentCount, frames] = convertTimestampsToOptions(json);
+		console.log(segmentCount);
+		await extract_audio(filePath, frames);
+		
 		// const transcription: Transcription = await get_transcription(filePath);
 		// return transcription.text;
-		return 'a';
+		return ['a', 'b'];
 	} catch (error) {
 		console.log(error);
 		return null;
 	} finally {
-		await rm(filePath + '.mp3');
+		await rm('*.mp3');
 	}
 }
