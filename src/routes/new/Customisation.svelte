@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { Input, Label, Checkbox, Radio } from 'flowbite-svelte';
 
-	export let nrOfPages: number;
-	export let areKeyWordsHighlighted: boolean;
-	export let typeOfSummary: string;
-	export let hasQandAns: boolean;
+	export let customisation: Customisation;
 </script>
 
 <div class="customization">
@@ -13,20 +10,19 @@
 		<Input
 			type="number"
 			id="nr-pages"
-			placeholder="Max Number of Pages"
-			required
-			bind:value={nrOfPages}
+			placeholder="1 (default)"
+			bind:value={customisation.no_pages}
 		/>
 	</div>
-	<Checkbox checked={areKeyWordsHighlighted}>Highlight Key Words</Checkbox>
+	<Checkbox checked={customisation.highlight_keywords}>Highlight Key Words</Checkbox>
 	<div>
 		<Label for="summary-types" class="mb-2">Types of Summary:</Label>
-		<Radio name="type" value={''} bind:group={typeOfSummary}>Text Format</Radio>
-		<Radio name="type" value={' as bullet points'} bind:group={typeOfSummary}>Bullet Points</Radio>
+		<Radio name="type" value={''} bind:group={customisation.summary_format}>Text Format</Radio>
+		<Radio name="type" value={' as bullet points'} bind:group={customisation.summary_format}>Bullet Points</Radio>
 	</div>
 	<div>
 		<Label for="extra-features" class="mb-2">Extra Features:</Label>
-		<Checkbox checked={hasQandAns}>Generate Questions and Answers</Checkbox>
+		<Checkbox checked={customisation.questions}>Generate Questions and Answers</Checkbox>
 	</div>
 </div>
 

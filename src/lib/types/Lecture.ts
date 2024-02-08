@@ -6,9 +6,12 @@ import { URLHandler } from "./URLHandler";
 export abstract class Lecture {
 
     path: string;
-    public supplementaryInfo: SupplementaryInfo | undefined;
+    public supplementaryInfo: SupplementaryInfo = {
+        slides: undefined,
+        extras: undefined
+    };
 
-    public constructor(fileName: string) {
+    public constructor(fileName: string,) {
         this.path = `static/${fileName}`;
     }
 
@@ -20,13 +23,35 @@ export abstract class Lecture {
     }
 
     static fromForm(form: FormData): Lecture {
+
+        let lecture: Lecture | undefined;
         if (form.get('isLectureFile') === "true") {
-            return new LectureFromFile(form.get(`lectureFile`) as File);
+            lecture = new LectureFromFile(form.get(`lectureFile`) as File);
         } else {
             const data = form.get('lectureURL');
             if (!data) throw new Error("Invalid URL");
-            return new LectureFromUrl(new URL(data.toString()));
+            lecture = new LectureFromUrl(new URL(data.toString()));
         }
+
+        if (form.has("slides")) {
+            const slides: File = form.get("slides") as File;
+            lecture.supplementaryInfo.slides = {
+                file: slides,
+                noSlides: 0, // TODO
+                slides: [] // TODO
+            }
+        }
+
+        const noSupplementary: number = Number(form.get("noSupplementary")?.toString());
+        if (noSupplementary) {
+            lecture.supplementaryInfo.extras = [];
+            for (let i: number = 0; i < noSupplementary; i++) {
+                const data: File = form.get(`supplementary${i}`) as File;
+                lecture.supplementaryInfo.extras.push(data);
+            }
+        }
+
+        return lecture;
     }
 
     static fromFile(file: File): Lecture {

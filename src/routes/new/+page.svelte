@@ -1,26 +1,37 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { Button, Spinner } from 'flowbite-svelte';
-	import { AccordionItem, Accordion } from 'flowbite-svelte';
+	import { AccordionItem, Accordion, Fileupload, Button, Spinner, Input } from 'flowbite-svelte';
 	import LectureUpload from './LectureUpload.svelte';
-	import SlidesUpload from './SlidesUpload.svelte';
-	import SupplementaryUpload from './SupplementaryUpload.svelte';
 	import Customisation from './Customisation.svelte';
 
 	let waiting: boolean = false;
 
+	let title: string;
+	let date: Date;
+
 	let doLectureUpload = false;
 	let lectureURL: string;
 	let lectureFileList: FileList;
-	let slidesFile: File;
-	let supplementaryFiles: File[] = [];
-	let nrOfPages: number;
-	let areKeyWordsHighlighted: boolean;
-	let typeOfSummary: string;
-	let hasQandAns: boolean;
+
+	let supplementary: { 
+		slides: FileList | undefined, 
+		extras: FileList | undefined
+	} = { 
+		slides: undefined, 
+		extras: undefined 
+	}
+
+	let customisation: Customisation = {
+		highlight_keywords: false,
+		questions: false,
+		summary_format: "",
+		no_pages: 1
+	}
 
 	async function submit() {
 		const form = new FormData();
+
+		form.append('userId', $page.data.session.user.id);
 
 		form.append('isLectureFile', doLectureUpload.toString());
 		if (doLectureUpload) {
@@ -28,42 +39,22 @@
 				form.append('lectureFile', lectureFileList[0]);
 			}
 		} else form.append('lectureURL', lectureURL);
-		form.append('slidesFile', slidesFile);
+
+		form.append('customisation', JSON.stringify(customisation));
+
+		if (supplementary.slides?.length) form.append('slides', supplementary.slides)
+		form.append('noSupplementary', supplementary.length);
 		supplementaryFiles.forEach((file, i) => {
-			form.append(`supplementaryFiles${i}`, file);
+			form.append(`supplementary${i}`, file);
 		});
 
-		form.append('nrOfPages', nrOfPages?.toString());
-		form.append('areKeyWordsHighlighted', areKeyWordsHighlighted?.toString());
-		form.append('typeOfSummary', typeOfSummary);
-		form.append('hasQandAns', hasQandAns?.toString());
-		form.append('userId', $page.data.session.user.id);
-
 		waiting = true;
-
 		const response: Response = await fetch('?/submit', {
 			method: 'POST',
 			body: form
 		});
 
 		const data = JSON.parse((await response.json()).data);
-
-		if (data[data[0].success]) {
-			// Create a Blob with the LaTeX content
-			const blob = new Blob([data[data[0].summary]], { type: 'application/x-latex' });
-
-			// Create a link element
-			const link = document.createElement('a');
-			link.download = 'summary.tex';
-			link.href = window.URL.createObjectURL(blob);
-			document.body.appendChild(link);
-
-			// Trigger a click event on the link to start the download
-			link.click();
-
-			document.body.removeChild(link);
-		}
-
 		waiting = false;
 	}
 </script>
@@ -71,27 +62,35 @@
 <div class="flex-1 p-5">
 	<div class="flex-1">
 		<Accordion>
+			<AccordionItem>
+				<span slot="header">Info</span>
+				<div class="flex flex-row justify-between">
+					<div>
+						<span>Title</span>
+						<Input type="text" bind:title placeholder="My Lecture..."/>
+					</div>
+					<div>
+						<span>Date</span>
+						<Input type="date" bind:date />
+					</div>
+				</div>
+			</AccordionItem>
 			<AccordionItem open>
 				<span slot="header">Upload Lecture</span>
 				<LectureUpload bind:fileList={lectureFileList} bind:doLectureUpload bind:lectureURL />
 			</AccordionItem>
 			<AccordionItem>
 				<span slot="header">Upload Slides</span>
-				<SlidesUpload bind:slidesFile />
+				<Fileupload on:change={event => supplementary.slides = event.target.files}/>
 			</AccordionItem>
 
 			<AccordionItem>
 				<span slot="header">Add Supplementary Info</span>
-				<SupplementaryUpload bind:supplementaryFiles />
+				<Fileupload multiple on:change={event => supplementary.extras = event.target.files} />
 			</AccordionItem>
 			<AccordionItem>
 				<span slot="header">Customisation</span>
-				<Customisation
-					bind:nrOfPages
-					bind:areKeyWordsHighlighted
-					bind:typeOfSummary
-					bind:hasQandAns
-				/>
+				<Customisation bind:customisation />
 			</AccordionItem>
 		</Accordion>
 	</div>

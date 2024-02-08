@@ -16,9 +16,10 @@ export const actions = {
 
 		const project: Project = Project.from(title, new Date(date), form);
 		const success: boolean = await project.process(true);
+		if (success) project.output()
 		project.log();
 
-		return { success, summary: project.output()?.text };
+		return { success };
 	}
 } satisfies Actions;
 
