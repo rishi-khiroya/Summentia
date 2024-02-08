@@ -75,10 +75,10 @@ export class Project {
 	}
 
 	private async addSlidesToSummaries(): Promise<boolean> {
-		if (!this.lecture.supplementaryInfo?.slides?.length || !this.summary) return false;
+		if (!this.lecture.supplementaryInfo?.slides?.slides?.length || !this.summary) return false;
 
 		generateFinalLatexCode(
-			this.lecture.supplementaryInfo.slides.map((slide) => slide.path),
+			this.lecture.supplementaryInfo.slides.slides,
 			[this.summary?.text],
 			this.title,
 			'TODO'
