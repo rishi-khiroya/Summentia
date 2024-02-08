@@ -1,29 +1,27 @@
-function getSlidePaths(slides_json: string): string[] {
-    const parsed_slide = JSON.parse(slides_json);
-    const slides_paths = parsed_slide.slides;
-    return slides_paths;
-}
-
-function getBodyLatexCode(slides: string, summaries: string[]){
-    const slide_paths = getSlidePaths(slides);
-    let body = "";
-    for (let i = 0; i < slide_paths.length; i++){
-        body += `
+function getBodyLatexCode(slides: string[], summaries: string[]): string {
+	// const slide_paths = getSlidePaths(slides);
+	let body = '';
+	for (let i = 0; i < slides.length; i++) {
+		body += `
             \\begin{center}
-            \\includegraphics[width=0.75\\linewidth]{${slide_paths[i]}}
+            \\includegraphics[width=0.75\\linewidth]{${slides[i]}}
             \\end{center}
             \\subsection{} 
             ${summaries[i]}
-        `
-    }
-    return body;
+        `;
+	}
+	return body;
 }
 
-export function generateFinalLatexCode(slides: string, summaries:string[], title: string, author: string){
+export function generateFinalLatexCode(
+	slides: string[],
+	summaries: string[],
+	title: string,
+	author: string
+): string {
+	const body = getBodyLatexCode(slides, summaries);
 
-    const body = getBodyLatexCode(slides, summaries);
-
-    const code = `
+	const code = `
         \\documentclass{article}
 
         \\usepackage[none]{hyphenat}
@@ -50,8 +48,7 @@ export function generateFinalLatexCode(slides: string, summaries:string[], title
         ${body}
 
         \\end{document}
-        `
+        `;
 
-    return code;
+	return code;
 }
-

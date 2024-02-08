@@ -1,6 +1,6 @@
 export type Slide = {
     slide_no: number;
-    imageUrl: string;
+    path: string;
     startTimeStamp: number;
     endTimeStamp: number;
 }
