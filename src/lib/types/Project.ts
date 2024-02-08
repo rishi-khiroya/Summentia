@@ -14,8 +14,8 @@ export class Project {
 
     // Internal representations at each stage.
     private readonly lecture: Lecture;
-    private transcript: Transcript | undefined;
-    private summary: Summary | undefined;
+    private transcripts: Transcript[] | undefined;
+    private summaries: Summary[] | undefined;
 
     static from(title: string, date: Date, form: FormData): Project {
         return new Project(title, date, Lecture.fromForm(form));
@@ -31,20 +31,29 @@ export class Project {
         const path: string = await this.lecture.toFilePath();
         const extlessPath: string = path.substring(0, path.lastIndexOf('.'));
 
-        const transcript: string | null = await transcribe(extlessPath);
-        if (!transcript) return false;
+        const transcripts: string[] | null = await transcribe(extlessPath);
+        if (!transcripts) return false;
 
-        this.transcript = { text: transcript };
+        this.transcripts = transcripts.map((transcript, index) => {
+            return { id: index, text: transcript };
+        })
         return true;
     }
 
     private async summarise(): Promise<boolean> {
-        if (!this.transcript) return false;
+        if (!this.transcripts) return false;
 
-        const summary: string | null = await summarise(this.transcript?.text);
-        if (!summary) return false;
+        const summaries: string[] = []
 
-        this.summary = { text: summary };
+        for (const transcript of this.transcripts) {
+            const summary: string | null = await summarise(transcript.text);
+            if (!summary) return false;
+            summaries.push(summary);
+        }
+
+        this.summaries = summaries.map((summary, index) => {
+            return {id: index, text: summary};
+        })
         return true;
     }
 
@@ -60,11 +69,15 @@ export class Project {
     }
 
     public log(): void {
-        if (this.transcript) console.log(`Transcript:\n${this.transcript.text}\n`);
-        if (this.summary) console.log(`Summary:\n${this.summary.text}\n`);
+        if (this.transcripts) this.transcripts?.map((t) => {
+            console.log(`Transcript ${t.id}:\n${t.text}\n`);
+        })
+        if (this.summaries) this.summaries?.map((s) => {
+            console.log(`Summary ${s.id}:\n${s.text}\n`);
+        })
     }
 
-    public output(): Summary | undefined {
+    public output(): Summary[] | undefined {
 
         // const sanitiseFileName = (title: string) => {
         //     let fileName: string = title.substring(0, MAX_PATH_LENGTH); // take first MAX_PATH_LENGTH chars
@@ -77,6 +90,6 @@ export class Project {
 
         // output(this.summary.text, sanitiseFileName(this.title), OutputType.TEX);
         // return true;
-        return this.summary;
+        return this.summaries;
     }
 }

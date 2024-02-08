@@ -18,6 +18,7 @@ export const actions = {
 		const success: boolean = await project.process(true);
 		project.log();
 
-		return { success, summary: project.output()?.text };
+		// edit to return only the first summary rn
+		return { success, summary: (project.output()?.[0].text) };
 	}
 } satisfies Actions;
