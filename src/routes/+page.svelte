@@ -15,25 +15,29 @@
 	let areKeyWordsHighlighted: boolean;
 	let typeOfSummary: string;
 	let hasQandAns: boolean;
+	
 
 	async function submit() {
 		const form = new FormData();
 
-		form.append('isLectureFile', doLectureUpload.toString());
-		if (doLectureUpload) {
-			if (lectureFileList && lectureFileList.length) {
-				form.append('lectureFile', lectureFileList[0]);
-			}
-		} else form.append('lectureURL', lectureURL);
-		form.append('slidesFile', slidesFile);
-		supplementaryFiles.forEach((file, i) => {
-			form.append(`supplementaryFiles${i}`, file);
-		});
+		// form.append('isLectureFile', doLectureUpload.toString());
+		// if (doLectureUpload) {
+		// 	if (lectureFileList && lectureFileList.length) {
+		// 		form.append('lectureFile', lectureFileList[0]);
+		// 	}
+		// } else form.append('lectureURL', lectureURL);
+		// form.append('slidesFile', slidesFile);
+		// supplementaryFiles.forEach((file, i) => {
+		// 	form.append(`supplementaryFiles${i}`, file);
+		// });
 
-		form.append('nrOfPages', nrOfPages?.toString());
-		form.append('areKeyWordsHighlighted', areKeyWordsHighlighted?.toString());
-		form.append('typeOfSummary', typeOfSummary);
-		form.append('hasQandAns', hasQandAns?.toString());
+		// form.append('nrOfPages', nrOfPages?.toString());
+		// form.append('areKeyWordsHighlighted', areKeyWordsHighlighted?.toString());
+		// form.append('typeOfSummary', typeOfSummary);
+		// form.append('hasQandAns', hasQandAns?.toString());
+
+		form.append('isLectureFile', 'true');
+		form.append('lectureFile', 'video.mp4');
 
 		const response: Response = await fetch('?/submit', {
 			method: 'POST',
