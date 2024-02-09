@@ -33,6 +33,26 @@ export abstract class Lecture {
         return new LectureFromFile(file);
     }
 
+    static fromString(fileName: string): Lecture {
+        return new TestLecture(fileName);
+    }
+
+}
+
+class TestLecture extends Lecture {
+
+    public constructor(fileName: string) {
+        super(fileName);
+    }
+
+    public async toFilePath(): Promise<string> {
+        return this.path;
+    }
+
+    public saveToUrl(): URL {
+        throw new Error("Method not implemented.");
+    }
+
 }
 
 class LectureFromFile extends Lecture {
