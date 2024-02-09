@@ -57,6 +57,10 @@ async function get_transcription(filePath: string) {
 	});
 }
 
+function delay(ms: number) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function transcribe(filePath: string, timestamps: object[]): Promise<string[] | null> {
 	try {
 		const [segmentCount, frames] = convertTimestampsToOptions(timestamps);
@@ -64,6 +68,7 @@ export async function transcribe(filePath: string, timestamps: object[]): Promis
 
 		const transcripts: string[] = [];
 		for (let segment = 1; segment <= segmentCount; segment++) {
+			await delay(30000);
 			const fileName = ('000' + segment).slice(-3);
 			const transcription: Transcription = await get_transcription(fileName);
 			transcripts.push(transcription.text);
