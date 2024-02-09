@@ -134,3 +134,4 @@ export class Project {
 		output(this.summary.text, sanitiseFileName(this.title), OutputType.PDF);
 	}
 }
+
