@@ -5,14 +5,14 @@ import { createReadStream } from 'fs';
 import { rm } from 'node:fs/promises';
 import pkg from 'fluent-ffmpeg';
 import { openai } from './openai_clinet';
+import type { Transcription } from 'openai/resources/audio/transcriptions.mjs';
+import path from 'path';
 
 const { setFfmpegPath } = pkg;
 
-function convertTimestampsToOptions(timestamps: string): [number, string] {
-	const json: [] = JSON.parse(timestamps);
-	console.log(json);
-	const segmentCount: number = json.length;
-	const options: string = json.map((timestamp) => timestamp.end).join(',');
+function convertTimestampsToOptions(timestamps: object[]): [number, string] {
+	const segmentCount: number = timestamps.length;
+	const options: string = timestamps.map((timestamp) => timestamp.end).join(',');
 	return [segmentCount, options];
 }
 
@@ -42,7 +42,7 @@ async function extract_audio(filePath: string, frames: string): Promise<void> {
 					resolve();
 				})
 				.on('error', (error) => {
-					console.log(error);
+					console.log('Error occurred with FFmpeg.');
 					reject(error);
 				})
 				.run();
@@ -57,21 +57,33 @@ async function get_transcription(filePath: string) {
 	});
 }
 
-export async function transcribe(filePath: string): Promise<string[] | null> {
+export async function transcribe(filePath: string, timestamps: object[]): Promise<string[] | null> {
 	try {
-		const json =
-			'[{ "id": 0, "start": 0, "end": 50000 }, { "id": 1, "start": 50001, "end": 60000 }]';
-		const [segmentCount, frames] = convertTimestampsToOptions(json);
-		console.log(segmentCount);
+		const [segmentCount, frames] = convertTimestampsToOptions(timestamps);
 		await extract_audio(filePath, frames);
-		
-		// const transcription: Transcription = await get_transcription(filePath);
-		// return transcription.text;
-		return ['a', 'b'];
+
+		const transcripts: string[] = [];
+		for (let segment = 1; segment <= segmentCount; segment++) {
+			const fileName = ('000' + segment).slice(-3);
+			const transcription: Transcription = await get_transcription(fileName);
+			transcripts.push(transcription.text);
+		}
+		return transcripts;
 	} catch (error) {
 		console.log(error);
 		return null;
 	} finally {
-		await rm('*.mp3');
+		fs.readdir('./', (err, files) => {
+			if (err) {
+				console.log(err);
+			}
+
+			files.forEach((file) => {
+				const fileDir = path.join('./', file);
+				if (path.extname(file).toLowerCase() == '.mp3') {
+					fs.unlinkSync(fileDir);
+				}
+			});
+		});
 	}
 }
