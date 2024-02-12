@@ -48,7 +48,7 @@
 			<!-- <TableBodyCell>{item.id}</TableBodyCell> -->
 			<TableBodyCell>{item.title}</TableBodyCell>
 			<TableBodyCell>{item.date}</TableBodyCell>
-			<TableBodyCell>{item.created_at}</TableBodyCell>
+			<TableBodyCell>{item.createdAt}</TableBodyCell>
 			<TableBodyCell>{determine_status(item)}</TableBodyCell>
 			</TableBodyRow>
 		{/each}

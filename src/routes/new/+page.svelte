@@ -22,10 +22,10 @@
 	}
 
 	let customisation: Customisation = {
-		highlight_keywords: false,
+		highlightKeywords: false,
 		questions: false,
-		summary_format: "",
-		no_pages: 1
+		summaryFormat: "",
+		noPages: 1
 	}
 
 	async function submit() {

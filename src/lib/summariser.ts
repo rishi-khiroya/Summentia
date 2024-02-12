@@ -3,25 +3,25 @@ import OpenAI from 'openai';
 
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-export async function summarise(transcript: string, detail_level: number = 1){
+export async function summarise(transcript: string, detailLevel: number = 1){
 
   // Adds prompt the level parameter for the extent of a given summary
-  let detail_phrase = "";
-  switch (detail_level){
+  let detailPhrase = "";
+  switch (detailLevel){
     case 0:
-      detail_phrase = " in 3 sentences or less: ";
+      detailPhrase = " in 3 sentences or less: ";
       break;
     case 1:
-      detail_phrase = ": ";
+      detailPhrase = ": ";
       break;
     case 2:
-      detail_phrase = " in great detail: ";
+      detailPhrase = " in great detail: ";
       break;
     default:
       break;
   }
 
-  const prompt = "Please summarise this" +  detail_phrase + transcript;
+  const prompt = "Please summarise this" +  detailPhrase + transcript;
   
 
   const completion = await openai.chat.completions.create({

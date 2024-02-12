@@ -10,7 +10,7 @@ const { setFfmpegPath } = pkg;
 const SPIN_TIMER_MS: number = 1000;
 const MAX_SPINS = 10;
 
-function extract_audio(filePath: string): boolean {
+function extractAudio(filePath: string): boolean {
 	if (!ffmpegPath) return false;
 
 	try {
@@ -38,7 +38,7 @@ function extract_audio(filePath: string): boolean {
 	return true;
 }
 
-async function run_query(filePath: string) {
+async function runQuery(filePath: string) {
 	const data = fs.readFileSync(filePath + '.mp3');
 	const response = await fetch(
 		'https://api-inference.huggingface.co/models/openai/whisper-large-v3',
@@ -54,14 +54,14 @@ async function run_query(filePath: string) {
 
 export async function transcribe(filePath: string): Promise<string | null> {
 	try {
-		if (!extract_audio(filePath)) return null;
+		if (!extractAudio(filePath)) return null;
 		let attempts: number = 0;
 		while (!fs.existsSync(filePath + '.mp3') && attempts <= MAX_SPINS) {
 			// spin every 1000ms
 			attempts++;
 			await new Promise((resolve) => setTimeout(resolve, SPIN_TIMER_MS));
 		}
-		const transcript = await run_query(filePath);
+		const transcript = await runQuery(filePath);
 		return transcript.text;
 	} catch (error) {
 		console.log(error);

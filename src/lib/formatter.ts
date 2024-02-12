@@ -8,27 +8,27 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 // we assumed that transcript_code is a string of LaTeX code containing the summary
 export async function format(transcript_code: string, customisations: Customisation){
 
-  let highlight_phrase = "";
-  if (customisations.highlight_keywords){
-    highlight_phrase = " highlight keywords ";
+  let highlightPhrase = "";
+  if (customisations.highlightKeywords){
+    highlightPhrase = " highlight keywords ";
   }
   
-  let questions_phrase = "";
+  let questionsPhrase = "";
   if (customisations.questions){
-    questions_phrase = " with a revision question answer section"
+    questionsPhrase = " with a revision question answer section"
   }
 
   // adds length prompt for length upper bound in pages, default set to 1
-  let length_phrase = "";
+  let lengthPhrase = "";
   if (customisations.length != -1){
     if (customisations.length == 1){
-      length_phrase = " in 1 page ";
+      lengthPhrase = " in 1 page ";
     } else {
-      length_phrase = " in " + customisations.length + " pages ";
+      lengthPhrase = " in " + customisations.length + " pages ";
     } 
   }
   
-  const prompt = "Plase give me this LaTeX code, " + length_phrase + highlight_phrase + customisations.summary_format + questions_phrase +" :" + transcript_code;
+  const prompt = "Plase give me this LaTeX code, " + lengthPhrase + highlightPhrase + customisations.summaryFormat + questionsPhrase +" :" + transcript_code;
 
   const completion = await openai.chat.completions.create({
     messages: [{ role: "system", content: prompt}],
