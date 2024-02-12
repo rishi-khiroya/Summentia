@@ -44,7 +44,7 @@
 
 		form.append('customisation', JSON.stringify(customisation));
 
-		if (supplementary.slides?.length) form.append('slides', supplementary.slides)
+		if (supplementary.slides?.length) form.append('slides', supplementary.slides);
 		form.append('noSupplementary', supplementary.length);
 		supplementaryFiles.forEach((file, i) => {
 			form.append(`supplementary${i}`, file);
