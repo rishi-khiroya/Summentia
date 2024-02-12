@@ -22,7 +22,7 @@ function createOuts(fileName: string): Record<OutputType, PandocOutFormat[]> {
 // do not need save parameter anymore
 export function output(latexCode: string, fileName: string = DEFAULT_FILE_NAME, outputType: OutputType = OutputType.PDF, save: boolean = false) {
     const pandocFormat = createOuts(fileName)[outputType][0];
-    if(outputType === OutputType.PDF){
+    if (outputType === OutputType.PDF) {
         const pdfEngine = 'xelatex';
         const pandocCommand = `pandoc -f latex -s -o "${pandocFormat.fname}" --pdf-engine=${pdfEngine}`;
         const child = childProcess.exec(pandocCommand, (error, stdout, stderr) => {

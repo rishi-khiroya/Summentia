@@ -71,7 +71,9 @@ export class Project {
 			if (!data) return false;
 			this.summary.text = data;
 			return true;
-		} else return false;
+		} 
+		
+		return false;
 	}
 
 	private async addSlidesToSummaries(): Promise<boolean> {

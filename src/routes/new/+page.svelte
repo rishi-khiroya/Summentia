@@ -38,7 +38,9 @@
 			if (lectureFileList && lectureFileList.length) {
 				form.append('lectureFile', lectureFileList[0]);
 			}
-		} else form.append('lectureURL', lectureURL);
+		} else {
+			form.append('lectureURL', lectureURL);
+		}
 
 		form.append('customisation', JSON.stringify(customisation));
 
