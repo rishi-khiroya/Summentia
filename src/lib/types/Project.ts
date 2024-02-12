@@ -48,20 +48,7 @@ export class Project {
 		this.customisation = customisation;
 	}
 
-	private async timestamp(): Promise<boolean> {
-		const video_path = 'video.mp4';
-		const slidesJSON = `{\
-                "num_slides": 7,\
-                "slides": [\
-                        "slides/Slides - Module 2 - K-NN and Decision Trees-01.png",\
-                        "slides/Slides - Module 2 - K-NN and Decision Trees-02.png",\
-                        "slides/Slides - Module 2 - K-NN and Decision Trees-03.png",\
-                        "slides/Slides - Module 2 - K-NN and Decision Trees-04.png",\
-                        "slides/Slides - Module 2 - K-NN and Decision Trees-05.png",\
-                        "slides/Slides - Module 2 - K-NN and Decision Trees-06.png",\
-                        "slides/Slides - Module 2 - K-NN and Decision Trees-07.png"\
-                ]\
-        }`;
+	private async timestamp(video_path: string, slidesJSON: string): Promise<boolean> {
 
 		const response: Response = await fetch('http://localhost:8000/get_timestamps', {
 			method: 'POST',
@@ -82,39 +69,23 @@ export class Project {
 	}
 
 	private async transcribe(): Promise<boolean> {
-		// const path: string = await this.lecture.toFilePath();
-		// const extlessPath: string = path.substring(0, path.lastIndexOf('.'));
+		if (!this.timestamps) return false;
 
-		const transcripts: string[] = [
-			'Hello everybody, and welcome to this second lecture for the Introduction to Machine Learning course.',
-			"You probably have already seen this course plan last week in Josiah's lecture, and today we are in week three, so we will cover instance-based learning and decision trees algorithm. Next week, I will leave the floor to my colleague Marek, that will be covering evaluation of machine learning algorithms and how we can actually compare, so first of all, quantify the performance and compare different algorithms together. Then it will be also covered in the next two weeks, the neural networks part of the course, and then I will see you again for the unsupervised learning algorithm and the genetic algorithm for the two last lectures of this term. So as I said, today we will be covering the instance-based learning and decision tree.",
-			'tree algorithm and more specifically we will cover in the first part of the lecture the k-nearest neighbor algorithm and then we will cover an algorithm used to train or to generate decision trees which is called the ID-free algorithm.',
-			"The reason why we are covering those two algorithms is because they actually belong to two different bigger classes of algorithms that are called the lazy learners and the eager learners. More specifically, the k-nearest neighbor is part of the lazy learner while the decision tree is part of the eager learner. The idea behind the lazy learner here is that the lazy learner will actually just store all the training examples in a data set and just postpone any type of processing on those data until an explicit request is made at test time. So typically when the user requests the model or the machine learning algorithm to make a prediction, then it's only there that the algorithm will actually do something and do some work. It's lazy in a sense that it's waiting the very last moment to do any type of work. On the other hand, the eager learner here will actually try to learn beforehand an explicit representation of the target function. The target function is what you can for instance see here and it will learn this prior any query. So then after learning this explicit function, it can actually discard and get rid of all the training data sets and training examples and just maintain in memory this target decision function and use this later when the user makes some queries or wants some prediction to be done.",
-			"So, for today's lecture, we will, as I said, first cover the classification with instance-based learning and, more specifically, the k-nearest neighbor algorithm. We will also see some variants of these k-NN algorithms, distance-weighted k-nearest neighbor algorithms, and we will just finish this part with a very brief introduction on how we can also use k-nearest neighbor algorithms for regression. Then in the second part of this lecture today, we will see how we can create decision trees and use decision trees to do some classification tasks. In particular, we will start with some intuition and motivation, then I will introduce the information entropy, that is a very fundamental concept in information theory, and then you will see how we can derive from the information entropy the information gain that is very central in the creation of decision trees. Then I will cover the overall algorithm of the decision trees, ID3 again, and I will show you in a worked example, step by step, how we can apply this algorithm on a very simple dataset. Finally, we will end this lecture with some further consideration about, for instance, how a decision tree can overfit, and how we can also apply an extended version of decision trees that are called random forests, and also regression trees as a brief introduction.",
-			"The lecture today is actually divided into six smaller videos. The first one is this current short introduction that will lays or that is actually laying down the different elements of this course and then the next video will be about the classification using k-nearest neighbor, so instance-based learning, then it's classification using decision trees, then how we can use and select the optimal split rules, you will see later why it's that important, then I cut and move the worked example in a separate video so you can find it whenever you want if you want to go back in specific details, and finally we will finish with a summary and some general consideration about decision trees and specifically how we can deal with overfitting. So first of all what is overfitting and how we can deal with overfitting in the case of decision trees.",
-			"So, that's the end for this first clip, and I invite you to move on to the next one, which will be about classification using instance-based learning. See you soon!"
-		];
+		const path: string = await this.lecture.toFilePath();
+		const extlessPath: string = path.substring(0, path.lastIndexOf('.'));
+
+		const transcripts: string[] | null = await transcribe(extlessPath, this.timestamps);
+		if (!transcripts) return false;
+		
 
 		this.transcripts = transcripts.map((transcript, index) => {
 			return { id: index, text: transcript };
 		});
 		return true;
-
-		// const transcript: string | null = await transcribe(extlessPath);
-		// if (!transcript) return false;
-
-		// this.transcript = { text: transcript };
-		// return true;
 	}
 
 	private async summarise(): Promise<boolean> {
 		if (!this.transcripts?.length) return false;
-
-		// const summary: string | null = await summarise(this.transcript?.text);
-		// if (!summary) return false;
-
-		// this.summary = { text: summary };
-		// return true;
 
 		const summaries: string[] = [];
 
@@ -168,6 +139,8 @@ export class Project {
 	// }
 
 	public async process(withLogs: boolean = false): Promise<boolean> {
+		if (withLogs) console.log('Timestamping...');
+		if (!(await this.timestamp("video_name", "slides_set"))) return false;
 		if (withLogs) console.log('Transcribing...');
 		if (!(await this.transcribe())) return false;
 		if (withLogs) console.log('Summarising...');
