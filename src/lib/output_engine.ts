@@ -20,7 +20,12 @@ function createOuts(fileName: string): Record<OutputType, PandocOutFormat[]> {
 }
 
 // do not need save parameter anymore
-export function output(latexCode: string, fileName: string = DEFAULT_FILE_NAME, outputType: OutputType = OutputType.PDF, save: boolean = false) {
+export function output(
+    latexCode: string, 
+    fileName: string = DEFAULT_FILE_NAME, 
+    outputType: OutputType = OutputType.PDF, 
+    save: boolean = false
+) {
     const pandocFormat = createOuts(fileName)[outputType][0];
     if (outputType === OutputType.PDF) {
         const pdfEngine = 'xelatex';

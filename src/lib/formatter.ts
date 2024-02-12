@@ -28,7 +28,13 @@ export async function format(transcript_code: string, customisations: Customisat
         } 
     }
   
-    const prompt = "Plase give me this LaTeX code, " + lengthPhrase + highlightPhrase + customisations.summaryFormat + questionsPhrase +" :" + transcript_code;
+    const prompt = "Please give me this LaTeX code, " 
+                        + lengthPhrase 
+                        + highlightPhrase 
+                        + customisations.summaryFormat 
+                        + questionsPhrase 
+                        + " :" 
+                        + transcript_code;
 
     const completion = await openai.chat.completions.create({
         messages: [{ role: "system", content: prompt}],

@@ -6,7 +6,9 @@
 
 	const NO_PAGES: number = 5;
 	let searchTerm: string = ''
-  	$: filteredItems = data.projects.filter((project) => project.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1);
+  	$: filteredItems = data.projects.filter(
+		(project) => project.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+	);
 
 	let pages = Array.from( { 
 		length: NO_PAGES 
@@ -25,10 +27,18 @@
 	}
 
 	const previous = () => {
-		goto(`?${new URLSearchParams($page.url.searchParams.toString()).set('page', Math.max(pageNo - 1, 1)).toString()}`)
+		goto(
+			`?${new URLSearchParams($page.url.searchParams.toString())
+					.set('page', Math.max(pageNo - 1, 1))
+					.toString()}`
+		)
 	};
 	const next = () => {
-		goto(`?${new URLSearchParams($page.url.searchParams.toString()).set('page', Math.min(pageNo + 1, data.noProjects)).toString()}`)
+		goto(
+			`?${new URLSearchParams($page.url.searchParams.toString())
+					.set('page', Math.min(pageNo + 1, data.noProjects))
+					.toString()}`
+		)
 	};
 
 </script>
