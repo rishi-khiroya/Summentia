@@ -59,7 +59,9 @@ export class Project {
 		return JSON.stringify(json);
 	}
 
-	private async timestamp(video_path: string): Promise<boolean> {
+	private async timestamp(): Promise<boolean> {
+
+		const videoPath: string = await this.lecture.toFilePath();
 
 		const slidesJSON = this.slidesArrayToString();
 		if (!slidesJSON) return false;
@@ -70,7 +72,7 @@ export class Project {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				video_path: video_path,
+				video_path: videoPath,
 				slides_json: slidesJSON
 			})
 		});
@@ -85,7 +87,8 @@ export class Project {
 	private async transcribe(): Promise<boolean> {
 		if (!this.timestamps) return false;
 
-		const path: string = await this.lecture.toFilePath();
+		// TODO: should path attribbute be called like this?
+		const path: string = await this.lecture.path;
 		const extlessPath: string = path.substring(0, path.lastIndexOf('.'));
 
 		const transcripts: string[] | null = await transcribe(extlessPath, this.timestamps);
@@ -154,7 +157,7 @@ export class Project {
 
 	public async process(withLogs: boolean = false): Promise<boolean> {
 		if (withLogs) console.log('Timestamping...');
-		if (!(await this.timestamp("video_name"))) return false;
+		if (!(await this.timestamp())) return false;
 		if (withLogs) console.log('Transcribing...');
 		if (!(await this.transcribe())) return false;
 		if (withLogs) console.log('Summarising...');
