@@ -9,6 +9,7 @@ import { prisma } from '$lib/prisma';
 import type { Customisation } from './Customisation';
 import { format } from '$lib/formatter';
 import { generateFinalLatexCode } from '$lib/latex_generation';
+import type { Slides } from './Slides';
 
 const MAX_PATH_LENGTH = 16;
 
@@ -48,7 +49,20 @@ export class Project {
 		this.customisation = customisation;
 	}
 
-	private async timestamp(video_path: string, slidesJSON: string): Promise<boolean> {
+	private slidesArrayToString() {
+		const slides: Slides | undefined = this.lecture.supplementaryInfo.slides;
+		if (!slides) return null;
+		const json = {
+			'num_slides': slides.noSlides,
+			'slides': slides.slides
+		}
+		return JSON.stringify(json);
+	}
+
+	private async timestamp(video_path: string): Promise<boolean> {
+
+		const slidesJSON = this.slidesArrayToString();
+		if (!slidesJSON) return false;
 
 		const response: Response = await fetch('http://localhost:8000/get_timestamps', {
 			method: 'POST',
@@ -140,7 +154,7 @@ export class Project {
 
 	public async process(withLogs: boolean = false): Promise<boolean> {
 		if (withLogs) console.log('Timestamping...');
-		if (!(await this.timestamp("video_name", "slides_set"))) return false;
+		if (!(await this.timestamp("video_name"))) return false;
 		if (withLogs) console.log('Transcribing...');
 		if (!(await this.transcribe())) return false;
 		if (withLogs) console.log('Summarising...');
