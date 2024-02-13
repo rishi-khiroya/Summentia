@@ -19,6 +19,7 @@ export const handle = SvelteKitAuth({
             clientId: AUTH0_CLIENT_ID,
             clientSecret: AUTH0_CLIENT_SECRET,
             issuer: AUTH0_ISSUER_BASE_URL,
+            allowDangerousEmailAccountLinking: true
         })
     ],
     callbacks: {
