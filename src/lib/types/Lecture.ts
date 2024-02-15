@@ -9,7 +9,7 @@ export abstract class Lecture {
 		this.path = `${fileName}`;
 	}
 
-	public abstract getTitleDate(): Promise<{ title: string; date: Date }>;
+	public abstract getTitleDate(): Promise<{ title: string; date: string }>;
 
 	public abstract toFilePath(): Promise<string>;
 	// public abstract saveToUrl(): URL;
@@ -41,7 +41,7 @@ export abstract class Lecture {
 }
 
 class TestLecture extends Lecture {
-	public getTitleDate(): Promise<{ title: string; date: Date }> {
+	public getTitleDate(): Promise<{ title: string; date: string }> {
 		throw new Error('Method not implemented.');
 	}
 
@@ -59,7 +59,7 @@ class TestLecture extends Lecture {
 }
 
 class LectureFromFile extends Lecture {
-	public getTitleDate(): Promise<{ title: string; date: Date }> {
+	public getTitleDate(): Promise<{ title: string; date: string }> {
 		throw new Error('Method not implemented.');
 	}
 
@@ -82,7 +82,7 @@ class LectureFromFile extends Lecture {
 
 // TODO: check if can be combined with URLHandler
 class LectureFromUrl extends Lecture {
-	public getTitleDate(): Promise<{ title: string; date: Date }> {
+	public getTitleDate(): Promise<{ title: string; date: string }> {
 		throw new Error('Method not implemented.');
 	}
 
