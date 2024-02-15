@@ -5,7 +5,7 @@
 	let uploadFile: File[] = [];
 
 	export let name: string;
-
+	export let required: boolean = false;
 	export let allowedFileType: string;
 
 	export let upload: Upload = {
@@ -87,7 +87,7 @@
 					/></svg
 				>
 				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-					<span class="font-semibold">Click to upload</span> or drag and drop
+					{required ? '*' : ''}<span class="font-semibold">Click to upload</span> or drag and drop
 				</p>
 				<p class="text-xs text-gray-500 dark:text-gray-400">{allowedFileType} files only</p>
 			{:else}
@@ -95,7 +95,7 @@
 			{/if}
 		</Dropzone>
 	{:else}
-		<span class="px-1 dark:text-white">URL:</span>
+		<span class="px-1 dark:text-white">{required ? '*' : ''}URL:</span>
 		<Input type="url" placeholder="Enter lecture URL" bind:value={upload.url} />
 	{/if}
 </div>
