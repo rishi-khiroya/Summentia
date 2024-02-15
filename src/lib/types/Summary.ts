@@ -1,7 +1,5 @@
 export interface Summary {
-
-    // TODO
-    id: number
-    text: string
-
+	// TODO
+	id: number;
+	text: string;
 }

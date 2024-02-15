@@ -1,7 +1,5 @@
 export interface Transcript {
-
-    // TODO
-    id: number
-    text: string
-
+	// TODO
+	id: number;
+	text: string;
 }

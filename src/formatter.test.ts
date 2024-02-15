@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { format } from "../src/lib/formatter";
+import { format } from '../src/lib/formatter';
 
 const lecture1_latex: string = `\\documentclass{article}
 \\usepackage[utf8]{inputenc}
@@ -43,156 +43,160 @@ Now there are other verbal pneumonic techniques as well.
 
 \\end{document}`;
 
-const default_customisation = {highlight_keywords: false,  questions: false, 
-                           summary_format: "", length: 1};
+const default_customisation = {
+	highlight_keywords: false,
+	questions: false,
+	summary_format: '',
+	length: 1
+};
 
 test('1 page of short transcript remains in LaTeX format', async () => {
-    
-    const summary = await format(lecture1_latex, default_customisation);
+	const summary = await format(lecture1_latex, default_customisation);
 
-    let is_latex = false;
-    if (summary != null){
-        is_latex = summary.includes(`\\begin{document}`);
-    }
+	let is_latex = false;
+	if (summary != null) {
+		is_latex = summary.includes(`\\begin{document}`);
+	}
 
-    expect(is_latex).toStrictEqual(true);
+	expect(is_latex).toStrictEqual(true);
 }, 70000);
 
 test('1 page of short transcript in LaTeX format with highlighted keywords', async () => {
-    
-    let customisation = {};
-    customisation = Object.assign(customisation, default_customisation);
-    customisation.highlight_keywords = true;
+	let customisation = {};
+	customisation = Object.assign(customisation, default_customisation);
+	customisation.highlight_keywords = true;
 
-    const summary = await format(lecture1_latex, customisation);
+	const summary = await format(lecture1_latex, customisation);
 
-    let has_highlights = false;
-    if (summary != null){
-        has_highlights = summary.includes("\\textbf") || summary.includes("\\\keyword");
-    }
+	let has_highlights = false;
+	if (summary != null) {
+		has_highlights = summary.includes('\\textbf') || summary.includes('\\keyword');
+	}
 
-    expect(has_highlights).toStrictEqual(true);
+	expect(has_highlights).toStrictEqual(true);
 }, 70000);
 
 test('1 page of short transcript in LaTeX format with bullet points', async () => {
-    
-    let customisation = {};
-    customisation = Object.assign(customisation, default_customisation);
-    customisation.summary_format = " in bullet point format ";
+	let customisation = {};
+	customisation = Object.assign(customisation, default_customisation);
+	customisation.summary_format = ' in bullet point format ';
 
-    const summary = await format(lecture1_latex, customisation);
+	const summary = await format(lecture1_latex, customisation);
 
-    let has_bullet_points = false;
-    if (summary != null){
-        has_bullet_points = summary.includes("\\item") || summary.includes("\n- ");
-    }
+	let has_bullet_points = false;
+	if (summary != null) {
+		has_bullet_points = summary.includes('\\item') || summary.includes('\n- ');
+	}
 
-    expect(has_bullet_points).toStrictEqual(true);
+	expect(has_bullet_points).toStrictEqual(true);
 }, 70000);
 
 test('1 page of short transcript in LaTeX format with both highlighted keywords and bullet points', async () => {
-    
-    let customisation = {};
-    customisation = Object.assign(customisation, default_customisation);
-    customisation.summary_format = " in bullet point format ";
-    customisation.highlight_keywords = true;
+	let customisation = {};
+	customisation = Object.assign(customisation, default_customisation);
+	customisation.summary_format = ' in bullet point format ';
+	customisation.highlight_keywords = true;
 
-    const summary = await format(lecture1_latex, customisation);
+	const summary = await format(lecture1_latex, customisation);
 
-    let has_bullet_points = false;
-    if (summary != null){
-        has_bullet_points = summary.includes("\\item") || summary.includes("\n- ");
-    }
+	let has_bullet_points = false;
+	if (summary != null) {
+		has_bullet_points = summary.includes('\\item') || summary.includes('\n- ');
+	}
 
-    let has_highlights = false;
-    if (summary != null){
-        has_highlights = summary.includes("\\textbf") || summary.includes("\\\keyword");
-    }
+	let has_highlights = false;
+	if (summary != null) {
+		has_highlights = summary.includes('\\textbf') || summary.includes('\\keyword');
+	}
 
-    expect(has_bullet_points).toStrictEqual(true);
-    expect(has_highlights).toStrictEqual(true);
+	expect(has_bullet_points).toStrictEqual(true);
+	expect(has_highlights).toStrictEqual(true);
 }, 70000);
 
 test('1 page of short transcript in LaTeX format with revision section', async () => {
-    
-    let customisation = {};
-    customisation = Object.assign(customisation, default_customisation);
-    customisation.questions = true;
+	let customisation = {};
+	customisation = Object.assign(customisation, default_customisation);
+	customisation.questions = true;
 
-    const summary = await format(lecture1_latex, customisation);
+	const summary = await format(lecture1_latex, customisation);
 
-    let has_revision_section = false;
-    if (summary != null){
-        has_revision_section = summary.includes("Question") || summary.includes("Question 1") ||
-                               summary.includes("Q") || summary.includes("Q1") || summary.includes("question")
-                               || summary.includes("Revision");
-    }
+	let has_revision_section = false;
+	if (summary != null) {
+		has_revision_section =
+			summary.includes('Question') ||
+			summary.includes('Question 1') ||
+			summary.includes('Q') ||
+			summary.includes('Q1') ||
+			summary.includes('question') ||
+			summary.includes('Revision');
+	}
 
-    expect(has_revision_section).toStrictEqual(true);
+	expect(has_revision_section).toStrictEqual(true);
 }, 70000);
 
 test('1 page of short transcript in LaTeX format with bullet points, highlighted keywords and revision section', async () => {
-    
-    let customisation = {};
-    customisation = Object.assign(customisation, default_customisation);
-    customisation.questions = true;
-    customisation.summary_format = " in bullet point format ";
-    customisation.highlight_keywords = true;
+	let customisation = {};
+	customisation = Object.assign(customisation, default_customisation);
+	customisation.questions = true;
+	customisation.summary_format = ' in bullet point format ';
+	customisation.highlight_keywords = true;
 
-    const summary = await format(lecture1_latex, customisation);
+	const summary = await format(lecture1_latex, customisation);
 
-    let has_revision_section = false;
-    if (summary != null){
-        has_revision_section = summary.includes("Question") && summary.includes("Answer") ||
-                               summary.includes("Question 1") && summary.includes("Answer 1") ||
-                               summary.includes("Q") && summary.includes("A") ||
-                               summary.includes("Q1") && summary.includes("A1") || summary.includes("Revision");
-    }
+	let has_revision_section = false;
+	if (summary != null) {
+		has_revision_section =
+			(summary.includes('Question') && summary.includes('Answer')) ||
+			(summary.includes('Question 1') && summary.includes('Answer 1')) ||
+			(summary.includes('Q') && summary.includes('A')) ||
+			(summary.includes('Q1') && summary.includes('A1')) ||
+			summary.includes('Revision');
+	}
 
-    let has_bullet_points = false;
-    if (summary != null){
-        has_bullet_points = summary.includes("\\item") || summary.includes("\n- ");
-    }
+	let has_bullet_points = false;
+	if (summary != null) {
+		has_bullet_points = summary.includes('\\item') || summary.includes('\n- ');
+	}
 
-    let has_highlights = false;
-    if (summary != null){
-        has_highlights = summary.includes("\\textbf") || summary.includes("\\\keyword");
-    }
+	let has_highlights = false;
+	if (summary != null) {
+		has_highlights = summary.includes('\\textbf') || summary.includes('\\keyword');
+	}
 
-    expect(has_revision_section).toStrictEqual(true);
-    expect(has_bullet_points).toStrictEqual(true);
-    expect(has_highlights).toStrictEqual(true);
+	expect(has_revision_section).toStrictEqual(true);
+	expect(has_bullet_points).toStrictEqual(true);
+	expect(has_highlights).toStrictEqual(true);
 }, 70000);
 
 test('1 page of realistic transcript in LaTeX format with bullet points, highlighted keywords and revision section', async () => {
-    
-    let customisation = {};
-    customisation = Object.assign(customisation, default_customisation);
-    customisation.questions = true;
-    customisation.summary_format = " in bullet point format ";
-    customisation.highlight_keywords = true;
+	let customisation = {};
+	customisation = Object.assign(customisation, default_customisation);
+	customisation.questions = true;
+	customisation.summary_format = ' in bullet point format ';
+	customisation.highlight_keywords = true;
 
-    const summary = await format(lecture2_latex, customisation);
+	const summary = await format(lecture2_latex, customisation);
 
-    let has_revision_section = false;
-    if (summary != null){
-        has_revision_section = summary.includes("Question") && summary.includes("Answer") ||
-                               summary.includes("Question 1") && summary.includes("Answer 1") ||
-                               summary.includes("Q") && summary.includes("A") ||
-                               summary.includes("Q1") && summary.includes("A1");
-    }
+	let has_revision_section = false;
+	if (summary != null) {
+		has_revision_section =
+			(summary.includes('Question') && summary.includes('Answer')) ||
+			(summary.includes('Question 1') && summary.includes('Answer 1')) ||
+			(summary.includes('Q') && summary.includes('A')) ||
+			(summary.includes('Q1') && summary.includes('A1'));
+	}
 
-    let has_bullet_points = false;
-    if (summary != null){
-        has_bullet_points = summary.includes("\\item") || summary.includes("\n- ");
-    }
+	let has_bullet_points = false;
+	if (summary != null) {
+		has_bullet_points = summary.includes('\\item') || summary.includes('\n- ');
+	}
 
-    let has_highlights = false;
-    if (summary != null){
-        has_highlights = summary.includes("\\textbf") || summary.includes("\\\keyword");
-    }
+	let has_highlights = false;
+	if (summary != null) {
+		has_highlights = summary.includes('\\textbf') || summary.includes('\\keyword');
+	}
 
-    expect(has_revision_section).toStrictEqual(true);
-    expect(has_bullet_points).toStrictEqual(true);
-    expect(has_highlights).toStrictEqual(true);
+	expect(has_revision_section).toStrictEqual(true);
+	expect(has_bullet_points).toStrictEqual(true);
+	expect(has_highlights).toStrictEqual(true);
 }, 70000);
