@@ -5,7 +5,9 @@
 	export let currentStep: number;
 	export let step: Step;
 
-	export let submit: () => { success: boolean; msg: string | undefined } = () => {
+	export let submit: () =>
+		| { success: boolean; msg: string | undefined }
+		| Promise<{ success: boolean; msg: string | undefined }> = () => {
 		return { success: true, msg: undefined };
 	};
 	export let isPopulated: () => boolean = () => true;
@@ -13,7 +15,7 @@
 	$: try {
 		step.populated = isPopulated();
 	} catch (e) {
-		console.warn(e);
+		// console.warn(e);
 		step.populated = false;
 	}
 </script>
@@ -28,12 +30,13 @@
 			>
 			<Button
 				color="alternative"
-				on:click={() => {
-					const response = submit();
+				on:click={async () => {
+					if (step.required && !step.populated) return;
+
+					const response = await submit();
 					if (!response.success) return; // TODO: indicate to user why it failed using msg
 
 					if (currentStep == -1) return;
-					if (step.required && !step.populated) return;
 
 					// Set status and move to next step
 					step.status = step.populated ? StepStatus.COMPLETED : StepStatus.SKIPPED;
