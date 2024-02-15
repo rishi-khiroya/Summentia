@@ -1,109 +1,119 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { AccordionItem, Accordion, Fileupload, Button, Spinner, Input } from 'flowbite-svelte';
-	import LectureUpload from './LectureUpload.svelte';
-	import Customisation from './Customisation.svelte';
+	import FormStep from './FormStep.svelte';
+	import { StepStatus, type Step } from './(types)/Step';
+	import ProgressIndicator from './ProgressIndicator.svelte';
+	import { Input } from 'flowbite-svelte';
+	import FileUpload from './FileUpload.svelte';
+	import type { Upload } from './(types)/Upload';
+	import { goto } from '$app/navigation';
 
-	let waiting: boolean = false;
+	export let data;
 
-	let title: string;
-	let date: Date;
+	let currentStep: number = -1;
 
-	let doLectureUpload = false;
-	let lectureURL: string;
-	let lectureFileList: FileList;
+	let steps: Step[] = [
+		{
+			id: 0,
+			name: 'Lecture',
+			required: true,
+			populated: false,
+			status: StepStatus.UNSEEN
+		},
+		{
+			id: 1,
+			name: 'Slides',
+			required: false,
+			populated: false,
+			status: StepStatus.UNSEEN
+		},
+		{
+			id: 2,
+			name: 'Info',
+			required: true,
+			populated: false,
+			status: StepStatus.UNSEEN
+		}
+	];
 
-	let supplementary: { 
-		slides: FileList | undefined, 
-		extras: FileList | undefined
-	} = { 
-		slides: undefined, 
-		extras: undefined 
+	$: {
+		if (currentStep == steps.length) currentStep = -1;
+		if (currentStep < -1) currentStep = steps.length - 1;
 	}
 
-	let customisation: Customisation = {
-		highlight_keywords: false,
-		questions: false,
-		summary_format: "",
-		no_pages: 1
-	}
+	let lectureUpload: Upload;
 
-	async function submit() {
-		const form = new FormData();
+	let info: {
+		title: string;
+		date: string;
+	} = { title: 'Test', date: '2024-02-14' };
 
-		form.append('userId', $page.data.session.user.id);
-
-		form.append('isLectureFile', doLectureUpload.toString());
-		if (doLectureUpload) {
-			if (lectureFileList && lectureFileList.length) {
-				form.append('lectureFile', lectureFileList[0]);
-			}
-		} else form.append('lectureURL', lectureURL);
-
-		form.append('customisation', JSON.stringify(customisation));
-
-		if (supplementary.slides?.length) form.append('slides', supplementary.slides)
-		form.append('noSupplementary', supplementary.length);
-		supplementaryFiles.forEach((file, i) => {
-			form.append(`supplementary${i}`, file);
-		});
-
-		waiting = true;
-		const response: Response = await fetch('?/submit', {
-			method: 'POST',
-			body: form
-		});
-
-		const data = JSON.parse((await response.json()).data);
-		waiting = false;
-	}
+	let slidesUpload: Upload;
 </script>
 
-<div class="flex-1 p-5">
-	<div class="flex-1">
-		<Accordion>
-			<AccordionItem>
-				<span slot="header">Info</span>
-				<div class="flex flex-row justify-between">
-					<div>
-						<span>Title</span>
-						<Input type="text" bind:title placeholder="My Lecture..."/>
-					</div>
-					<div>
-						<span>Date</span>
-						<Input type="date" bind:date />
-					</div>
-				</div>
-			</AccordionItem>
-			<AccordionItem open>
-				<span slot="header">Upload Lecture</span>
-				<LectureUpload bind:fileList={lectureFileList} bind:doLectureUpload bind:lectureURL />
-			</AccordionItem>
-			<AccordionItem>
-				<span slot="header">Upload Slides</span>
-				<Fileupload on:change={event => supplementary.slides = event.target.files}/>
-			</AccordionItem>
+<div class="flex flex-col p-5 m-10 bg-white dark:bg-slate-800 shadow-xl rounded-2xl">
+	<ProgressIndicator bind:currentStep bind:steps />
 
-			<AccordionItem>
-				<span slot="header">Add Supplementary Info</span>
-				<Fileupload multiple on:change={event => supplementary.extras = event.target.files} />
-			</AccordionItem>
-			<AccordionItem>
-				<span slot="header">Customisation</span>
-				<Customisation bind:customisation />
-			</AccordionItem>
-		</Accordion>
-	</div>
-	<div style="display: flex; justify-content: flex-end;">
-		{#if waiting}
-			<Button color="dark" class="m-5 p-4">
-				<Spinner class="me-3" size="4" color="white" />
-				Loading ...
-			</Button>
-		{:else}
-			<Button type="submit" on:click={() => submit()} color="dark" class="text-white m-5 p-4"
-				>Submit</Button
-			>
+	<!-- Upload Lecture -->
+	<FormStep
+		bind:step={steps[0]}
+		bind:currentStep
+		isPopulated={() => (lectureUpload.fromFile ? !!lectureUpload.fileList : !!lectureUpload.url)}
+	>
+		<h1 class="text-2xl font-bold dark:text-white">Upload lecture:</h1>
+		<FileUpload bind:upload={lectureUpload} name="Lecture" allowedFileType=".mp4" />
+	</FormStep>
+
+	<!-- Upload Slides (maybe) -->
+	<FormStep
+		step={steps[1]}
+		bind:currentStep
+		isPopulated={() => (slidesUpload.fromFile ? !!slidesUpload.fileList : !!slidesUpload.url)}
+	>
+		<h1 class="text-2xl font-bold dark:text-white">Upload slides:</h1>
+		<FileUpload bind:upload={slidesUpload} name="Slides" allowedFileType=".pdf, .pptx" />
+	</FormStep>
+
+	<!-- Confirm title and date (guessed from lecture/slides) -->
+	<FormStep step={steps[2]} bind:currentStep isPopulated={() => !!info.date && !!info.title}>
+		<h1 class="text-2xl font-bold dark:text-white">Project Information:</h1>
+		<div class="flex flex-col space-y-3">
+			<h1 class="font-semibold dark:text-white">Please verify the following:</h1>
+			<div class="flex flex-row space-x-5 px-5">
+				<div class="w-full p-3 mx-5">
+					<span class="dark:text-white p-1">Title:</span>
+					<Input type="text" bind:value={info.title} placeholder="My Lecture..." />
+				</div>
+				<div class="w-full p-3 mx-5">
+					<span class="dark:text-white p-1">Date:</span>
+					<Input type="date" bind:value={info.date} />
+				</div>
+			</div>
+			<!-- TODO: potentially add a preview of the video here -->
+		</div>
+	</FormStep>
+
+	<!-- Review and submit -->
+	<FormStep
+		step={{
+			id: -1,
+			name: 'Submit',
+			required: true,
+			status: StepStatus.UNSEEN,
+			populated: false
+		}}
+		bind:currentStep
+		submit={() => {
+			goto('dashboard'); // TODO: change to a progress page or something like that
+			return { success: true, msg: undefined };
+		}}
+	>
+		<h1 class="text-2xl font-bold dark:text-white">Review & Submit:</h1>
+		<p class="p-5">Blah blah some stuff ...</p>
+		<!-- TODO -->
+		{#if !data.session?.user}
+			<h1 class="font-medium text-orange-600">
+				Warning: you are not logged in. This project will not be accessible again.
+			</h1>
 		{/if}
-	</div>
+	</FormStep>
 </div>
