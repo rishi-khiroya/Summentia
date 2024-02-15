@@ -4,9 +4,14 @@
 
 	export let currentStep: number;
 	export let steps: Step[];
+	export let waiting: boolean;
 
 	const ACTIVE_TEXT_STYLE: string = 'font-bold text-black dark:text-white';
 	const PASSIVE_TEXT_STYLE: string = 'text-gray-700 dark:text-gray-300';
+
+	const ACTIVE_SEPARATOR_STYLE: string =
+		'h-1 rounded-2xl animate-pulse bg-gray-300 dark:bg-gray-600';
+	const PASSIVE_SEPARATOR_STYLE: string = 'h-0.5 bg-gray-200  dark:bg-gray-700';
 
 	function statusToColor(step: Step): 'gray' | 'red' | 'yellow' | 'green' {
 		switch (step.status) {
@@ -61,7 +66,9 @@
 						</h3>
 					</div>
 				</button>
-				<div class="flex w-full bg-gray-200 h-0.5 dark:bg-gray-700 mt-3" />
+				<div
+					class={`flex w-full mt-3 ${waiting && step.id == currentStep ? ACTIVE_SEPARATOR_STYLE : PASSIVE_SEPARATOR_STYLE}`}
+				/>
 			</div>
 		{/each}
 		<button
