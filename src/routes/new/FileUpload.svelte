@@ -1,26 +1,33 @@
 <script lang="ts">
 	import { Dropzone, Input, Toggle } from 'flowbite-svelte';
+	import type { Upload } from './(types)/Upload';
 
-	let lectureFile: File[] = [];
-	export let doLectureUpload: boolean;
-	export let lectureURL: string;
+	let uploadFile: File[] = [];
 
-	export let fileList: FileList;
+	export let name: string;
+
+	export let allowedFileType: string;
+
+	export let upload: Upload = {
+		fromFile: false,
+		url: '',
+		fileList: undefined
+	};
 
 	const dropHandle = (event: any) => {
-		lectureFile = [];
+		uploadFile = [];
 		event.preventDefault();
 		if (event.dataTransfer.items) {
 			[...event.dataTransfer.items].forEach((item) => {
 				if (item.kind === 'file') {
 					const file = item.getAsFile();
-					lectureFile.push(file.name);
-					lectureFile = lectureFile;
+					uploadFile.push(file.name);
+					uploadFile = uploadFile;
 				}
 			});
 		} else {
 			[...event.dataTransfer.files].forEach((file) => {
-				lectureFile = file.name;
+				uploadFile = file.name;
 			});
 		}
 	};
@@ -28,10 +35,10 @@
 	const handleChange = (event: any) => {
 		const files = event.target.files;
 		if (files.length > 0) {
-			lectureFile.push(files[0].name);
-			lectureFile = lectureFile;
+			uploadFile.push(files[0].name);
+			uploadFile = uploadFile;
 		}
-		fileList = files;
+		upload.fileList = files;
 	};
 
 	const showFiles = (files: Blob[]) => {
@@ -51,14 +58,12 @@
 
 <div class="flex py-3">
 	<!-- TODO: improve wording -->
-	<p class="pr-3">Upload Lecture</p>
-	<Toggle checked on:change={() => (doLectureUpload = !doLectureUpload)} />
-	<p class="pl-0">Lecture From URL</p>
+	<p class="pr-3 dark:text-white">{name} from File</p>
+	<Toggle checked on:change={() => (upload.fromFile = !upload.fromFile)} />
+	<p class="pl-0 dark:text-white">{name} from URL</p>
 </div>
 <div class="flex-1">
-	{#if doLectureUpload}
-		<h1 class="text-lg">Upload Lecture:</h1>
-
+	{#if upload.fromFile}
 		<Dropzone
 			on:drop={dropHandle}
 			on:dragover={(event) => {
@@ -66,7 +71,7 @@
 			}}
 			on:change={handleChange}
 		>
-			{#if lectureFile.length === 0}
+			{#if uploadFile.length === 0}
 				<svg
 					aria-hidden="true"
 					class="mb-3 w-10 h-10 text-gray-400"
@@ -84,13 +89,13 @@
 				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
 					<span class="font-semibold">Click to upload</span> or drag and drop
 				</p>
-				<p class="text-xs text-gray-500 dark:text-gray-400">.mp4 files only</p>
+				<p class="text-xs text-gray-500 dark:text-gray-400">{allowedFileType} files only</p>
 			{:else}
-				<p>{showFiles(lectureFile)}</p>
+				<p>{showFiles(uploadFile)}</p>
 			{/if}
 		</Dropzone>
 	{:else}
-		<h1 class="text-lg">Upload from URL:</h1>
-		<Input type="url" placeholder="Enter lecture URL" bind:value={lectureURL} />
+		<span class="px-1 dark:text-white">URL:</span>
+		<Input type="url" placeholder="Enter lecture URL" bind:value={upload.url} />
 	{/if}
 </div>
