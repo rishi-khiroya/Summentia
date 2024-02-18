@@ -48,7 +48,7 @@ Previous Slide
 
 <div class="fixed bottom-10 right-40 p-40">
     <Button color="dark" pill={true} class="fixed bottom-60 right-80 p-5"><ArrowRightOutline class="w-4 h-4" /></Button>
-Previous Slide
+Next Slide
 </div>
 
 <div class="fixed bottom-0 right-0 p-5">
