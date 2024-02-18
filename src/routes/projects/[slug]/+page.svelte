@@ -1,18 +1,44 @@
 <script lang="ts">
-    import { EditSolid, DownloadSolid, AngleDownSolid } from 'flowbite-svelte-icons';
     import InformationBox from './InformationBox.svelte'
+    import { 
+        EditSolid, 
+        DownloadSolid, 
+        AngleDownSolid, 
+        ChevronLeftOutline, 
+        ChevronRightOutline 
+    } from 'flowbite-svelte-icons';
     import { 
         ButtonGroup, 
         Button, 
         Dropdown, 
         DropdownItem, 
+        ImagePlaceholder,
         VideoPlaceholder, 
         TextPlaceholder, 
-        CardPlaceholder
+        CardPlaceholder,
+        Pagination
     } from 'flowbite-svelte';
+
+    let displaySlides = true;
+
+    let pages = [
+        { name: "1", href: "/projects/1?page=1" },
+        { name: "3", href: "/projects/1?page=3" },
+        { name: "2", href: "/projects/1?page=2" },
+        { name: "4", href: "/projects/1?page=4" },
+        { name: "5", href: "/projects/1?page=5"}
+    ]
+
+    const previous = () => {
+        alert('Previous btn clicked. Make a call to your server to fetch data.');
+    };
+    const next = () => {
+        alert('Next btn clicked. Make a call to your server to fetch data.');
+    };
+
 </script>
 
-<div class="max-h-screen flex-1">
+<div class="flex-1">
     <div class="flex-col px-10 pt-10">
         <div class="justify-start items-center flex">
             <Button class="h-10 w-10" pill={true} color="dark"><EditSolid class="focus:!outline-none" /></Button>
@@ -29,16 +55,41 @@
                 </Dropdown>
             </ButtonGroup>
         </div>
-        <div class="flex">
-            <div class="flex-col flex-1">
-                <InformationBox title="Transcript" maxHeight="80">
+        {#if displaySlides}
+            <div class="grid grid-rows-2 grid-flow-col gap-0">
+                <VideoPlaceholder size="xxl" class="m-5" />
+                <ImagePlaceholder imgHeight="72" class="m-5" />
+                <InformationBox title="Transcript:" maxHeight="72">
                     <TextPlaceholder size="xxl" />
                 </InformationBox>
-                <VideoPlaceholder size="xxl" class="m-5" />
+                <InformationBox title="Summary:" maxHeight="72">
+                    <TextPlaceholder size="xxl" />
+                </InformationBox>
             </div>
-            <InformationBox title="Preview:" maxHeight="[650px]" additionalAttributes="flex-1 min-h-[600px]">
-            <CardPlaceholder size="xxl" />
-            </InformationBox>
-        </div>
+            <div class="flex justify-center">
+                <Pagination {pages} large on:previous={previous} on:next={next} icon>
+                    <svelte:fragment slot="prev">
+                        <span class="sr-only">Previous</span>
+                        <ChevronLeftOutline class="w-7 h-7" />
+                    </svelte:fragment>
+                    <svelte:fragment slot="next">
+                        <span class="sr-only">Next</span>
+                        <ChevronRightOutline class="w-7 h-7" />
+                    </svelte:fragment>
+                </Pagination>
+            </div>
+        {:else}
+            <div class="flex">
+                <div class="flex-col flex-1">
+                    <InformationBox title="Transcript" maxHeight="80">
+                        <TextPlaceholder size="xxl" />
+                    </InformationBox>
+                    <VideoPlaceholder size="xxl" class="m-5" />
+                </div>
+                <InformationBox title="Preview:" maxHeight="[650px]" additionalAttributes="flex-1 min-h-[600px]">
+                <CardPlaceholder size="xxl" />
+                </InformationBox>
+            </div>
+        {/if}
     </div>
 </div>
