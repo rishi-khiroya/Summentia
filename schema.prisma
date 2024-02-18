@@ -8,17 +8,27 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+enum Status {
+  UNPROCESSED
+  SPLIT
+  TRANSCRIBED
+  SUMMARISED
+  OUTPUT
+  COMPLETED
+}
+
 model Project {
-  id         Int       @id @default(autoincrement())
-  title      String
-  userId     String
-  date       DateTime?
-  createdAt  DateTime  @default(now())
-  videoUrl   String?   @db.Text
-  audioUrl   String?   @db.Text
-  transcript String?   @db.Text
-  summary    String?   @db.Text
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  title     String
+  userId    String?
+  date      DateTime
+  createdAt DateTime @default(now())
+  status    Status   @default(UNPROCESSED)
+  waiting   Boolean  @default(true)
+  hasSlides Boolean  @default(false)
+  video     String?  @db.Text
+  data      Json?    @default(dbgenerated())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
