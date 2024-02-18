@@ -9,16 +9,17 @@ datasource db {
 }
 
 model Project {
-  id         Int       @id @default(autoincrement())
-  title      String
-  userId     String
-  date       DateTime?
-  createdAt  DateTime  @default(now())
-  videoUrl   String?   @db.Text
-  audioUrl   String?   @db.Text
-  transcript String?   @db.Text
-  summary    String?   @db.Text
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  title     String
+  userId    String?
+  date      DateTime
+  createdAt DateTime @default(now())
+  data      Json?
+  status    Status   @default(UNPROCESSED)
+  waiting   Boolean  @default(true)
+  hasSlides Boolean  @default(false)
+  video     String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
@@ -27,15 +28,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -52,12 +52,12 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
-  emailVerified DateTime?
   createdAt     DateTime  @default(now())
+  emailVerified DateTime?
   image         String?
   accounts      Account[]
-  sessions      Session[]
   projects      Project[]
+  sessions      Session[]
 }
 
 model VerificationToken {
@@ -66,4 +66,13 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum Status {
+  UNPROCESSED
+  SPLIT
+  TRANSCRIBED
+  SUMMARISED
+  OUTPUT
+  COMPLETED
 }
