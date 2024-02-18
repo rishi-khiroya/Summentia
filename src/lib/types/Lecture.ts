@@ -1,5 +1,6 @@
 import { rm, writeFile } from 'node:fs/promises';
 import { URLHandler } from './URLHandler';
+import path from 'node:path';
 
 // TODO: complete definition
 export abstract class Lecture {
@@ -20,7 +21,7 @@ export abstract class Lecture {
 
 	static fromForm(form: FormData): Lecture {
 		let lecture: Lecture | undefined;
-		if (form.get('isLectureFile') === 'true') {
+		if (form.get('lectureFromFile') === 'true') {
 			lecture = new LectureFromFile(form.get(`lectureFile`) as File);
 		} else {
 			const data = form.get('lectureURL');
@@ -59,9 +60,6 @@ class TestLecture extends Lecture {
 }
 
 class LectureFromFile extends Lecture {
-	public getTitleDate(): Promise<{ title: string; date: string }> {
-		throw new Error('Method not implemented.');
-	}
 
 	private readonly file: File;
 
@@ -73,6 +71,21 @@ class LectureFromFile extends Lecture {
 	public async toFilePath(): Promise<string> {
 		await writeFile(this.path, Buffer.from(await this.file.arrayBuffer()));
 		return this.path;
+	}
+
+	public async getTitleDate(): Promise<{ title: string; date: string }> {
+
+		const date = new Date();
+
+		return {
+			title: path.parse(this.file.name).
+				name.
+				replaceAll(/[^a-zA-Z\d]/g, ' ').
+				split(" ").
+				map(word => word[0].toUpperCase() + word.substring(1)).
+				join(" "),
+			date: `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+		};
 	}
 
 	// public saveToUrl(): URL {
