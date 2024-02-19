@@ -6,6 +6,7 @@
     // Will to be set to relevant slide PNG and summary
     let currentSlideSummary = 'This is the second lecture for the Introduction to Machine Learning course';
     let currentSlideImage = "placeholder_slide.PNG";
+    let slideNumber = 1;
 
     
 
@@ -18,7 +19,7 @@
 
             <div class="flex flex-col bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-5">
 
-                <h2 class="text-xl px-2 font-semibold text-center">Slide 1/7</h2>
+                <h2 class="text-xl px-2 font-semibold text-center">Slide {slideNumber}/7</h2>
                 <Hr /> 
 
                 <!-- svelte-ignore a11y-img-redundant-alt -->
