@@ -19,15 +19,32 @@
         Pagination
     } from 'flowbite-svelte';
 
-    let displaySlides = true;
+    export let data;
 
-    let pages = [
-        { name: "1", href: "/projects/1?page=1" },
-        { name: "3", href: "/projects/1?page=3" },
-        { name: "2", href: "/projects/1?page=2" },
-        { name: "4", href: "/projects/1?page=4" },
-        { name: "5", href: "/projects/1?page=5"}
-    ]
+    let displaySlides = data.project.hasSlides;
+    $: displayButtonText = displaySlides ? "Slides View" : "Overview";
+    let pages: { name: string, href: string }[];
+
+    if (displaySlides) {
+        // TODO: Convert slideData into PrismaSlidesData object and determine pages
+        let slideData = data.project.data;
+        pages = [
+            { name: "1", href: "/projects/1?page=1" },
+            { name: "3", href: "/projects/1?page=3" },
+            { name: "2", href: "/projects/1?page=2" },
+            { name: "4", href: "/projects/1?page=4" },
+            { name: "5", href: "/projects/1?page=5" }
+        ]
+    }
+
+    const downloadOptionPressed = (e: MouseEvent) => {
+        let option = e.target?.textContent ?? "unknown";
+        alert(`Download option ${option} pressed`);
+    };
+
+    const changeView = () => {
+        displaySlides = !displaySlides;
+    };
 
     const previous = () => {
         alert('Previous btn clicked. Make a call to your server to fetch data.');
@@ -40,20 +57,32 @@
 
 <div class="flex-1">
     <div class="flex-col px-10 pt-10">
-        <div class="justify-start items-center flex">
-            <Button class="h-10 w-10" pill={true} color="dark"><EditSolid class="focus:!outline-none" /></Button>
-            <h1 class="text-4xl p-5 font-bold">Intro to IML video</h1>
-            <ButtonGroup>
-                <Button pill color="dark"><DownloadSolid class="me-2 focus:!outline-none"/>Download Summary</Button>
-                <Button class="border-l border-gray-500 w-5" pill={false} color="dark">
-                    <AngleDownSolid class="focus:!outline-none"></AngleDownSolid>
-                </Button>
-                <Dropdown>
-                    <DropdownItem>.pdf</DropdownItem>
-                    <DropdownItem>.docx</DropdownItem>
-                    <DropdownItem>.txt</DropdownItem>
-                </Dropdown>
-            </ButtonGroup>
+        <div class="flow-root">
+            <div class="float-left justify-start items-center flex">
+                <!-- TODO: Link button to edit page -->
+                <Button class="h-10 w-10" pill color="dark" href="/projects"><EditSolid class="focus:!outline-none" /></Button>
+                <h1 class="text-4xl p-5 font-bold">{data.project.title}</h1>
+                <ButtonGroup>
+                    <Button pill color="dark"><DownloadSolid class="me-2 focus:!outline-none"/>Download Summary</Button>
+                    <Button class="border-l border-gray-500 w-5" color="dark">
+                        <AngleDownSolid class="focus:!outline-none"></AngleDownSolid>
+                    </Button>
+                    <Dropdown>
+                        <div slot="header">
+                            <span class="font-medium py-2 px-4 text-md">Summary File Type</span>
+                        </div>
+                        <DropdownItem on:click={downloadOptionPressed}>.pdf</DropdownItem>
+                        <DropdownItem on:click={downloadOptionPressed}>.tex</DropdownItem>
+                        <DropdownItem on:click={downloadOptionPressed}>.doc</DropdownItem>
+                        <DropdownItem on:click={downloadOptionPressed}>.txt</DropdownItem>
+                    </Dropdown>
+                </ButtonGroup>
+            </div>
+            {#if data.project.hasSlides}
+                <div class="float-right justify-end items-center flex">
+                    <Button pill color="dark" on:click={changeView}>{displayButtonText}</Button>
+                </div>
+            {/if}
         </div>
         {#if displaySlides}
             <div class="grid grid-rows-2 grid-flow-col gap-0">
@@ -81,12 +110,12 @@
         {:else}
             <div class="flex">
                 <div class="flex-col flex-1">
-                    <InformationBox title="Transcript" maxHeight="80">
+                    <InformationBox title="Transcript:" maxHeight="80">
                         <TextPlaceholder size="xxl" />
                     </InformationBox>
                     <VideoPlaceholder size="xxl" class="m-5" />
                 </div>
-                <InformationBox title="Preview:" maxHeight="[650px]" additionalAttributes="flex-1 min-h-[600px]">
+                <InformationBox title="Summary:" maxHeight="[650px]" additionalAttributes="flex-1 min-h-[600px]">
                 <CardPlaceholder size="xxl" />
                 </InformationBox>
             </div>
