@@ -13,7 +13,6 @@ enum Status {
   SPLIT
   TRANSCRIBED
   SUMMARISED
-  OUTPUT
   COMPLETED
 }
 
@@ -26,7 +25,8 @@ model Project {
   status    Status   @default(UNPROCESSED)
   waiting   Boolean  @default(true)
   hasSlides Boolean  @default(false)
-  video     String?  @db.Text
+  video     String?  @default("") @db.Text
+  slides    String?  @db.Text
   data      Json?    @default(dbgenerated())
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

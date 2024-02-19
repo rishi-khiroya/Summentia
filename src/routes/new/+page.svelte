@@ -7,6 +7,7 @@
 	import type { Upload } from './(types)/Upload';
 	import { goto } from '$app/navigation';
 	import { formResponseToJSON } from '$lib/utils';
+	import { redirect } from '@sveltejs/kit';
 
 	export let data;
 
@@ -44,10 +45,12 @@
 
 	let lectureUpload: Upload;
 
-	let info: {
-		title: string;
-		date: string;
-	} = { title: 'Test', date: '2024-02-14' };
+	let lecture: {
+		video: string;
+		slides: string;
+		userId: string;
+		info: { title: string; date: string };
+	};
 
 	let slidesUpload: Upload;
 
@@ -58,7 +61,7 @@
 		return '';
 	}
 
-	async function handleLecture() {
+	async function handleLecture(): Promise<{ success: boolean; msg: string | undefined }> {
 		const form: FormData = new FormData();
 
 		// Add userId to the form
@@ -80,17 +83,109 @@
 		if (!response.ok) {
 			waiting = false;
 			console.log(response.statusText);
-			return { success: false, msg: undefined };
+			return { success: false, msg: response.statusText };
 		}
 
 		const json = await response.json();
-		const responseData = formResponseToJSON(json.data.toString());
+		const responseData: {
+			success: boolean;
+			error: string | undefined;
+			lecture: {
+				video: string;
+				slides: string;
+				userId: string;
+				info: { title: string; date: string };
+			};
+		} = formResponseToJSON(json.data.toString());
 
 		waiting = false;
 
 		if (responseData.success) {
-			info = responseData.info;
+			lecture = JSON.parse(responseData.lecture.toString());
 			return { success: true, msg: undefined };
+		} else return { success: false, msg: responseData.error };
+	}
+
+	async function handleSlides(): Promise<{ success: boolean; msg: string | undefined }> {
+		if (slidesUpload.fromFile ? !slidesUpload.fileList : !slidesUpload.url)
+			return { success: false, msg: "Error: 'submit' should not have been called for a skip." };
+
+		const form: FormData = new FormData();
+
+		form.append('lecture', JSON.stringify(lecture));
+
+		// Add slides to the form
+		form.append('slidesFromFile', slidesUpload.fromFile.toString());
+		if (slidesUpload.fromFile && slidesUpload.fileList?.length)
+			form.append('slidesFile', slidesUpload.fileList[0]);
+		else form.append('slidesURL', slidesUpload.url);
+
+		waiting = true;
+
+		const response: Response = await fetch('?/addSlides', {
+			method: 'POST',
+			body: form
+		});
+
+		if (!response.ok) {
+			waiting = false;
+			console.log(response.statusText);
+			return { success: false, msg: response.statusText };
+		}
+
+		const json = await response.json();
+		const responseData: {
+			success: boolean;
+			error: string | undefined;
+			lecture: {
+				video: string;
+				slides: string;
+				userId: string;
+				info: { title: string; date: string };
+			};
+		} = formResponseToJSON(json.data.toString());
+
+		waiting = false;
+
+		if (responseData.success) {
+			return { success: true, msg: undefined };
+		} else return { success: false, msg: responseData.error };
+	}
+
+	async function handleSubmit(): Promise<{ success: boolean; msg: string | undefined }> {
+		const form: FormData = new FormData();
+
+		form.append('lecture', JSON.stringify(lecture));
+
+		waiting = true;
+
+		const response: Response = await fetch('?/submit', {
+			method: 'POST',
+			body: form
+		});
+
+		if (!response.ok) {
+			waiting = false;
+			console.log(response.statusText);
+			return { success: false, msg: response.statusText };
+		}
+
+		const json = await response.json();
+		console.log(json);
+		const responseData: {
+			success: boolean;
+			projectId: number | undefined;
+			error: string | undefined;
+		} = formResponseToJSON(json.data.toString());
+
+		waiting = false;
+
+		if (responseData.success) {
+			try {
+				return { success: true, msg: undefined };
+			} finally {
+				goto(`/new/inprogress/${responseData.projectId}`);
+			}
 		} else return { success: false, msg: responseData.error };
 	}
 </script>
@@ -122,24 +217,29 @@
 			step={steps[1]}
 			bind:currentStep
 			isPopulated={() => (slidesUpload.fromFile ? !!slidesUpload.fileList : !!slidesUpload.url)}
+			submit={() => handleSlides()}
 		>
 			<h1 class="text-2xl font-bold dark:text-white">Upload slides:</h1>
 			<FileUpload bind:upload={slidesUpload} name="Slides" allowedFileType=".pdf, .pptx" />
 		</FormStep>
 
 		<!-- Confirm title and date (guessed from lecture/slides) -->
-		<FormStep step={steps[2]} bind:currentStep isPopulated={() => !!info.date && !!info.title}>
+		<FormStep
+			step={steps[2]}
+			bind:currentStep
+			isPopulated={() => !!lecture.info.date && !!lecture.info.title}
+		>
 			<h1 class="text-2xl font-bold dark:text-white">Project Information:</h1>
 			<div class="flex flex-col space-y-3">
 				<h1 class="font-semibold dark:text-white">Please verify the following:</h1>
 				<div class="flex flex-row space-x-5 px-5">
 					<div class="w-full p-3 mx-5">
 						<span class="dark:text-white p-1">Title:</span>
-						<Input type="text" bind:value={info.title} placeholder="My Lecture..." />
+						<Input type="text" bind:value={lecture.info.title} placeholder="My Lecture..." />
 					</div>
 					<div class="w-full p-3 mx-5">
 						<span class="dark:text-white p-1">Date:</span>
-						<Input type="date" bind:value={info.date} />
+						<Input type="date" bind:value={lecture.info.date} />
 					</div>
 				</div>
 				<!-- TODO: potentially add a preview of the video here -->
@@ -156,10 +256,7 @@
 				populated: false
 			}}
 			bind:currentStep
-			submit={() => {
-				goto('dashboard'); // TODO: change to a progress page or something like that
-				return { success: true, msg: undefined };
-			}}
+			submit={() => handleSubmit()}
 		>
 			<h1 class="text-2xl font-bold dark:text-white">Review & Submit:</h1>
 			<p class="p-5">Blah blah some stuff ...</p>

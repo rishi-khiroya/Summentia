@@ -5,12 +5,14 @@ export interface PrismaUser {
 }
 
 export interface PrismaProject {
+	id: number,
 	title: string;
-	userId: number;
-	date: string;
-	createdAt: string;
+	userId: string | null;
+	date: Date;
+	createdAt: Date;
 	hasSlides: boolean;
-	video: string; // path of the video on the vm
+	video: string | undefined; // path of the video on the vm
+	slides: string | undefined
 	data: PrismaBasicData | PrismaSlidesData[];
 	status: PrismaProjectStatus;
 	waiting: boolean;
@@ -32,6 +34,5 @@ export enum PrismaProjectStatus {
 	SPLIT,
 	TRANSCRIBED,
 	SUMMARISED,
-	OUTPUT,
 	COMPLETED
 }

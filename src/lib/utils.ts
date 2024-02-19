@@ -20,3 +20,7 @@ export function formResponseToJSON(response: string) {
 
 	return process(data[0]);
 }
+
+export function formatDate(date: Date) {
+	return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+}

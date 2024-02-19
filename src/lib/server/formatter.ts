@@ -1,6 +1,6 @@
 import { OPENAI_API_KEY } from '$env/static/private';
 import OpenAI from 'openai';
-import type { Customisation } from '$lib/types/Customisation';
+import type { Customisation } from '$lib/server/types/Customisation';
 
 // TODO: extract openai client to its own exported thing
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });

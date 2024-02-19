@@ -33,9 +33,10 @@
 				on:click={async () => {
 					if (step.required && !step.populated) return;
 
-					const response = await submit();
-					if (!response.success) return; // TODO: indicate to user why it failed using msg
-
+					if (step.populated) {
+						const response = await submit();
+						if (!response.success) return; // TODO: indicate to user why it failed using msg
+					}
 					if (currentStep == -1) return;
 
 					// Set status and move to next step
