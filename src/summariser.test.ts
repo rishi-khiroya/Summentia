@@ -37,13 +37,33 @@ In clustering, basically you recall items better if you can recognize that there
 Let’s say that I give you the first list; north, cardinal, south, robin, east, wren, west, sparrow. Now if you can recognize that north, south, east and west are points on a compass and cardinal, robin, wren and sparrow are birds, then you have a higher probability of recalling that material than if you just tried to recall the list in order.
 The same occurs with the second list that is located on the right hand side of page six. So let’s list these words as well; pig, cat, horse, dog, sheep, birds, cow, and fish. Now if you can recognize that these are two groups of animals; one being farm animals and the other being domestic companions, ala, pets, then you can recall that list of material better than if you just tried to recall the list in order. So again, this is another type of example of organizational strategy.
 Now there are other organizational strategies that one can use as well. The next one of these, as we see on slide seven, are what are called verbal pneumonic techniques. In verbal pneumonic techniques, you make your own organization and there are many, many different types of techniques. So let’s talk about the first of these on slide eight and that is called acrostics. In acrostics these are phrases in which the first letter of each word functions as a cue to help you recall some piece of information. There are a variety of different acrostics that one uses. The most famous of these relates to this saying: On Old Olympus Towering Tops A Fin And German Vented Some Hops. These relate to the twelve different cranial nerves that we have within the brain and if you are a traditional medical student or taking anatomy and physiology, this is the acrostic that you usually use to remember them.
-Now there are other verbal pneumonic techniques as well.`
+Now there are other verbal pneumonic techniques as well.`;
 
-const lecture2_keywords = new Set<string>(['memory', 'factors', 'influence', 'overlearning', 'study', 'recall', 'perfectly', 'topic', 'continue', 'easier', 'organization', 'material', 'strategies', 'clustering', 'recognize', 'probability', 'groups', 'pneumonic', 'acrostics']);
+const lecture2_keywords = new Set<string>([
+	'memory',
+	'factors',
+	'influence',
+	'overlearning',
+	'study',
+	'recall',
+	'perfectly',
+	'topic',
+	'continue',
+	'easier',
+	'organization',
+	'material',
+	'strategies',
+	'clustering',
+	'recognize',
+	'probability',
+	'groups',
+	'pneumonic',
+	'acrostics'
+]);
 
 test('accurate summary of short transcript', async () => {
-    const summary = await summarise(lecture1);
-    const keyWords = lecture1_keywords;
+	const summary = await summarise(lecture1);
+	const keyWords = lecture1_keywords;
 
 	const splitted = (summary == null ? '' : summary)
 		.split(/[ .,]/)
@@ -62,9 +82,8 @@ test('accurate summary of short transcript', async () => {
 }, 70000);
 
 test('accurate brief summary of short transcript', async () => {
-
-    const summary = await summarise(lecture1, 0);
-    const keyWords = lecture1_keywords;
+	const summary = await summarise(lecture1, 0);
+	const keyWords = lecture1_keywords;
 
 	const splitted = (summary == null ? '' : summary)
 		.split(/[ .,]/)
@@ -83,9 +102,8 @@ test('accurate brief summary of short transcript', async () => {
 }, 70000);
 
 test('accurate extensive summary of short transcript', async () => {
-
-    const summary = await summarise(lecture1, 2);
-    const keyWords = lecture1_keywords;
+	const summary = await summarise(lecture1, 2);
+	const keyWords = lecture1_keywords;
 
 	const splitted = (summary == null ? '' : summary)
 		.split(/[ .,]/)
@@ -104,10 +122,12 @@ test('accurate extensive summary of short transcript', async () => {
 }, 70000);
 
 test('accurate summary of realistic transcript', async () => {
-    const summary = await summarise(lecture2);
-    const keyWords = lecture2_keywords;
+	const summary = await summarise(lecture2);
+	const keyWords = lecture2_keywords;
 
-    const splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
+	const splitted = (summary == null ? '' : summary)
+		.split(/[ .,]/)
+		.filter((item) => item.length > 0);
 
 	let count = 0;
 	function update_count(item: string) {
@@ -116,36 +136,18 @@ test('accurate summary of realistic transcript', async () => {
 		}
 	}
 
-    splitted.forEach(update_count);
-    
-    expect(count).toBeGreaterThan(10);
+	splitted.forEach(update_count);
+
+	expect(count).toBeGreaterThan(10);
 }, 70000);
 
 test('accurate brief summary of realistic transcript', async () => {
+	const summary = await summarise(lecture2, 0);
+	const keyWords = lecture2_keywords;
 
-    const summary = await summarise(lecture2, 0);
-    const keyWords = lecture2_keywords;
-
-    const splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
-
-    let count = 0;
-    function update_count(item: string) {
-        if (keyWords.has(item.toLowerCase())) {
-            count += 1;
-        }
-    }
-
-    splitted.forEach(update_count);
-    
-    expect(count).toBeGreaterThan(5);
-}, 70000);
-
-test('accurate extensive summary of realistic transcript', async () => {
-
-    const summary = await summarise(lecture2, 2);
-    const keyWords = lecture2_keywords;
-
-    const splitted = (summary == null ? "" : summary).split(/[ .,]/).filter((item)=> item.length > 0);
+	const splitted = (summary == null ? '' : summary)
+		.split(/[ .,]/)
+		.filter((item) => item.length > 0);
 
 	let count = 0;
 	function update_count(item: string) {
@@ -154,7 +156,27 @@ test('accurate extensive summary of realistic transcript', async () => {
 		}
 	}
 
-    splitted.forEach(update_count);
-    
-    expect(count).toBeGreaterThan(15);
+	splitted.forEach(update_count);
+
+	expect(count).toBeGreaterThan(5);
+}, 70000);
+
+test('accurate extensive summary of realistic transcript', async () => {
+	const summary = await summarise(lecture2, 2);
+	const keyWords = lecture2_keywords;
+
+	const splitted = (summary == null ? '' : summary)
+		.split(/[ .,]/)
+		.filter((item) => item.length > 0);
+
+	let count = 0;
+	function update_count(item: string) {
+		if (keyWords.has(item.toLowerCase())) {
+			count += 1;
+		}
+	}
+
+	splitted.forEach(update_count);
+
+	expect(count).toBeGreaterThan(15);
 }, 70000);

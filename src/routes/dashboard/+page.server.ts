@@ -9,4 +9,4 @@ export const load: PageServerLoad = async (event) => {
 	// Load useful data
 
 	return {};
-}
+};

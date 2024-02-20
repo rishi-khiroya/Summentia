@@ -1,109 +1,271 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { AccordionItem, Accordion, Fileupload, Button, Spinner, Input } from 'flowbite-svelte';
-	import LectureUpload from './LectureUpload.svelte';
-	import Customisation from './Customisation.svelte';
+	import FormStep from './FormStep.svelte';
+	import { StepStatus, type Step } from './(types)/Step';
+	import ProgressIndicator from './ProgressIndicator.svelte';
+	import { Input, Spinner } from 'flowbite-svelte';
+	import FileUpload from './FileUpload.svelte';
+	import type { Upload } from './(types)/Upload';
+	import { goto } from '$app/navigation';
+	import { formResponseToJSON } from '$lib/utils';
+	import { redirect } from '@sveltejs/kit';
 
+	export let data;
+
+	let currentStep: number = 0;
 	let waiting: boolean = false;
 
-	let title: string;
-	let date: Date;
+	let steps: Step[] = [
+		{
+			id: 0,
+			name: 'Lecture',
+			required: true,
+			populated: false,
+			status: StepStatus.UNSEEN
+		},
+		{
+			id: 1,
+			name: 'Slides',
+			required: false,
+			populated: false,
+			status: StepStatus.UNSEEN
+		},
+		{
+			id: 2,
+			name: 'Info',
+			required: true,
+			populated: false,
+			status: StepStatus.UNSEEN
+		}
+	];
 
-	let doLectureUpload = false;
-	let lectureURL: string;
-	let lectureFileList: FileList;
-
-	let supplementary: { 
-		slides: FileList | undefined, 
-		extras: FileList | undefined
-	} = { 
-		slides: undefined, 
-		extras: undefined 
+	$: {
+		if (currentStep == steps.length) currentStep = -1;
+		if (currentStep < -1) currentStep = steps.length - 1;
 	}
 
-	let customisation: Customisation = {
-		highlight_keywords: false,
-		questions: false,
-		summary_format: "",
-		no_pages: 1
+	let lectureUpload: Upload;
+
+	let lecture: {
+		video: string;
+		slides: string;
+		userId: string;
+		info: { title: string; date: string };
+	};
+
+	let slidesUpload: Upload;
+
+	// Stop the page from refreshing without confirmation of losing data.
+	function beforeUnload(event: BeforeUnloadEvent): string {
+		event.preventDefault();
+		event.returnValue = '';
+		return '';
 	}
 
-	async function submit() {
-		const form = new FormData();
+	async function handleLecture(): Promise<{ success: boolean; msg: string | undefined }> {
+		const form: FormData = new FormData();
 
-		form.append('userId', $page.data.session.user.id);
+		// Add userId to the form
+		if (data.session) form.append('userId', data.session.user.id);
 
-		form.append('isLectureFile', doLectureUpload.toString());
-		if (doLectureUpload) {
-			if (lectureFileList && lectureFileList.length) {
-				form.append('lectureFile', lectureFileList[0]);
-			}
-		} else form.append('lectureURL', lectureURL);
-
-		form.append('customisation', JSON.stringify(customisation));
-
-		if (supplementary.slides?.length) form.append('slides', supplementary.slides)
-		form.append('noSupplementary', supplementary.length);
-		supplementaryFiles.forEach((file, i) => {
-			form.append(`supplementary${i}`, file);
-		});
+		// Add lecture to the form
+		form.append('lectureFromFile', lectureUpload.fromFile.toString());
+		if (lectureUpload.fromFile && lectureUpload.fileList?.length)
+			form.append('lectureFile', lectureUpload.fileList[0]);
+		else form.append('lectureURL', lectureUpload.url);
 
 		waiting = true;
+
+		const response: Response = await fetch('?/extractInfo', {
+			method: 'POST',
+			body: form
+		});
+
+		if (!response.ok) {
+			waiting = false;
+			console.log(response.statusText);
+			return { success: false, msg: response.statusText };
+		}
+
+		const json = await response.json();
+		const responseData: {
+			success: boolean;
+			error: string | undefined;
+			lecture: {
+				video: string;
+				slides: string;
+				userId: string;
+				info: { title: string; date: string };
+			};
+		} = formResponseToJSON(json.data.toString());
+
+		waiting = false;
+
+		if (responseData.success) {
+			lecture = JSON.parse(responseData.lecture.toString());
+			return { success: true, msg: undefined };
+		} else return { success: false, msg: responseData.error };
+	}
+
+	async function handleSlides(): Promise<{ success: boolean; msg: string | undefined }> {
+		if (slidesUpload.fromFile ? !slidesUpload.fileList : !slidesUpload.url)
+			return { success: false, msg: "Error: 'submit' should not have been called for a skip." };
+
+		const form: FormData = new FormData();
+
+		form.append('lecture', JSON.stringify(lecture));
+
+		// Add slides to the form
+		form.append('slidesFromFile', slidesUpload.fromFile.toString());
+		if (slidesUpload.fromFile && slidesUpload.fileList?.length)
+			form.append('slidesFile', slidesUpload.fileList[0]);
+		else form.append('slidesURL', slidesUpload.url);
+
+		waiting = true;
+
+		const response: Response = await fetch('?/addSlides', {
+			method: 'POST',
+			body: form
+		});
+
+		if (!response.ok) {
+			waiting = false;
+			console.log(response.statusText);
+			return { success: false, msg: response.statusText };
+		}
+
+		const json = await response.json();
+		const responseData: {
+			success: boolean;
+			error: string | undefined;
+			lecture: {
+				video: string;
+				slides: string;
+				userId: string;
+				info: { title: string; date: string };
+			};
+		} = formResponseToJSON(json.data.toString());
+
+		waiting = false;
+
+		if (responseData.success) {
+			return { success: true, msg: undefined };
+		} else return { success: false, msg: responseData.error };
+	}
+
+	async function handleSubmit(): Promise<{ success: boolean; msg: string | undefined }> {
+		const form: FormData = new FormData();
+
+		form.append('lecture', JSON.stringify(lecture));
+
+		waiting = true;
+
 		const response: Response = await fetch('?/submit', {
 			method: 'POST',
 			body: form
 		});
 
-		const data = JSON.parse((await response.json()).data);
+		if (!response.ok) {
+			waiting = false;
+			console.log(response.statusText);
+			return { success: false, msg: response.statusText };
+		}
+
+		const json = await response.json();
+		console.log(json);
+		const responseData: {
+			success: boolean;
+			projectId: number | undefined;
+			error: string | undefined;
+		} = formResponseToJSON(json.data.toString());
+
 		waiting = false;
+
+		if (responseData.success) {
+			try {
+				return { success: true, msg: undefined };
+			} finally {
+				goto(`/new/inprogress/${responseData.projectId}`);
+			}
+		} else return { success: false, msg: responseData.error };
 	}
 </script>
 
-<div class="flex-1 p-5">
-	<div class="flex-1">
-		<Accordion>
-			<AccordionItem>
-				<span slot="header">Info</span>
-				<div class="flex flex-row justify-between">
-					<div>
-						<span>Title</span>
-						<Input type="text" bind:title placeholder="My Lecture..."/>
+<svelte:window on:beforeunload={beforeUnload} />
+
+<div class="flex flex-col p-5 m-10 bg-white dark:bg-slate-800 shadow-xl rounded-2xl">
+	<ProgressIndicator bind:currentStep bind:steps bind:waiting />
+
+	<!-- If waiting for something, show a spinner, else show form -->
+	{#if waiting}
+		<div class="text-center p-10">
+			<Spinner size="16" />
+		</div>
+	{:else}
+		<!-- Upload Lecture -->
+		<FormStep
+			bind:step={steps[0]}
+			bind:currentStep
+			isPopulated={() => (lectureUpload.fromFile ? !!lectureUpload.fileList : !!lectureUpload.url)}
+			submit={() => handleLecture()}
+		>
+			<h1 class="text-2xl font-bold dark:text-white">Upload lecture:</h1>
+			<FileUpload bind:upload={lectureUpload} name="Lecture" allowedFileType=".mp4" required />
+		</FormStep>
+
+		<!-- Upload Slides (maybe) -->
+		<FormStep
+			step={steps[1]}
+			bind:currentStep
+			isPopulated={() => (slidesUpload.fromFile ? !!slidesUpload.fileList : !!slidesUpload.url)}
+			submit={() => handleSlides()}
+		>
+			<h1 class="text-2xl font-bold dark:text-white">Upload slides:</h1>
+			<FileUpload bind:upload={slidesUpload} name="Slides" allowedFileType=".pdf, .pptx" />
+		</FormStep>
+
+		<!-- Confirm title and date (guessed from lecture/slides) -->
+		<FormStep
+			step={steps[2]}
+			bind:currentStep
+			isPopulated={() => !!lecture.info.date && !!lecture.info.title}
+		>
+			<h1 class="text-2xl font-bold dark:text-white">Project Information:</h1>
+			<div class="flex flex-col space-y-3">
+				<h1 class="font-semibold dark:text-white">Please verify the following:</h1>
+				<div class="flex flex-row space-x-5 px-5">
+					<div class="w-full p-3 mx-5">
+						<span class="dark:text-white p-1">Title:</span>
+						<Input type="text" bind:value={lecture.info.title} placeholder="My Lecture..." />
 					</div>
-					<div>
-						<span>Date</span>
-						<Input type="date" bind:date />
+					<div class="w-full p-3 mx-5">
+						<span class="dark:text-white p-1">Date:</span>
+						<Input type="date" bind:value={lecture.info.date} />
 					</div>
 				</div>
-			</AccordionItem>
-			<AccordionItem open>
-				<span slot="header">Upload Lecture</span>
-				<LectureUpload bind:fileList={lectureFileList} bind:doLectureUpload bind:lectureURL />
-			</AccordionItem>
-			<AccordionItem>
-				<span slot="header">Upload Slides</span>
-				<Fileupload on:change={event => supplementary.slides = event.target.files}/>
-			</AccordionItem>
+				<!-- TODO: potentially add a preview of the video here -->
+			</div>
+		</FormStep>
 
-			<AccordionItem>
-				<span slot="header">Add Supplementary Info</span>
-				<Fileupload multiple on:change={event => supplementary.extras = event.target.files} />
-			</AccordionItem>
-			<AccordionItem>
-				<span slot="header">Customisation</span>
-				<Customisation bind:customisation />
-			</AccordionItem>
-		</Accordion>
-	</div>
-	<div style="display: flex; justify-content: flex-end;">
-		{#if waiting}
-			<Button color="dark" class="m-5 p-4">
-				<Spinner class="me-3" size="4" color="white" />
-				Loading ...
-			</Button>
-		{:else}
-			<Button type="submit" on:click={() => submit()} color="dark" class="text-white m-5 p-4"
-				>Submit</Button
-			>
-		{/if}
-	</div>
+		<!-- Review and submit -->
+		<FormStep
+			step={{
+				id: -1,
+				name: 'Submit',
+				required: true,
+				status: StepStatus.UNSEEN,
+				populated: false
+			}}
+			bind:currentStep
+			submit={() => handleSubmit()}
+		>
+			<h1 class="text-2xl font-bold dark:text-white">Review & Submit:</h1>
+			<p class="p-5">Blah blah some stuff ...</p>
+			<!-- TODO -->
+			{#if !data.session?.user}
+				<h1 class="font-medium text-orange-600">
+					Warning: you are not logged in. This project will not be accessible again.
+				</h1>
+			{/if}
+		</FormStep>
+	{/if}
 </div>
