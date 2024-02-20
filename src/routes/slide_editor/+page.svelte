@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import {Hr, Button, Textarea  } from 'flowbite-svelte';
 
     let slides = ["placeholder_slide_1.PNG", "placeholder_slide_2.PNG", "placeholder_slide_3.PNG",
@@ -12,28 +13,35 @@
                      `Today we will be learning about classification with instance based learning versus classification with decision trees`,
                      `Today's lecture will be delivered in 6 short videos`
                     ];
+
+    // both buttons temporarily go back to projects page for now
+    function goBack() {
+        goto('/projects');
+    }
+
+    function complete() {
+        goto('/projects');
+    }
 </script>
 
 <h1 class="text-5xl p-10 font-bold">Slide Editor</h1>
 
-<div class="flex flex-row flex-wrap p-0 justify-center items-start">
+<div class="flex flex-wrap">
     {#each slides as slide, index}
-        <div class="flex flex-col space-y-5 m-5">
+        <div class="flex flex-col space-y-2 m-4">
 
-            <div class="flex flex-col bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-10">
+            <div class="flex flex-col bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 p-10">
 
                 <h2 class="text-xl px-2 font-semibold text-center">Slide {index + 1}/{slides.length}</h2>
-                <Hr /> 
 
                 <!-- svelte-ignore a11y-img-redundant-alt -->
                 <img width="450px" src={slide} alt="Slide {index + 1}" />
-                <Hr /> 
 
             </div>
 
             <div class="flex flex-col bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-5">
                 <h2 class="text-xl px-2 font-semibold">Summary {index + 1}/{slides.length}</h2>
-                <Textarea readonly rows="5" cols="50" value={summaries[index]} />
+                <Textarea readonly rows="7" cols="50" value={summaries[index]} />
             </div>
             
         </div>
@@ -41,13 +49,13 @@
 </div>
 
 <div class="fixed bottom-0 left-0 p-5">
-    <Button color="blue" size="sm">
+    <Button color="blue" size="lg" on:click={goBack}>
         Back
     </Button>
 </div>
 
 <div class="fixed bottom-0 right-0 p-5">
-    <Button color="blue" size="sm" background-color="transparent">
+    <Button color="blue" size="xl" on:click={complete}>
         Complete Summary
     </Button>
 </div>
