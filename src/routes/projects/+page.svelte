@@ -11,6 +11,8 @@
 		Button
 	} from 'flowbite-svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import moment from 'moment';
 
 	export let data;
 
@@ -24,9 +26,9 @@
 		{
 			length: NO_PAGES
 		},
-		(value, index) => data.pageNo - Math.min(2, data.pageNo - 1) + index
+		(value, index) => index
 	)
-		.filter((id: number) => id <= Math.max(1, Math.ceil(data.noProjects / NO_PAGES)))
+		.filter((id: number) => id <= Math.max(0, Math.ceil(data.noProjects??0 / NO_PAGES)))
 		.map((id: number) => {
 			return {
 				name: id,
@@ -42,15 +44,27 @@
 	};
 
 	const previous = () => {
-		goto(
-			`?${new URLSearchParams($page.url.searchParams.toString()).set('page', Math.max(pageNo - 1, 1)).toString()}`
-		);
+		const params = new URLSearchParams(window.location.search);
+    	const page = Math.max(parseInt(params.get('page')) - 1, 0);
+    	params.set('page', page.toString());
+    	window.location.search = params.toString();
 	};
 	const next = () => {
-		goto(
-			`?${new URLSearchParams($page.url.searchParams.toString()).set('page', Math.min(pageNo + 1, data.noProjects)).toString()}`
-		);
+		const params = new URLSearchParams(window.location.search);
+    	const pageNo = parseInt(params.get('page'));
+    	const noProjects = parseInt(data.noProjects) || 0;
+    	const page = Math.min(pageNo + 1, noProjects);
+    	params.set('page', page.toString());
+    	window.location.search = params.toString();
 	};
+	function nav_to_project_page(project_id:number) {
+		console.log(project_id)
+		goto('projects/' + project_id.toString());
+	}
+
+	function reformat_date(project_date:Date){
+		return moment(project_date).format('DD-MM-YYYY');
+	}
 </script>
 
 <div class="flex flex-col p-10 space-y-3 justify-center align-top">
@@ -64,18 +78,20 @@
 		</TableHead>
 		<TableBody class="divide-y">
 			{#each filteredItems as item}
-				<TableBodyRow>
+		
+				<TableBodyRow on:click={nav_to_project_page(item.id)}>
 					<!-- <TableBodyCell>{item.id}</TableBodyCell> -->
 					<TableBodyCell>{item.title}</TableBodyCell>
-					<TableBodyCell>{item.date}</TableBodyCell>
-					<TableBodyCell>{item.created_at}</TableBodyCell>
+					<TableBodyCell>{reformat_date(item.date)}</TableBodyCell>
+					<TableBodyCell>{reformat_date(item.createdAt)}</TableBodyCell>
 					<TableBodyCell>{determine_status(item)}</TableBodyCell>
 				</TableBodyRow>
+			
 			{/each}
 		</TableBody>
 	</TableSearch>
 
-	<Pagination {pages} on:previous={previous} on:next={next} />
+	<Pagination {pages} on:previous={previous} on:next={next} /> 
 </div>
 <!-- <Button color="dark" class="relative r-5 b-5 p-1 rounded">
 	<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
