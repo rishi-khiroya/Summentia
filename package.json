@@ -21,7 +21,6 @@
 		"@auth/sveltekit": "^0.10.0",
 		"@playwright/test": "^1.28.1",
 		"@prisma/client": "^5.9.0",
-		"@rollup/rollup-win32-x64-msvc": "^4.10.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-node": "^4.0.1",
 		"@sveltejs/kit": "^2.0.0",
@@ -58,7 +57,8 @@
 		"vitest": "^1.2.1"
 	},
 	"optionalDependencies": {
-		"@rollup/rollup-linux-x64-gnu": "4.6.1"
+		"@rollup/rollup-linux-x64-gnu": "4.6.1",
+		"@rollup/rollup-win32-x64-msvc": "^4.10.0"
 	},
 	"type": "module",
 	"dependencies": {
