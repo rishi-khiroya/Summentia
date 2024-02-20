@@ -1,7 +1,7 @@
 import type { Session } from '@auth/core/types';
 import type { PageServerLoad } from '../$types';
 import { redirect } from '@sveltejs/kit';
-import { prisma } from '$lib/prisma';
+import { prisma } from '$lib/server/prisma';
 import type { Project } from '@prisma/client';
 
 const ITEMS_PER_PAGE: number = 10;
