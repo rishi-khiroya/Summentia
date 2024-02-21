@@ -2,6 +2,8 @@
 	import '../app.css';
 	import Footer from './Footer.svelte';
 	import Navbar from './Navbar.svelte';
+	import { Button } from 'flowbite-svelte';
+	import { PlusSolid } from 'flowbite-svelte-icons';
 </script>
 
 <div
@@ -11,7 +13,10 @@
         bg-animate min-h-screen h-max justify-between"
 >
 	<Navbar />
-	<slot />
+	<div class="h-screen w-screen">
+		<slot />
+		<Button class="absolute bottom-5 right-5 z-10" pill outline color="alternative" href="/new"><PlusSolid class="mr-3"/> New Project</Button>
+	</div>
 	<Footer />
 </div>
 
