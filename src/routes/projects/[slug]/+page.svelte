@@ -1,5 +1,6 @@
 <script lang="ts">
     import InformationBox from './InformationBox.svelte'
+    import { goto } from '$app/navigation';
     import { 
         EditSolid, 
         DownloadSolid, 
@@ -52,6 +53,9 @@
     const next = () => {
         alert('Next btn clicked. Make a call to your server to fetch data.');
     };
+    function edit() {
+        goto('slide_editor/' + data.project.id.toString());
+    }
 
 </script>
 
@@ -64,6 +68,7 @@
                 <h1 class="text-4xl p-5 font-bold">{data.project.title}</h1>
                 <ButtonGroup>
                     <Button pill color="dark"><DownloadSolid class="me-2 focus:!outline-none"/>Download Summary</Button>
+
                     <Button class="border-l border-gray-500 w-5" color="dark">
                         <AngleDownSolid class="focus:!outline-none"></AngleDownSolid>
                     </Button>
@@ -77,6 +82,9 @@
                         <DropdownItem on:click={downloadOptionPressed}>.txt</DropdownItem>
                     </Dropdown>
                 </ButtonGroup>
+                <div class="float-left justify-start items-center flex p-10">
+                    <Button color="dark" size="lg" on:click={edit}>Edit Summary</Button>
+                </div>
             </div>
             {#if data.project.hasSlides}
                 <div class="float-right justify-end items-center flex">
