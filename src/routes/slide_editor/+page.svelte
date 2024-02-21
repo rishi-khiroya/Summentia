@@ -15,10 +15,13 @@
                     ];
 
     // both buttons temporarily go back to projects page for now
+
+    // should go to per project page
     function goBack() {
         goto('/projects');
     }
 
+    // should go to download page?
     function complete() {
         goto('/projects');
     }
@@ -26,7 +29,7 @@
 
 <h1 class="text-5xl p-10 font-bold">Slide Editor</h1>
 
-<div class="flex flex-wrap">
+<div class="flex flex-wrap justify-center">
     {#each slides as slide, index}
         <div class="flex flex-col space-y-2 m-4">
 
