@@ -5,8 +5,10 @@
     import { goto } from '$app/navigation';
 
 	export let data;
+
+    const NR_RECENT_PROJECTS = 5;
     let searchTerm: string = '';
-    const recent_projects = data.projects.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    const recent_projects = data.projects.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, NR_RECENT_PROJECTS);
     $: filteredItems = recent_projects.filter(
 		(project) => project.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
 	);
