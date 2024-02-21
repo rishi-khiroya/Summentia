@@ -15,12 +15,9 @@
                      `Today's lecture will be delivered in 6 short videos`
                     ];
 
-                    
-                    
     export let data;
 
     let displaySlides = data.hasSlides;
-    let pages: string[];
 
     if (displaySlides) {
         // TODO: Convert slideData into PrismaSlidesData object and determine pages
@@ -32,14 +29,8 @@
             slides = [];
             summaries = [];
         }
-
     }
 
-    
-
-    // both buttons temporarily go back to projects page for now
-
-    // should go to per project page
     function goBack() {
         goto('../projects/' + data.id.toString());
     }
@@ -52,27 +43,23 @@
 
 <h1 class="text-5xl p-10 font-bold">Edit</h1>
 
-<div class="flex flex-wrap justify-center">
-    {#each slides as slide, index}
-        <div class="flex flex-row space-x-2 m-4">
+{#each slides as slide, index}
+    <div class="justify-center flex space-x-2 m-4">
 
-            <div class="flex flex-col bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 p-10">
+        <div class="flex flex-col bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 p-10">
+            <h2 class="text-xl px-2 font-semibold text-center">Slide {index + 1}/{slides.length}</h2>
 
-                <h2 class="text-xl px-2 font-semibold text-center">Slide {index + 1}/{slides.length}</h2>
-
-                <!-- svelte-ignore a11y-img-redundant-alt -->
-                <img width="450px" src={slide} alt="Slide {index + 1}" />
-
-            </div>
-
-            <div class="flex flex-col bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-5">
-                <h2 class="text-xl px-2 font-semibold">Summary {index + 1}/{slides.length}</h2>
-                <Textarea readonly rows="7" cols="50" value={summaries[index]} />
-            </div>
-            
+            <!-- svelte-ignore a11y-img-redundant-alt -->
+            <img width="500px" src={slide} alt="Slide {index + 1}" />
         </div>
-    {/each}
-</div>
+
+        <div class="bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-5">
+            <h2 class="text-xl px-2 font-semibold">Summary {index + 1}/{slides.length}</h2>
+            <Textarea readonly rows="13" cols="100" value={summaries[index]} />
+        </div>
+            
+    </div>
+{/each}
 
 <div class="fixed bottom-0 left-0 p-5">
     <Button color="red" size="xl" on:click={goBack}>
