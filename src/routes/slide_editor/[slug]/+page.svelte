@@ -35,9 +35,10 @@
         goto('../projects/' + data.id.toString());
     }
 
-    // should go to download page?
     function complete() {
-        goto('/projects');
+        // TODO: code to save summary changes should go here
+        // note: will probably need to add names to iteratively created textareas
+        goto('../projects/' + data.id.toString());
     }
 </script>
 
