@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import {Hr, Button, Textarea  } from 'flowbite-svelte';
+    import {Button, Textarea  } from 'flowbite-svelte';
+    import { FileCheckSolid } from 'flowbite-svelte-icons';
 
     let slides = ["placeholder_slide_1.PNG", "placeholder_slide_2.PNG", "placeholder_slide_3.PNG",
                   "placeholder_slide_4.PNG", "placeholder_slide_5.PNG","placeholder_slide_6.PNG"];
@@ -13,6 +14,28 @@
                      `Today we will be learning about classification with instance based learning versus classification with decision trees`,
                      `Today's lecture will be delivered in 6 short videos`
                     ];
+
+                    
+     /*               
+    export let data;
+
+    let displaySlides = data.hasSlides;
+    let pages: string[];
+
+    if (displaySlides) {
+        // TODO: Convert slideData into PrismaSlidesData object and determine pages
+        let slideData = data;
+        slides = slideData.map(data => data.slide);
+        summaries = slideData.map(data => data.summary);
+
+        if (slides == null || summaries == null){
+            slides = [];
+            summaries = [];
+        }
+
+    }
+*/
+    
 
     // both buttons temporarily go back to projects page for now
 
@@ -27,11 +50,11 @@
     }
 </script>
 
-<h1 class="text-5xl p-10 font-bold">Slide Editor</h1>
+<h1 class="text-5xl p-10 font-bold">Edit</h1>
 
 <div class="flex flex-wrap justify-center">
     {#each slides as slide, index}
-        <div class="flex flex-col space-y-2 m-4">
+        <div class="flex flex-row space-x-2 m-4">
 
             <div class="flex flex-col bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 p-10">
 
@@ -52,13 +75,12 @@
 </div>
 
 <div class="fixed bottom-0 left-0 p-5">
-    <Button color="blue" size="lg" on:click={goBack}>
+    <Button color="red" size="xl" on:click={goBack}>
         Back
     </Button>
-</div>
-
-<div class="fixed bottom-0 right-0 p-5">
-    <Button color="blue" size="xl" on:click={complete}>
-        Complete Summary
+    
+    <Button color="green" size="xl" on:click={complete}>
+        Save
+        <FileCheckSolid/>
     </Button>
 </div>
