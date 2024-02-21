@@ -192,7 +192,7 @@
 
 <svelte:window on:beforeunload={beforeUnload} />
 
-<div class="flex flex-col p-5 m-10 bg-white dark:bg-slate-800 shadow-xl rounded-2xl">
+<div class="flex flex-col w-full p-5 m-10 bg-white dark:bg-slate-800 shadow-xl rounded-2xl">
 	<ProgressIndicator bind:currentStep bind:steps bind:waiting />
 
 	<!-- If waiting for something, show a spinner, else show form -->
