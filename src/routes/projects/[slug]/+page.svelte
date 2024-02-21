@@ -54,7 +54,7 @@
         alert('Next btn clicked. Make a call to your server to fetch data.');
     };
     function edit() {
-        goto('slide_editor/' + data.project.id.toString());
+        goto('../slide_editor/' + data.project.id.toString());
     }
 
 </script>

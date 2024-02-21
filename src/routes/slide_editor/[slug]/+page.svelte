@@ -3,8 +3,8 @@
     import {Button, Textarea  } from 'flowbite-svelte';
     import { FileCheckSolid } from 'flowbite-svelte-icons';
 
-    let slides = ["placeholder_slide_1.PNG", "placeholder_slide_2.PNG", "placeholder_slide_3.PNG",
-                  "placeholder_slide_4.PNG", "placeholder_slide_5.PNG","placeholder_slide_6.PNG"];
+    let slides = ["../placeholder_slide_1.PNG", "../placeholder_slide_2.PNG", "../placeholder_slide_3.PNG",
+                  "../placeholder_slide_4.PNG", "../placeholder_slide_5.PNG","../placeholder_slide_6.PNG"];
 
     let summaries = [`This is the second lecture for the Introduction to Machine Learning course`,
                      `This is the course plan for the Introduction to Machine Learning course`,
@@ -16,7 +16,7 @@
                     ];
 
                     
-     /*               
+                    
     export let data;
 
     let displaySlides = data.hasSlides;
@@ -34,14 +34,14 @@
         }
 
     }
-*/
+
     
 
     // both buttons temporarily go back to projects page for now
 
     // should go to per project page
     function goBack() {
-        goto('/projects');
+        goto('../projects/' + data.id.toString());
     }
 
     // should go to download page?
