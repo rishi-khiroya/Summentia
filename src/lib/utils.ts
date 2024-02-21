@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export function formResponseToJSON(response: string) {
 	const data = JSON.parse(response);
 
@@ -24,3 +26,8 @@ export function formResponseToJSON(response: string) {
 export function formatDate(date: Date) {
 	return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 }
+
+export function reformat_date(project_date:Date){
+	return moment(project_date).format('DD-MM-YYYY');
+}
+

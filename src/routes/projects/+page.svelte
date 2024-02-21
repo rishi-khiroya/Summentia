@@ -12,7 +12,7 @@
 	} from 'flowbite-svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import moment from 'moment';
+	import { reformat_date } from '$lib/utils.js';
 
 	export let data;
 
@@ -45,26 +45,24 @@
 
 	const previous = () => {
 		const params = new URLSearchParams(window.location.search);
-    	const page = Math.max(parseInt(params.get('page')) - 1, 0);
+    	const page = Math.max(parseInt(params.get('page')??"0") - 1, 0);
     	params.set('page', page.toString());
     	window.location.search = params.toString();
 	};
 	const next = () => {
 		const params = new URLSearchParams(window.location.search);
-    	const pageNo = parseInt(params.get('page'));
-    	const noProjects = parseInt(data.noProjects) || 0;
+    	const pageNo = parseInt(params.get('page')??"0");
+    	const noProjects = parseInt((data.noProjects??0).toString()) || 0;
     	const page = Math.min(pageNo + 1, noProjects);
     	params.set('page', page.toString());
     	window.location.search = params.toString();
 	};
+	
 	function nav_to_project_page(project_id:number) {
-		console.log(project_id)
-		goto('projects/' + project_id.toString());
-	}
-
-	function reformat_date(project_date:Date){
-		return moment(project_date).format('DD-MM-YYYY');
-	}
+	console.log(project_id)
+	goto('projects/' + project_id.toString());
+	};
+	
 </script>
 
 <div class="flex flex-col p-10 space-y-3 justify-center align-top">

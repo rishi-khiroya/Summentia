@@ -10,7 +10,7 @@ export const load: PageServerLoad = async (event) => {
 	const session: Session | null = await event.locals.auth();
 	if (!session?.user) throw redirect(303, '/');
 
-	const pageNoParam: string | null = event.url.searchParams.get('page');
+	const pageNoParam: string = event.url.searchParams.get('page') ?? "0";
 	const pageNo: number = pageNoParam ? Number(pageNoParam) : 0;
 
 	// Load useful data
