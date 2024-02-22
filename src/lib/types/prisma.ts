@@ -11,7 +11,7 @@ export interface PrismaProject {
 	date: Date;
 	createdAt: Date;
 	hasSlides: boolean;
-	video: string | undefined; // path of the video on the vm
+	video: string | null; // path of the video on the vm
 	slides: string | undefined
 	data: PrismaBasicData | PrismaSlidesData[];
 	status: PrismaProjectStatus;
