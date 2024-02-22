@@ -25,8 +25,8 @@ model Project {
   status    Status   @default(UNPROCESSED)
   waiting   Boolean  @default(true)
   hasSlides Boolean  @default(false)
-  video     String?  @default("") @db.Text
-  slides    String?  @db.Text
+  video     String   @default("") @db.Text
+  slides    String   @default("") @db.Text
   data      Json?    @default(dbgenerated())
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
