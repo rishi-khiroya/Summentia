@@ -55,15 +55,8 @@ export const actions = {
 		const project: Project = await Project.fromLecture(lecture);
 
 		console.log(project);
-		let record: PrismaProject | undefined = undefined;
-		while (!record) {
-			record = await project.saveToDB();
-			await new Promise((resolve) => {
-				setTimeout(resolve, 1000);
-			});
-		};
-		// TODO: PUSH TO DB and return project id
+		const id: number | undefined = await project.saveToDB();
 
-		return { success: true, projectId: record.id };
+		return { success: true, projectId: id };
 	}
 };

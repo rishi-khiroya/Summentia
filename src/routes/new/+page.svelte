@@ -7,7 +7,6 @@
 	import type { Upload } from './(types)/Upload';
 	import { goto } from '$app/navigation';
 	import { formResponseToJSON } from '$lib/utils';
-	import { redirect } from '@sveltejs/kit';
 
 	export let data;
 
