@@ -1,9 +1,12 @@
 import { prisma } from "$lib/server/prisma";
-import { error } from "@sveltejs/kit";
-import type { PageServerLoad } from "../$types";
-import { PrismaProjectStatus, type PrismaProject } from "$lib/types/Prisma";
+import { error, redirect } from "@sveltejs/kit";
+import type { PageServerLoad } from "./$types";
+import type { Session } from "@auth/core/types";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
+
+    const session: Session | null = await locals.auth();
+    const userId: string | undefined = session?.user.id;
 
     const data = await prisma.project.findUnique({
         where: {
@@ -11,10 +14,40 @@ export const load: PageServerLoad = async ({ params }) => {
         }
     });
 
-    //if (!data || !data.video || !data.data) error(503, "Project not found.");
+    if (!data) error(503, "No project found");
+    if (data.userId != userId) redirect(303, `/projects`);
+    if (!data.video || !data.data || data.status != 'SUMMARISED') redirect(303, `/new/inprogress/${params.slug}`);
 
-    console.log(data.data);
+    console.log(data);
 
-    return { data: JSON.parse(JSON.stringify(data.data)), id: data.id, hasSlides: data.hasSlides, };
+    return { data: JSON.parse(JSON.stringify(data.data)), hasSlides: data.hasSlides, id: data.id };
 
+}
+
+export const actions = {
+    save: async ({ request }) => {
+        const form = await request.formData();
+
+        const data = form.getAll('data');
+        const id = form.get('id');
+        const userId = form.get('userId');
+        if (!data || !id) error(503, "No form data found.");
+
+        console.log();
+
+        const record = await prisma.project.update({
+            where: {
+                id: Number(id.toString()),
+                userId: userId?.toString()
+            },
+            data: {
+                data: data.map(data => JSON.parse(data.toString()))
+            }
+        })
+
+        console.log("Updated record.");
+
+        return record?.id.toString() === id.toString();
+        // return {};
+    }
 }

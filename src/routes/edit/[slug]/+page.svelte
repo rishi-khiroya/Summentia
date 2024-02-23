@@ -1,80 +1,100 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Button, Textarea } from 'flowbite-svelte';
-	import { FileCheckSolid } from 'flowbite-svelte-icons';
-
-	let slides = [
-		'../placeholder_slide_1.PNG',
-		'../placeholder_slide_2.PNG',
-		'../placeholder_slide_3.PNG',
-		'../placeholder_slide_4.PNG',
-		'../placeholder_slide_5.PNG',
-		'../placeholder_slide_6.PNG'
-	];
-
-	let summaries = [
-		`This is the second lecture for the Introduction to Machine Learning course`,
-		`This is the course plan for the Introduction to Machine Learning course`,
-		`Here are some of the classification algorithms we will learn about`,
-		`Lazy learner models, like k-nearest neighbors (kNN), don't build a model during training; they store the data and compute predictions based on similarity at prediction time. They're intuitive, handle data changes well, but are computationally expensive and memory-intensive.
-                      Eager learner models, exemplified by decision trees, build a model during training and generalize data patterns. They're faster at prediction, less memory-intensive, but require more computational resources during training and may overfit if not properly regularized.`,
-		`Today we will be learning about classification with instance based learning versus classification with decision trees`,
-		`Today's lecture will be delivered in 6 short videos`
-	];
+	import { Button, Modal, Textarea } from 'flowbite-svelte';
+	import { ExclamationCircleOutline, FileCheckSolid } from 'flowbite-svelte-icons';
 
 	export let data;
 
-	let displaySlides = data.hasSlides;
+	let slidesData = data.data;
+	let saved: boolean = true;
+	let backModal: boolean = false;
+	let dirty: boolean = false;
 
-	if (displaySlides) {
-		// TODO: Convert slideData into PrismaSlidesData object and determine pages
-		let slideData = data;
-		slides = slideData.map((data) => data.slide);
-		summaries = slideData.map((data) => data.summary);
+	async function save() {
+		const form: FormData = new FormData();
 
-		if (slides == null || summaries == null) {
-			slides = [];
-			summaries = [];
+		// Add userId to the form
+		if (data.session) form.append('userId', data.session.user.id);
+
+		slidesData.forEach((data) => {
+			form.append('data', JSON.stringify(data));
+		});
+		form.append('id', data.id.toString());
+
+		const response = await fetch('?/save', {
+			method: 'POST',
+			body: form
+		});
+
+		if (response.ok) saved = true;
+		// TODO: trigger toast
+	}
+
+	function back() {
+		if (saved) goto(`../projects/${data.id}`);
+		else {
+			dirty = true;
+			backModal = true;
 		}
 	}
 
-	function goBack() {
-		goto('../projects/' + data.id.toString());
-	}
+	// Stop the page from refreshing without confirmation of losing data.
+	function beforeUnload(event: BeforeUnloadEvent): string {
+		if (saved || dirty) return '';
 
-	function complete() {
-		// TODO: code to save summary changes should go here
-		// note: will probably need to add names to iteratively created textareas
-		goto('../projects/' + data.id.toString());
+		event.preventDefault();
+		event.returnValue = '';
+		return '';
 	}
 </script>
 
-<h1 class="text-5xl p-10 font-bold">Summary Editor</h1>
+<svelte:window on:beforeunload={beforeUnload} />
 
-{#each slides as slide, index}
-	<div class="justify-center flex space-x-2 m-4">
-		<div
-			class="flex flex-col bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 p-10"
-		>
-			<h2 class="text-xl px-2 font-semibold text-center">Slide {index + 1}/{slides.length}</h2>
-
-			<!-- svelte-ignore a11y-img-redundant-alt -->
-			<img width="500px" src={slide} alt="Slide {index + 1}" />
-		</div>
-
-		<div
-			class="bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-5"
-		>
-			<h2 class="text-xl px-2 font-semibold">Summary {index + 1}/{slides.length}</h2>
-			<Textarea readonly rows="13" cols="100" value={summaries[index]} />
-		</div>
+<Modal bind:open={backModal} size="xs" autoclose>
+	<div class="text-center">
+		<ExclamationCircleOutline class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" />
+		<h3 class="mb-5 text-lg text-gray-500 dark:text-gray-400">
+			Are you sure you want to go back? Your changes will not be saved.
+		</h3>
+		<Button color="red" class="me-2" href={`projects/${data.id}`}>Yes, I'm sure</Button>
+		<Button color="alternative">No, cancel</Button>
 	</div>
-{/each}
+</Modal>
+
+<div class="flex flex-col w-full p-20">
+	<h1 class="text-5xl p-10 font-bold">Summary Editor</h1>
+
+	{#if data.hasSlides}
+		{#each slidesData as { slide, summary }, index}
+			<div class="justify-between flex w-full space-x-6 m-4">
+				<div
+					class="flex flex-col w-full bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
+				>
+					<h2 class="text-xl px-2 font-semibold text-center pb-5">
+						Slide {index + 1}/{slidesData.length}
+					</h2>
+
+					<!-- svelte-ignore a11y-img-redundant-alt -->
+					<img class="flex-1" src={slide} alt="Slide {index + 1}" />
+				</div>
+
+				<div
+					class="flex flex-col w-full bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
+				>
+					<h2 class="text-xl px-2 font-semibold text-center pb-5">
+						Summary {index + 1}/{slidesData.length}
+					</h2>
+					<Textarea rows="13" cols="100" bind:value={summary} on:change={() => (saved = false)} />
+				</div>
+			</div>
+		{/each}
+	{/if}
+</div>
 
 <div class="fixed bottom-0 left-0 p-5">
-	<Button color="red" size="xl" on:click={goBack}>Back</Button>
+	<Button color="red" size="xl" on:click={() => back()}>Back</Button>
 
-	<Button color="green" size="xl" on:click={complete}>
+	<Button color="green" size="xl" on:click={() => save()}>
 		Save
 		<FileCheckSolid />
 	</Button>
