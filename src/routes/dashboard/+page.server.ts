@@ -4,7 +4,7 @@ import { redirect } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
 import type { Project } from '@prisma/client';
 
-const ITEMS_PER_PAGE: number = 10;
+const NO_PROJECTS: number = 5;
 
 export const load: PageServerLoad = async (event) => {
 	const session: Session | null = await event.locals.auth();
@@ -28,8 +28,7 @@ export const load: PageServerLoad = async (event) => {
 		where: {
 			userId: session.user.id
 		},
-		skip: pageNo * ITEMS_PER_PAGE,
-		take: ITEMS_PER_PAGE,
+		take: NO_PROJECTS,
 		orderBy: {
 			createdAt: 'desc'
 		}
