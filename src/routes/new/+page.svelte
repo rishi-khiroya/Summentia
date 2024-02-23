@@ -172,6 +172,8 @@
 		}
 
 		const json = await response.json();
+		if (json.type == 'redirect') return { success: true, msg: "Already redirected."};
+
 		const responseData: {
 			success: boolean;
 			projectId: number | undefined;

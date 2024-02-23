@@ -3,6 +3,7 @@ import type { PageServerLoad } from './$types';
 import { Lecture } from '$lib/server/types/Lecture';
 import { Project } from '$lib/server/types/Project';
 import type { PrismaProject } from '$lib/types/Prisma';
+import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async (event) => {
 	const session: Session | null = await event.locals.auth();
@@ -56,6 +57,7 @@ export const actions = {
 		// console.log(project);
 		const id: number | undefined = await project.saveToDB();
 
+		redirect(303, `/new/inprogess/${id}`);
 		return { success: true, projectId: id };
 	}
 };
