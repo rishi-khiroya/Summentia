@@ -91,7 +91,7 @@ export const load: PageServerLoad = async ({ params }) => {
         if (project.hasSlides) {
             const slidesData: PrismaSlidesData[] = project.data as PrismaSlidesData[];
             slidesData.forEach(async slideData => {
-                const summary: string | null = await summarise(slideData.transcript);
+                const summary: string | null = await summarise(slideData.transcript, project.customisation.summaryLevel - 1);
                 slideData.summary = summary ? summary : "Error...";
             })
             data = slidesData.map(data => JSON.stringify(data));
