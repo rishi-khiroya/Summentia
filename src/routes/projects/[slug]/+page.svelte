@@ -85,8 +85,7 @@
 	<div class="flex-col px-10 pt-10">
 		<div class="flow-root">
 			<div class="float-left justify-start items-center flex">
-				<!-- TODO: Link button to edit page -->
-				<Button class="h-10 w-10" pill color="dark" href="/projects"
+				<Button class="h-10 w-10" pill color="dark" on:click={edit}"
 					><EditSolid class="focus:!outline-none" /></Button
 				>
 				<h1 class="text-4xl p-5 font-bold dark:text-white">{data.project.title}</h1>
@@ -108,9 +107,6 @@
 						<DropdownItem on:click={downloadOptionPressed}>.txt</DropdownItem>
 					</Dropdown>
 				</ButtonGroup>
-				<div class="float-left justify-start items-center flex p-10">
-					<Button color="dark" size="lg" on:click={edit}>Edit Summary</Button>
-				</div>
 			</div>
 			{#if data.project.hasSlides}
 				<div class="float-right justify-end items-center flex">
