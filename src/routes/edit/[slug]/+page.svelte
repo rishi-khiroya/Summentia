@@ -62,15 +62,15 @@
 </Modal>
 
 <div class="flex flex-col w-full p-20">
-	<h1 class="text-5xl p-10 font-bold">Summary Editor</h1>
+	<h1 class="text-5xl p-10 font-bold dark:text-white">Summary Editor</h1>
 
 	{#if data.hasSlides}
 		{#each slidesData as { slide, summary }, index}
 			<div class="justify-between flex w-full space-x-6 m-4">
 				<div
-					class="flex flex-col w-full bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
+					class="flex flex-col w-full bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
 				>
-					<h2 class="text-xl px-2 font-semibold text-center pb-5">
+					<h2 class="text-xl px-2 font-semibold text-center pb-5 dark:text-white">
 						Slide {index + 1}/{slidesData.length}
 					</h2>
 
@@ -79,9 +79,9 @@
 				</div>
 
 				<div
-					class="flex flex-col w-full bg-white outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
+					class="flex flex-col w-full bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
 				>
-					<h2 class="text-xl px-2 font-semibold text-center pb-5">
+					<h2 class="text-xl px-2 font-semibold text-center pb-5 dark:text-white">
 						Summary {index + 1}/{slidesData.length}
 					</h2>
 					<Textarea rows="13" cols="100" bind:value={summary} on:change={() => (saved = false)} />
