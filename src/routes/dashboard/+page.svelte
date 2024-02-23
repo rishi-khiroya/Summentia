@@ -8,43 +8,39 @@
 		TableBodyCell,
 		TableHead,
 		TableHeadCell,
-		Table
+		Table,
+		Hr
 	} from 'flowbite-svelte';
 	import { ArrowRightOutline } from 'flowbite-svelte-icons';
 	import { reformat_date } from '$lib/utils.js';
 	import { goto } from '$app/navigation';
+	import { PrismaProjectStatus } from '$lib/types/Prisma';
 
 	export let data;
 
-	let searchTerm: string = '';
-	const recent_projects = data.projects;
-
-	function nav_to_project_page(project_id: number) {
-		console.log(project_id);
-		goto('projects/' + project_id.toString());
-	}
+	const projects = data.projects;
 </script>
 
 <div class="flex flex-col p-10">
 	<h1 class="text-4xl p-10 font-bold dark:text-white">Dashboard</h1>
 	<div class="flex space-x-10 py-5">
 		<div
-			class="flex flex-col bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-5"
+			class="flex-1 flex-col bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-5"
 		>
 			<h2 class="text-xl px-2 font-semibold dark:text-white">Your most recent summary:</h2>
-			<div class="flex space-x-5 py-3">
-				<Badge rounded large color="dark" class="w-55 h-19">
-					<div class="px-5 py-3">
-						<h1>{recent_projects[0].title}</h1>
-						<h3>{reformat_date(recent_projects[0].createdAt)}</h3>
-					</div>
-				</Badge>
-			</div>
-			<ImagePlaceholder alt="sample 1" />
-			<h3>{recent_projects[0].data.summary}</h3>
-			<div class="flex w-full bottom-5 right-5">
-				<Button class="right-0" href={``}>View</Button>
-			</div>
+			{#if projects?.length}
+				<div class="flex flex-row justify-between space-x-5 p-3">
+					<h1 class="text-4xl">{projects[0].title}</h1>
+					<h3 class="text-xl">{reformat_date(projects[0].date)}</h3>
+				</div>
+				<Hr />
+				<h3>{projects[0].data.summary}</h3>
+				<div class="flex w-full justify-end">
+					<Button href={`/projects/${projects[0].id}`}>View</Button>
+				</div>
+			{:else}
+				<h1>You have no recent projects.</h1>
+			{/if}
 		</div>
 
 		<div
@@ -55,21 +51,27 @@
 				<TableHead>
 					<TableHeadCell>Title</TableHeadCell>
 					<TableHeadCell>Date</TableHeadCell>
+					<TableHeadCell>Status</TableHeadCell>
 				</TableHead>
 				<TableBody>
-					{#each recent_projects as item}
-						<TableBodyRow on:click={() => nav_to_project_page(item.id)}>
+					{#each projects as item}
+						<TableBodyRow on:click={() => goto(`/projects/${item.id}`)}>
 							<!-- <TableBodyCell>{item.id}</TableBodyCell> -->
 							<TableBodyCell>{item.title}</TableBodyCell>
 							<TableBodyCell>{reformat_date(item.date)}</TableBodyCell>
+							<TableBodyCell
+								>{item.status[0].toUpperCase() +
+									item.status.substring(1).toLowerCase()}</TableBodyCell
+							>
 						</TableBodyRow>
 					{/each}
 				</TableBody>
 			</Table>
-			<p class="underline text-right font-medium text-gray-600 px-3 dark:text-gray-400">
-				<a href="/projects">All Projects <ArrowRightOutline class="w-3.5 h-3.5 ms-2" /></a>
-			</p>
-			<p></p>
+			<div class="flex w-full mt-10 justify-end align-bottom">
+				<Button outline color="alternative" href="/prijects">
+					All Projects <ArrowRightOutline class="w-3.5 h-3.5 ms-2" />
+				</Button>
+			</div>
 		</div>
 	</div>
 </div>
