@@ -53,7 +53,7 @@ export const actions = {
 
 		const project: Project = await Project.from(JSON.parse(data));
 
-		console.log(project);
+		// console.log(project);
 		const id: number | undefined = await project.saveToDB();
 
 		return { success: true, projectId: id };

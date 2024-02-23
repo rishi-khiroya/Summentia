@@ -41,7 +41,7 @@ export const actions = {
             }
         })
 
-        console.log("Updated record.");
+        // console.log("Updated record.");
 
         return record?.id.toString() === id.toString();
         // return {};
