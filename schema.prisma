@@ -8,31 +8,8 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-enum Status {
-  UNPROCESSED
-  SPLIT
-  TRANSCRIBED
-  SUMMARISED
-  COMPLETED
-}
-
-model Project {
-  id        Int      @id @default(autoincrement())
-  title     String
-  userId    String?
-  date      DateTime
-  createdAt DateTime @default(now())
-  status    Status   @default(UNPROCESSED)
-  waiting   Boolean  @default(true)
-  hasSlides Boolean  @default(false)
-  video     String   @default("") @db.Text
-  slides    String   @default("") @db.Text
-  data      Json?    @default(dbgenerated())
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id
   userId            String
   type              String
   provider          String
@@ -44,29 +21,44 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
+model Project {
+  id        Int      @id @default(autoincrement())
+  title     String
+  userId    String?
+  date      DateTime
+  createdAt DateTime @default(now())
+  data      Json?
+  status    Status   @default(UNPROCESSED)
+  waiting   Boolean  @default(true)
+  hasSlides Boolean  @default(false)
+  slides    String   @default("")
+  video     String   @default("")
+  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id
   name          String?
   email         String?   @unique
   createdAt     DateTime  @default(now())
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  projects      Project[]
-  sessions      Session[]
+  Account       Account[]
+  Project       Project[]
+  Session       Session[]
 }
 
 model VerificationToken {
@@ -75,4 +67,12 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum Status {
+  UNPROCESSED
+  SPLIT
+  TRANSCRIBED
+  SUMMARISED
+  COMPLETED
 }
