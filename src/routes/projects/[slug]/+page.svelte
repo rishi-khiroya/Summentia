@@ -18,37 +18,36 @@
 		TextPlaceholder,
 		CardPlaceholder,
 		Pagination,
-        Video
+		Video
 	} from 'flowbite-svelte';
-	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
-	import { stringify } from 'querystring';
+	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
 
-    const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
-        let basicData: PrismaBasicData;
+	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
+		let basicData: PrismaBasicData;
 
-        let transcripts: string[] = [];
-        let summaries: string[] = [];
-        slideData.forEach(element => {
-            transcripts.push(element.transcript);
-            summaries.push(element.summary);
-        });
+		let transcripts: string[] = [];
+		let summaries: string[] = [];
+		slideData.forEach((element) => {
+			transcripts.push(element.transcript);
+			summaries.push(element.summary);
+		});
 
-        basicData = {transcript: transcripts.join(" "), summary: summaries.join(" ")}
-        return basicData;
-    };
+		basicData = { transcript: transcripts.join(' '), summary: summaries.join(' ') };
+		return basicData;
+	};
 
 	export let data;
 
-    let displaySlides = data.project.hasSlides;
-    let slideData: PrismaSlidesData[];
-    let overviewData: PrismaBasicData;
-    let pages: { name: string; href: string }[];
-    
-    $: displayButtonText = displaySlides ? 'Slides View' : 'Overview';
+	let displaySlides = data.project.hasSlides;
+	let slideData: PrismaSlidesData[];
+	let overviewData: PrismaBasicData;
+	let pages: { name: string; href: string }[];
+
+	$: displayButtonText = displaySlides ? 'Slides View' : 'Overview';
 
 	if (displaySlides) {
 		slideData = JSON.parse(JSON.stringify(data.project.data));
-        overviewData = accumulateSlideData(slideData);
+		overviewData = accumulateSlideData(slideData);
 
 		pages = [
 			{ name: '1', href: '/projects/1?page=1' },
@@ -58,8 +57,8 @@
 			{ name: '5', href: '/projects/1?page=5' }
 		];
 	} else {
-        overviewData = JSON.parse(JSON.stringify(data.project.data));
-    }
+		overviewData = JSON.parse(JSON.stringify(data.project.data));
+	}
 
 	const downloadOptionPressed = (e: MouseEvent) => {
 		let option = e.target?.textContent ?? 'unknown';
@@ -85,7 +84,7 @@
 	<div class="flex-col px-10 pt-10">
 		<div class="flow-root">
 			<div class="float-left justify-start items-center flex">
-				<Button class="h-10 w-10" pill color="dark" on:click={edit}"
+				<Button class="h-10 w-10" pill color="dark" on:click={edit}
 					><EditSolid class="focus:!outline-none" /></Button
 				>
 				<h1 class="text-4xl p-5 font-bold dark:text-white">{data.project.title}</h1>
@@ -139,24 +138,28 @@
 			</div>
 		{:else}
 			<div class="flex">
-				<div class="flex-col flex-1">
+				<div class="flex-col flex-1 p-5">
+					{#if data.project.video == null}
+						<VideoPlaceholder size="xl" class="m-5" />
+					{:else}
+						<div class="flex justify-center">
+							<Video
+								src={data.project.video}
+								controls
+								class="rounded-xl h-72 outline-1 outline-transparent shadow-md shadow-black"
+							/>
+						</div>
+					{/if}
 					<InformationBox title="Transcript:" maxHeight="72" additionalAttributes="min-h-72">
 						<p>{overviewData.transcript}</p>
 					</InformationBox>
-					{#if data.project.video == null}
-                        <VideoPlaceholder size="xl" class="m-5" />
-                    {:else}
-                        <div class="flex justify-center">
-                            <Video src={data.project.video} controls class="rounded-xl h-72 outline-1 outline-transparent shadow-md shadow-black"/>
-                        </div>
-                    {/if}
 				</div>
 				<InformationBox
 					title="Summary:"
 					maxHeight="[650px]"
 					additionalAttributes="flex-1 min-h-[600px]"
 				>
-                	<p>{overviewData.summary}</p>
+					<p>{overviewData.summary}</p>
 				</InformationBox>
 			</div>
 		{/if}
