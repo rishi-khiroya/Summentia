@@ -1,6 +1,9 @@
+import { PATH_TO_DATA } from '$env/static/private';
 import { formatDate } from '$lib/utils';
+import { randomUUID } from 'node:crypto';
 import { VideoURLHandler } from './URLHandler';
 import path from 'node:path';
+import { writeFile } from 'node:fs/promises';
 
 // TODO: complete definition
 export class Lecture {
@@ -14,9 +17,10 @@ export class Lecture {
 		this.userId = userId;
 	}
 
-	public withSlidesFromFile(slides: File): Lecture {
-		// TODO: write to filesys
-		this.slides = slides.name;
+	public async withSlidesFromFile(slides: File): Promise<Lecture> {
+		const path: string = `${PATH_TO_DATA}/${randomUUID()}.pdf`;
+		await writeFile(path, Buffer.from(await slides.arrayBuffer()));
+		this.slides = path;
 		return this;
 	}
 
@@ -38,10 +42,10 @@ export class Lecture {
 	// 	if ()
 	// }
 
-	public static fromLectureForm(form: FormData): Lecture {
+	public static async fromLectureForm(form: FormData): Promise<Lecture> {
 		let video: Video;
 		if (form.get('lectureFromFile') === 'true') {
-			video = VideoFromFile.from(form.get(`lectureFile`) as File);
+			video = await VideoFromFile.from(form.get(`lectureFile`) as File);
 		} else {
 			const data = form.get('lectureURL');
 			if (!data) throw new Error('Invalid URL');
@@ -68,7 +72,8 @@ export class Lecture {
 		return JSON.stringify({
 			video: this.video.path,
 			slides: this.slides,
-			userId: this.userId, info: this.info ? this.info : await this.video.getTitleDate()
+			userId: this.userId,
+			info: this.info ? this.info : await this.video.getTitleDate()
 		});
 	}
 }
@@ -98,9 +103,10 @@ class VideoFromFile extends Video {
 		this.file = file;
 	}
 
-	static from(file: File): VideoFromFile {
-		// TODO: write to filesys
-		return new VideoFromFile("...", file);
+	static async from(file: File): Promise<VideoFromFile> {
+		const path: string = `${PATH_TO_DATA}/${randomUUID()}.mp4`;
+		await writeFile(path, Buffer.from(await file.arrayBuffer()));
+		return new VideoFromFile(path, file);
 	}
 
 	// public async toFilePath(): Promise<string> {
