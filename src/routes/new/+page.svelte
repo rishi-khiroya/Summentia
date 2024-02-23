@@ -2,7 +2,7 @@
 	import FormStep from './FormStep.svelte';
 	import { StepStatus, type Step } from './(types)/Step';
 	import ProgressIndicator from './ProgressIndicator.svelte';
-	import { Input, Spinner } from 'flowbite-svelte';
+	import { Input, Label, Spinner, Range, Toggle } from 'flowbite-svelte';
 	import FileUpload from './FileUpload.svelte';
 	import type { Upload } from './(types)/Upload';
 	import { goto } from '$app/navigation';
@@ -49,6 +49,7 @@
 		slides: string;
 		userId: string;
 		info: { title: string; date: string };
+		customisation: { summaryLevel: number, questions: boolean };
 	};
 
 	let slidesUpload: Upload;
@@ -171,7 +172,6 @@
 		}
 
 		const json = await response.json();
-		console.log(json);
 		const responseData: {
 			success: boolean;
 			projectId: number | undefined;
@@ -259,11 +259,33 @@
 			submit={() => handleSubmit()}
 		>
 			<h1 class="text-2xl font-bold dark:text-white">Review & Submit:</h1>
-			<p class="p-5">Blah blah some stuff ...</p>
-			<!-- TODO -->
+			<div class="flex flex-row justify-between w-full space-x-5">
+				<div class="flex flex-col w-full shadow-md shadow-black outline-1 outline-black p-5 m-5 rounded-xl space-y-5">
+					<div class="flex flex-row w-full justify-between mb-5">
+						<h1 class="font-bold text-xl text-clip">{lecture.info.title}</h1>
+						<h1 class="text-lg text-clip">{lecture.info.date}</h1>
+					</div>
+					<h1 class="text-lg text-clip">Video: {lecture.video}</h1>
+					<h1 class="text-lg text-clip">Slides: {lecture.slides ?? "None"}</h1>
+				</div>
+				<div class="flex flex-col w-full m-5 space-y-5">
+					<div class="flex flex-col shadow-md shadow-black outline-1 outline-black p-5 rounded-xl">
+						<Label class="pb-4 text-lg">How detailed should the summary be:</Label>
+						<Range id="range-steps" min="1" max="3" bind:value={lecture.customisation.summaryLevel} step="1" />
+						<div class="pt-4 flex w-full justify-between">
+							<h1 class={lecture.customisation.summaryLevel === 1 ? "font-semibold" : ""}>Concise</h1>
+							<h1 class={lecture.customisation.summaryLevel === 3 ? "font-semibold" : ""}>Detailed</h1>
+						</div>
+					</div>
+					<div class="flex flex-row space-x-5 align-middle shadow-md shadow-black outline-1 outline-black p-5 rounded-xl">
+						<Label class="text-lg align-middle">Generate Questions:</Label>
+						<Toggle bind:checked={lecture.customisation.questions}/>
+					</div>
+				</div>
+			</div>
 			{#if !data.session?.user}
 				<h1 class="font-medium text-orange-600">
-					Warning: you are not logged in. This project will not be accessible again.
+					Warning: you are not logged in. This project will only be accessible via URL.
 				</h1>
 			{/if}
 		</FormStep>
