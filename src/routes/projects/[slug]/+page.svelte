@@ -17,18 +17,39 @@
 		VideoPlaceholder,
 		TextPlaceholder,
 		CardPlaceholder,
-		Pagination
+		Pagination,
+        Video
 	} from 'flowbite-svelte';
+	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
+	import { stringify } from 'querystring';
+
+    const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
+        let basicData: PrismaBasicData;
+
+        let transcripts: string[] = [];
+        let summaries: string[] = [];
+        slideData.forEach(element => {
+            transcripts.push(element.transcript);
+            summaries.push(element.summary);
+        });
+
+        basicData = {transcript: transcripts.join(" "), summary: summaries.join(" ")}
+        return basicData;
+    };
 
 	export let data;
 
-	let displaySlides = data.project.hasSlides;
-	$: displayButtonText = displaySlides ? 'Slides View' : 'Overview';
-	let pages: { name: string; href: string }[];
+    let displaySlides = data.project.hasSlides;
+    let slideData: PrismaSlidesData[];
+    let overviewData: PrismaBasicData;
+    let pages: { name: string; href: string }[];
+    
+    $: displayButtonText = displaySlides ? 'Slides View' : 'Overview';
 
 	if (displaySlides) {
-		// TODO: Convert slideData into PrismaSlidesData object and determine pages
-		let slideData = data.project.data;
+		slideData = JSON.parse(JSON.stringify(data.project.data));
+        overviewData = accumulateSlideData(slideData);
+
 		pages = [
 			{ name: '1', href: '/projects/1?page=1' },
 			{ name: '3', href: '/projects/1?page=3' },
@@ -36,7 +57,9 @@
 			{ name: '4', href: '/projects/1?page=4' },
 			{ name: '5', href: '/projects/1?page=5' }
 		];
-	}
+	} else {
+        overviewData = JSON.parse(JSON.stringify(data.project.data));
+    }
 
 	const downloadOptionPressed = (e: MouseEvent) => {
 		let option = e.target?.textContent ?? 'unknown';
@@ -62,8 +85,7 @@
 	<div class="flex-col px-10 pt-10">
 		<div class="flow-root">
 			<div class="float-left justify-start items-center flex">
-				<!-- TODO: Link button to edit page -->
-				<Button class="h-10 w-10" pill color="dark" href="/projects"
+				<Button class="h-10 w-10" pill color="dark" on:click={edit}"
 					><EditSolid class="focus:!outline-none" /></Button
 				>
 				<h1 class="text-4xl p-5 font-bold dark:text-white">{data.project.title}</h1>
@@ -85,9 +107,6 @@
 						<DropdownItem on:click={downloadOptionPressed}>.txt</DropdownItem>
 					</Dropdown>
 				</ButtonGroup>
-				<div class="float-left justify-start items-center flex p-10">
-					<Button color="dark" size="lg" on:click={edit}>Edit Summary</Button>
-				</div>
 			</div>
 			{#if data.project.hasSlides}
 				<div class="float-right justify-end items-center flex">
@@ -121,17 +140,23 @@
 		{:else}
 			<div class="flex">
 				<div class="flex-col flex-1">
-					<InformationBox title="Transcript:" maxHeight="80">
-						<TextPlaceholder size="xxl" />
+					<InformationBox title="Transcript:" maxHeight="72" additionalAttributes="min-h-72">
+						<p>{overviewData.transcript}</p>
 					</InformationBox>
-					<VideoPlaceholder size="xxl" class="m-5" />
+					{#if data.project.video == null}
+                        <VideoPlaceholder size="xl" class="m-5" />
+                    {:else}
+                        <div class="flex justify-center">
+                            <Video src={data.project.video} controls class="rounded-xl h-72 outline-1 outline-transparent shadow-md shadow-black"/>
+                        </div>
+                    {/if}
 				</div>
 				<InformationBox
 					title="Summary:"
 					maxHeight="[650px]"
 					additionalAttributes="flex-1 min-h-[600px]"
 				>
-					<CardPlaceholder size="xxl" />
+                	<p>{overviewData.summary}</p>
 				</InformationBox>
 			</div>
 		{/if}
