@@ -44,9 +44,9 @@
 					<DropdownHeader>
 						<span class="block truncate text-sm font-medium">{$page.data.session.user.email}</span>
 					</DropdownHeader>
-					<DropdownItem href="dashboard">Dashboard</DropdownItem>
-					<DropdownItem href="projects">Projects</DropdownItem>
-					<DropdownItem href="settings">Settings</DropdownItem>
+					<DropdownItem href="/dashboard">Dashboard</DropdownItem>
+					<DropdownItem href="/projects">Projects</DropdownItem>
+					<DropdownItem href="/settings">Settings</DropdownItem>
 					<DropdownDivider />
 					<DropdownItem on:click={() => signOut()}>Sign out</DropdownItem>
 				</Dropdown>
