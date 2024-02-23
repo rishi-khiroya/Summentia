@@ -147,6 +147,7 @@
 		waiting = false;
 
 		if (responseData.success) {
+			lecture = JSON.parse(responseData.lecture.toString());
 			return { success: true, msg: undefined };
 		} else return { success: false, msg: responseData.error };
 	}
@@ -219,7 +220,7 @@
 			submit={() => handleSlides()}
 		>
 			<h1 class="text-2xl font-bold dark:text-white">Upload slides:</h1>
-			<FileUpload bind:upload={slidesUpload} name="Slides" allowedFileType=".pdf, .pptx" />
+			<FileUpload bind:upload={slidesUpload} name="Slides" allowedFileType=".pdf" />
 		</FormStep>
 
 		<!-- Confirm title and date (guessed from lecture/slides) -->

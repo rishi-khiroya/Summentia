@@ -15,7 +15,7 @@ export const actions = {
 
 		try {
 			// TODO: verify lecture exists
-			const lecture: Lecture = Lecture.fromLectureForm(form);
+			const lecture: Lecture = await Lecture.fromLectureForm(form);
 			// TODO: Put lecture in db
 			return { success: true, lecture: await lecture.toJSON() };
 		} catch (e) {
@@ -32,7 +32,7 @@ export const actions = {
 
 		const lecture: Lecture = Lecture.fromJSON(data);
 		if (form.get('slidesFromFile') === 'true') {
-			lecture.withSlidesFromFile(form.get(`slidesFile`) as File);
+			await lecture.withSlidesFromFile(form.get(`slidesFile`) as File);
 		} else {
 			const url = form.get('lectureURL');
 			if (!url) return { success: false, error: "Invalid Form: No url provided for slides." }
@@ -41,7 +41,7 @@ export const actions = {
 
 		// TODO: update db
 
-		return { success: true, lecture: lecture.toJSON() };
+		return { success: true, lecture: await lecture.toJSON() };
 
 	},
 
@@ -51,8 +51,7 @@ export const actions = {
 		const data = form.get('lecture')?.toString();
 		if (!data) return { success: false, error: "Invalid Form: No lecture found." }
 
-		const lecture: Lecture = Lecture.fromJSON(data);
-		const project: Project = await Project.fromLecture(lecture);
+		const project: Project = await Project.from(JSON.parse(data));
 
 		console.log(project);
 		const id: number | undefined = await project.saveToDB();

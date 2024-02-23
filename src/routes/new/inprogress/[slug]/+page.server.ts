@@ -23,8 +23,6 @@ export const load: PageServerLoad = async ({ params }) => {
         }
     }
 
-    console.log(data.data);
-
     const project: PrismaProject = {
         id: data.id,
         title: data.title,
@@ -33,46 +31,51 @@ export const load: PageServerLoad = async ({ params }) => {
         createdAt: data.createdAt,
         hasSlides: data.hasSlides,
         video: data.video, // path of the video on the vm
-        slides: "", // data.slides
+        slides: data.slides,
         data: JSON.parse(JSON.stringify(data.data)),
         status: PrismaProjectStatus[data.status],
         waiting: data.waiting,
     }
 
 
-    if (project.status == PrismaProjectStatus.TRANSCRIBED) {
-        console.log("Starting summarisation.");
+    if (project.waiting) {
+        if (project.status == PrismaProjectStatus.UNPROCESSED || project.status == PrismaProjectStatus.SPLIT) {
+            console.log("Sending request to Python back-end to complete splitting/transcribing.");
 
-        await prisma.project.update({
-            where: { id: project.id },
-            data: {
-                waiting: false
-            }
-        })
+        } else if (project.status == PrismaProjectStatus.TRANSCRIBED) {
+            console.log("Starting summarisation.");
 
-        let data;
-        if (project.hasSlides) {
-            const slidesData: PrismaSlidesData[] = project.data as PrismaSlidesData[];
-            slidesData.forEach(async slideData => {
-                const summary: string | null = await summarise(slideData.transcript);
-                slideData.summary = summary ? summary : "Error...";
+            await prisma.project.update({
+                where: { id: project.id },
+                data: {
+                    waiting: false
+                }
             })
-            data = slidesData.map(data => JSON.stringify(data));
-        } else {
-            const basicData: PrismaBasicData = project.data as PrismaBasicData;
-            const summary: string | null = await summarise(basicData.transcript);
-            basicData.transcript = summary ? summary : "Error...";
-            data = JSON.stringify(basicData);
-        }
 
-        await prisma.project.update({
-            where: { id: project.id },
-            data: {
-                data,
-                waiting: false,
-                status: 'SUMMARISED'
+            let data;
+            if (project.hasSlides) {
+                const slidesData: PrismaSlidesData[] = project.data as PrismaSlidesData[];
+                slidesData.forEach(async slideData => {
+                    const summary: string | null = await summarise(slideData.transcript);
+                    slideData.summary = summary ? summary : "Error...";
+                })
+                data = slidesData.map(data => JSON.stringify(data));
+            } else {
+                const basicData: PrismaBasicData = project.data as PrismaBasicData;
+                const summary: string | null = await summarise(basicData.transcript);
+                basicData.transcript = summary ? summary : "Error...";
+                data = JSON.stringify(basicData);
             }
-        })
+
+            await prisma.project.update({
+                where: { id: project.id },
+                data: {
+                    data,
+                    waiting: false,
+                    status: 'SUMMARISED'
+                }
+            })
+        }
     }
 
     console.log(project);
