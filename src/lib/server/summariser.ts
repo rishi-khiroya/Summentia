@@ -26,10 +26,10 @@ export async function summarise(transcript: string, detail_level: number = 1) {
 
 	const summary = completion.choices[0]['message']['content'];
 
-	console.log('Prompt : ');
-	console.log(prompt);
-	console.log('Summary : ');
-	console.log(summary);
+	// console.log('Prompt : ');
+	// console.log(prompt);
+	// console.log('Summary : ');
+	// console.log(summary);
 
 	return summary;
 }
