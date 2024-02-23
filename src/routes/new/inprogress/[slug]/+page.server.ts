@@ -43,6 +43,7 @@ export const load: PageServerLoad = async ({ params }) => {
         data: JSON.parse(JSON.stringify(data.data)),
         status: PrismaProjectStatus[data.status],
         waiting: data.waiting,
+        customisation: JSON.parse(JSON.stringify(data.customisation))
     }
 
 
