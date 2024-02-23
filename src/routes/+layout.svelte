@@ -15,7 +15,14 @@
 	<Navbar />
 	<div class="flex w-full justify-center">
 		<slot />
-		<Button class="absolute bottom-5 right-5 z-10" pill outline color="alternative" href="/new"><PlusSolid class="mr-3"/> New Project</Button>
+		<div class="fixed bottom-5 right-5 z-10">
+			<Button class="shadow-lg shadow-black hidden dark:flex" pill color="dark" href="/new"
+				><PlusSolid class="mr-3" /> New Project</Button
+			>
+			<Button class="shadow-lg shadow-black flex dark:hidden" pill color="alternative" href="/new"
+				><PlusSolid class="mr-3" /> New Project</Button
+			>
+		</div>
 	</div>
 	<Footer />
 </div>
