@@ -16,9 +16,13 @@
 		// Add userId to the form
 		if (data.session) form.append('userId', data.session.user.id);
 
-		slidesData.forEach((data) => {
-			form.append('data', JSON.stringify(data));
-		});
+		form.append('hasSlides', data.hasSlides.toString())
+		if (data.hasSlides)
+			slidesData.forEach((data) => {
+				form.append('data', JSON.stringify(data));
+			});
+		else form.append('data', JSON.stringify(slidesData));
+
 		form.append('id', data.id.toString());
 
 		const response = await fetch('?/save', {
@@ -88,6 +92,18 @@
 				</div>
 			</div>
 		{/each}
+	{:else}
+		<div
+			class="flex flex-col w-full bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
+		>
+			<h2 class="text-xl px-2 font-semibold text-center pb-5 dark:text-white">Summary</h2>
+			<Textarea
+				rows="13"
+				cols="100"
+				bind:value={data.data.summary}
+				on:change={() => (saved = false)}
+			/>
+		</div>
 	{/if}
 </div>
 
