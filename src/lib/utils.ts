@@ -15,8 +15,8 @@ export function formResponseToJSON(response: string) {
 				}
 			}
 		}
-		console.log(object);
-		console.log(map);
+		// console.log(object);
+		// console.log(map);
 		return Object.fromEntries(map);
 	};
 

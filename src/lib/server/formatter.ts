@@ -43,10 +43,10 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	const summary = completion.choices[0]['message']['content'];
 
-	console.log('Prompt : ');
-	console.log(prompt);
-	console.log('Customised Code : ');
-	console.log(summary);
+	// console.log('Prompt : ');
+	// console.log(prompt);
+	// console.log('Customised Code : ');
+	// console.log(summary);
 
 	return summary;
 }

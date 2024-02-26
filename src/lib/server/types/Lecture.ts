@@ -11,10 +11,12 @@ export class Lecture {
 	video: Video;
 	slides: string | undefined;
 	info: { title: string, date: string } | undefined;
+	customisation: { summaryLevel: number, questions: boolean };
 
 	public constructor(video: Video, userId: string | undefined) {
 		this.video = video;
 		this.userId = userId;
+		this.customisation = { summaryLevel: 2, questions: false };
 	}
 
 	public async withSlidesFromFile(slides: File): Promise<Lecture> {
@@ -60,11 +62,13 @@ export class Lecture {
 			video: string,
 			slides: string,
 			userId: string,
-			info: { title: string, date: string }
+			info: { title: string, date: string },
+			customisation: { summaryLevel: number, questions: boolean }
 		} = JSON.parse(json);
 		const lecture = new Lecture(new Video(data.video), data.userId);
 		lecture.slides = data.slides;
 		lecture.info = data.info;
+		lecture.customisation = data.customisation;
 		return lecture;
 	}
 
@@ -73,7 +77,8 @@ export class Lecture {
 			video: this.video.path,
 			slides: this.slides,
 			userId: this.userId,
-			info: this.info ? this.info : await this.video.getTitleDate()
+			info: this.info ? this.info : await this.video.getTitleDate(),
+			customisation: this.customisation
 		});
 	}
 }

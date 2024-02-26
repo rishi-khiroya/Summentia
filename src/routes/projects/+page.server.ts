@@ -10,8 +10,9 @@ export const load: PageServerLoad = async (event) => {
 	const session: Session | null = await event.locals.auth();
 	if (!session?.user) throw redirect(303, '/');
 
-	const pageNoParam: string = event.url.searchParams.get('page') ?? "0";
-	const pageNo: number = pageNoParam ? Number(pageNoParam) : 0;
+	const pageNoParam: string = event.url.searchParams.get('page') ?? "1";
+	let pageNo: number = pageNoParam ? Number(pageNoParam) : 1;
+	if (pageNo <= 0) pageNo = 1
 
 	// Load useful data
 	const noProjects: number | undefined = (
@@ -29,7 +30,7 @@ export const load: PageServerLoad = async (event) => {
 		where: {
 			userId: session.user.id
 		},
-		skip: pageNo * ITEMS_PER_PAGE,
+		skip: (pageNo - 1) * ITEMS_PER_PAGE,
 		take: ITEMS_PER_PAGE,
 		orderBy: {
 			createdAt: 'desc'

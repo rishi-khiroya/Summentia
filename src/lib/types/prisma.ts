@@ -16,6 +16,7 @@ export interface PrismaProject {
 	data: PrismaBasicData | PrismaSlidesData[];
 	status: PrismaProjectStatus;
 	waiting: boolean;
+	customisation: { summaryLevel: number, questions: boolean };
 }
 
 export interface PrismaSlidesData {

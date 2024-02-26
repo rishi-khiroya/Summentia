@@ -5,11 +5,11 @@
 	let uploadFile: File[] = [];
 
 	export let name: string;
-	export let required: boolean = false;
+	export let required: boolean = true;
 	export let allowedFileType: string;
 
 	export let upload: Upload = {
-		fromFile: false,
+		fromFile: true,
 		url: '',
 		fileList: undefined
 	};
@@ -59,7 +59,7 @@
 <div class="flex py-3">
 	<!-- TODO: improve wording -->
 	<p class="pr-3 dark:text-white">{name} from File</p>
-	<Toggle checked on:change={() => (upload.fromFile = !upload.fromFile)} />
+	<Toggle on:change={() => (upload.fromFile = !upload.fromFile)} />
 	<p class="pl-0 dark:text-white">{name} from URL</p>
 </div>
 <div class="flex-1">
