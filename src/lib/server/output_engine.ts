@@ -24,38 +24,22 @@ function createOuts(fileName: string): Record<OutputType, PandocOutFormat[]> {
 }
 
 // do not need save parameter anymore
-export function output(
+export async function output(
 	latexCode: string,
 	fileName: string = DEFAULT_FILE_NAME,
-	outputType: OutputType = OutputType.PDF,
-	save: boolean = false
+	outputType: OutputType = OutputType.PDF
 ) {
 	const pandocFormat = createOuts(fileName)[outputType][0];
 	if (outputType === OutputType.PDF) {
 		const pdfEngine = 'xelatex';
 		const pandocCommand = `pandoc -f latex -s -o "${pandocFormat.fname}" --pdf-engine=${pdfEngine}`;
-		const child = childProcess.exec(pandocCommand, (error, stdout, stderr) => {
-			if (error) {
-				console.error(`Error: ${error.message}`);
-			} else {
-				console.log(`PDF file was generated: ${pandocFormat.fname}`);
-			}
-		});
+		const child = childProcess.execSync(pandocCommand);
 
 		child.stdin.write(latexCode);
 		child.stdin.end();
 	} else {
 		const pandocInstance = new Pandoc('latex', [pandocFormat]);
-		pandocInstance.convert(latexCode, (result, err) => {
-			if (err) {
-				console.error(err);
-			}
-			if (result) {
-				console.log(
-					`${pandocFormat.format.toUpperCase()} file was generated: ${pandocFormat.fname}`
-				);
-			}
-		});
+		await pandocInstance.convertAsync(latexCode);
 	}
 }
 

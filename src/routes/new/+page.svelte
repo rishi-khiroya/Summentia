@@ -172,7 +172,7 @@
 		}
 
 		const json = await response.json();
-		if (json.type == 'redirect') return { success: true, msg: "Already redirected."};
+		// if (json.type == 'redirect') return { success: true, msg: "Already redirected."};
 
 		const responseData: {
 			success: boolean;
@@ -186,6 +186,7 @@
 			try {
 				return { success: true, msg: undefined };
 			} finally {
+				console.log("Try to redirect.");
 				goto(`/new/inprogress/${responseData.projectId}`);
 			}
 		} else return { success: false, msg: responseData.error };

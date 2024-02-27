@@ -60,9 +60,28 @@
 		overviewData = JSON.parse(JSON.stringify(data.project.data));
 	}
 
-	const downloadOptionPressed = (e: MouseEvent) => {
+	const downloadOptionPressed = async (e: MouseEvent) => {
 		let option = e.target?.textContent ?? 'unknown';
-		alert(`Download option ${option} pressed`);
+
+		const form = new FormData();
+		form.append('type', option.substring(1));
+
+		const response = await fetch(`?/download`, {
+			method:'POST',
+			body: form
+		})
+
+		const blob = await response.blob();
+		const url = window.URL || window.webkitURL;
+		const link = url.createObjectURL(blob);
+		let a = document.createElement("a");
+		a.setAttribute("download", `summary.${option.substring(1)}`);
+		a.setAttribute("href", link);
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+
+		// alert(`Download option ${option} pressed`);
 	};
 
 	const changeView = () => {

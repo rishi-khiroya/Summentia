@@ -15,8 +15,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     });
 
     if (!data) error(503, "No project found");
-    if (data.userId != userId) redirect(303, `/projects`);
-    if (!data.video || !data.data || data.status != 'SUMMARISED') redirect(303, `/new/inprogress/${params.slug}`);
+    // if (data.userId != userId) redirect(303, `/projects`);
+    // if (!data.video || !data.data || data.status != 'SUMMARISED') redirect(303, `/new/inprogress/${params.slug}`);
 
     return { data: JSON.parse(JSON.stringify(data.data)), hasSlides: data.hasSlides, id: data.id };
 

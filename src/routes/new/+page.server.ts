@@ -57,7 +57,7 @@ export const actions = {
 		// console.log(project);
 		const id: number | undefined = await project.saveToDB();
 
-		redirect(303, `/new/inprogess/${id}`);
+		// redirect(303, `/new/inprogess/${id}`);
 		return { success: true, projectId: id };
 	}
 };
