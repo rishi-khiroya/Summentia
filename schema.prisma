@@ -33,7 +33,7 @@ model Project {
 }
 
 model Account {
-  id                String  @id
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -45,44 +45,29 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-model Project {
-  id        Int      @id @default(autoincrement())
-  title     String
-  userId    String?
-  date      DateTime
-  createdAt DateTime @default(now())
-  data      Json?
-  status    Status   @default(UNPROCESSED)
-  waiting   Boolean  @default(true)
-  hasSlides Boolean  @default(false)
-  slides    String   @default("")
-  video     String   @default("")
-  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 model Session {
-  id           String   @id
+  id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String    @id
+  id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   createdAt     DateTime  @default(now())
   emailVerified DateTime?
   image         String?
-  Account       Account[]
-  Project       Project[]
-  Session       Session[]
+  accounts      Account[]
+  projects      Project[]
+  sessions      Session[]
 }
 
 model VerificationToken {
@@ -91,12 +76,4 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-enum Status {
-  UNPROCESSED
-  SPLIT
-  TRANSCRIBED
-  SUMMARISED
-  COMPLETED
 }
