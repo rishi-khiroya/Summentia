@@ -41,21 +41,25 @@
 	let displaySlides = data.project.hasSlides;
 	let slideData: PrismaSlidesData[];
 	let overviewData: PrismaBasicData;
+	let slideNo: number;
 	let pages: { name: string; href: string }[];
 
 	$: displayButtonText = displaySlides ? 'Slides View' : 'Overview';
 
+	console.log(data.project);
+
 	if (displaySlides) {
 		slideData = JSON.parse(JSON.stringify(data.project.data));
 		overviewData = accumulateSlideData(slideData);
+		slideNo = data.pageNo - 1;
 
-		pages = [
-			{ name: '1', href: '/projects/1?page=1' },
-			{ name: '3', href: '/projects/1?page=3' },
-			{ name: '2', href: '/projects/1?page=2' },
-			{ name: '4', href: '/projects/1?page=4' },
-			{ name: '5', href: '/projects/1?page=5' }
-		];
+		pages = slideData.map((slide, index) => {
+			return { 
+				name: (index + 1).toString(), 
+				href: `/projects/${data.project.id}?page=${index + 1}`,
+				active: index + 1 === data.pageNo
+			};
+		});
 	} else {
 		overviewData = JSON.parse(JSON.stringify(data.project.data));
 	}
@@ -70,11 +74,28 @@
 	};
 
 	const previous = () => {
-		alert('Previous btn clicked. Make a call to your server to fetch data.');
+		const params = new URLSearchParams(window.location.search);
+		const pageNo = parseInt(params.get('page') ?? '1');
+		const page = Math.max(pageNo - 1, 1);
+		params.set('page', page.toString());
+		window.location.search = params.toString();
 	};
+
 	const next = () => {
-		alert('Next btn clicked. Make a call to your server to fetch data.');
+		const params = new URLSearchParams(window.location.search);
+		const pageNo = parseInt(params.get('page') ?? '1');
+		const page = Math.min(pageNo + 1, slideData.length);
+		params.set('page', page.toString());
+		window.location.search = params.toString();
 	};
+
+	const pageClicked = (e: MouseEvent) => {
+		const params = new URLSearchParams(window.location.search);
+		const page = parseInt((e.target as HTMLButtonElement).textContent ?? '1');
+		params.set('page', page.toString());
+		window.location.search = params.toString();
+	};
+
 	function edit() {
 		goto(`/edit/${data.project.id}`);
 	}
@@ -114,18 +135,33 @@
 			{/if}
 		</div>
 		{#if displaySlides}
-			<div class="grid grid-rows-2 grid-flow-col gap-0">
-				<VideoPlaceholder size="xxl" class="m-5" />
-				<ImagePlaceholder imgHeight="72" class="m-5" />
-				<InformationBox title="Transcript:" maxHeight="72">
-					<TextPlaceholder size="xxl" />
-				</InformationBox>
-				<InformationBox title="Summary:" maxHeight="72">
-					<TextPlaceholder size="xxl" />
-				</InformationBox>
+			<div class="flex flex-col">
+				<div class="flex">
+					<div class="flex justify-center">
+						<Video
+							src={data.project.video}
+							controls
+							class="m-5 rounded-xl h-72 outline-1 outline-transparent shadow-md shadow-black"
+						/>
+					</div>
+					<InformationBox title="Transcript:" maxHeight="72" additionalAttributes="flex-1">
+						<p>{slideData[slideNo].transcript}</p>
+					</InformationBox>
+				</div>
+				<div class="flex">
+					<div class="flex justify-center">
+						<img 
+							class="m-5 h-72 rounded-xl outline-1 outline-transparent shadow-md shadow-black" 
+							src={slideData[slideNo].slide} 
+							alt="Slide 1">
+					</div>
+					<InformationBox title="Summary:" maxHeight="72" additionalAttributes="flex-1">
+						<p>{slideData[slideNo].summary}</p>
+					</InformationBox>
+				</div>
 			</div>
 			<div class="flex justify-center">
-				<Pagination {pages} large on:previous={previous} on:next={next} icon>
+				<Pagination {pages} large on:previous={previous} on:next={next} on:click={pageClicked} icon>
 					<svelte:fragment slot="prev">
 						<span class="sr-only">Previous</span>
 						<ChevronLeftOutline class="w-7 h-7" />
@@ -139,17 +175,13 @@
 		{:else}
 			<div class="flex">
 				<div class="flex-col flex-1 p-5">
-					{#if data.project.video == null}
-						<VideoPlaceholder size="xl" class="m-5" />
-					{:else}
-						<div class="flex justify-center">
-							<Video
-								src={data.project.video}
-								controls
-								class="rounded-xl h-72 outline-1 outline-transparent shadow-md shadow-black"
-							/>
-						</div>
-					{/if}
+					<div class="flex justify-center">
+						<Video
+							src={data.project.video}
+							controls
+							class="rounded-xl h-72 outline-1 outline-transparent shadow-md shadow-black"
+						/>
+					</div>
 					<InformationBox title="Transcript:" maxHeight="72" additionalAttributes="min-h-72">
 						<p>{overviewData.transcript}</p>
 					</InformationBox>
