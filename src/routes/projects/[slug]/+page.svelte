@@ -21,6 +21,8 @@
 		Video
 	} from 'flowbite-svelte';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
+	
+	import {S3Client } from '@aws-sdk/client-s3';
 
 	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
 		let basicData: PrismaBasicData;
@@ -60,28 +62,19 @@
 		overviewData = JSON.parse(JSON.stringify(data.project.data));
 	}
 
+
 	const downloadOptionPressed = async (e: MouseEvent) => {
 		let option = e.target?.textContent ?? 'unknown';
-
+		
 		const form = new FormData();
 		form.append('type', option.substring(1));
-
+		
 		const response = await fetch(`?/download`, {
 			method:'POST',
 			body: form
 		})
 
-		const blob = await response.blob();
-		const url = window.URL || window.webkitURL;
-		const link = url.createObjectURL(blob);
-		let a = document.createElement("a");
-		a.setAttribute("download", `summary.${option.substring(1)}`);
-		a.setAttribute("href", link);
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-
-		// alert(`Download option ${option} pressed`);
+		alert(`File Downloaded`);
 	};
 
 	const changeView = () => {
@@ -121,10 +114,11 @@
 						</div>
 						<DropdownItem on:click={downloadOptionPressed}>.pdf</DropdownItem>
 						<DropdownItem on:click={downloadOptionPressed}>.tex</DropdownItem>
-						<DropdownItem on:click={downloadOptionPressed}>.doc</DropdownItem>
+						<DropdownItem on:click={downloadOptionPressed}>.docx</DropdownItem>
 						<DropdownItem on:click={downloadOptionPressed}>.txt</DropdownItem>
 					</Dropdown>
 				</ButtonGroup>
+
 			</div>
 			{#if data.project.hasSlides}
 				<div class="float-right justify-end items-center flex">

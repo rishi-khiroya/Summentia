@@ -6,14 +6,14 @@ const DEFAULT_FILE_NAME: string = 'summary';
 export enum OutputType {
 	PDF,
 	TEX,
-	DOC,
+	DOCX,
 	TXT
 }
 
 function createOuts(fileName: string): Record<OutputType, PandocOutFormat[]> {
 	return {
 		[OutputType.TEX]: [{ name: 'latex', format: 'latex', fname: fileName + '.tex', outBin: false }],
-		[OutputType.DOC]: [
+		[OutputType.DOCX]: [
 			{ name: 'wordDoc', format: 'docx', fname: fileName + '.docx', outBin: false }
 		],
 		[OutputType.TXT]: [
@@ -78,5 +78,5 @@ function exmaple() {
 	output(summaryexample, undefined, OutputType.PDF);
 	output(summaryexample, undefined, OutputType.TXT);
 	output(summaryexample, undefined, OutputType.TEX);
-	output(summaryexample, undefined, OutputType.DOC);
+	output(summaryexample, undefined, OutputType.DOCX);
 }

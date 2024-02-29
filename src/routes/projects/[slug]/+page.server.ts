@@ -6,8 +6,10 @@ import type { Project } from '@prisma/client'
 import { addToTemplate } from '$lib/server/latex_generation';
 import type { PrismaBasicData } from '$lib/types/Prisma';
 import { OutputType, output } from '$lib/server/output_engine';
-import { PATH_TO_DATA } from '$env/static/private';
+import { PATH_TO_DATA, PATH_TO_DOWNLOAD } from '$env/static/private';
 import { fstat, readFile, readFileSync } from 'fs';
+import { upload } from '$lib/object_storage/upload';
+import { download } from '$lib/object_storage/download';
 
 export const load: PageServerLoad = async (event) => {
     const session: Session | null = await event.locals.auth();
@@ -33,10 +35,10 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
     download: async ({ request, params, locals }) => {
-
+        try{
         const form = await request.formData();
 
-        const type = form.get('type')?.toString();
+        let type = form.get('type')?.toString();
 
         if (!type) error(400, "Invalid form data.");
 
@@ -53,16 +55,27 @@ export const actions = {
         if (data.userId != userId) redirect(303, `/dashboard`);
 
         if (data.hasSlides) {
-            // TODO
+            //TODO
+            
         } else {
-            const latex: string = addToTemplate(data.title, session?.user.name, (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary);
+            const latex: string = addToTemplate(data.title, session?.user.name??"", (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary);
             const outputType: OutputType = OutputType[type.toUpperCase()]
+            
             const path = `${PATH_TO_DATA}/output.${type}`;
             await output(latex, `${PATH_TO_DATA}/output`, outputType);
+            
+            upload(path, `summaries/output.${type}`);
+            download(`summaries/output.${type}`, `${PATH_TO_DOWNLOAD}/summary.${type}`);
 
-            const file = readFileSync(path, 'binary');
-            return { file };
-
+           //const file = readFileSync(path, 'utf8');
+           
+           // console.log("tipi i file " + (typeof file));
+        
+            //return file;
         }
+    } catch (error) {
+        console.error("Error downloading file:", error.message);
+        return new Response({ error: error.message }, { status: 500 });
+    }
     }
 }
