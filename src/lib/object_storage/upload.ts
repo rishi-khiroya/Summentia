@@ -2,43 +2,42 @@
 
 // Step 1: Import the S3Client object and all necessary SDK commands.
 import {PutObjectCommand } from '@aws-sdk/client-s3';
-import { s3Client } from '../space_object_storage/s3_client';
+import { s3Client } from '../object_storage/s3_client';
 // use npm install @aws-sdk/client-s3
-
 import fs from 'fs'; // Import the file system module
 
-// Step 3: Define the parameters for the object you want to upload.
-const params = {
-  Bucket: "summentia-storage", // The path to the directory you want to upload the object to, starting with your Space name.
-  Key: "folder-path/my_video.mp4", // Object key, referenced whenever you want to access this file later.
-  Body: fs.createReadStream('path_to_your_video_file'), // The object's contents. This variable is an object, not a string.
+export async function upload(filePath: string, destPath: string){
   
-  //ACL: "private", // Defines ACL permissions, such as private or public.
+  const params = {
+    Bucket: "summentia-storage", // The path to the directory you want to upload the object to, starting with your Space name.
+    Key: destPath, // Object key, referenced whenever you want to access this file later.
+    Body: fs.createReadStream(filePath), // The object's contents. This variable is an object, not a string.
+
   
-  Metadata: { // Defines metadata tags.
-    "x-amz-meta-my-key": "your-value"
-  }
-};
+    Metadata: { // Defines metadata tags.
+      "x-amz-meta-my-key": "DO00LTWRAXLVDGZTFZ2W"
+    }
+  };
 
-// Step 4: Define a function that uploads your object using SDK's PutObjectCommand object and catches any errors.
-const uploadObject = async () => {
-  try {
-    const data = await s3Client.send(new PutObjectCommand(params));
-    console.log(
-      "Successfully uploaded object: " +
-        params.Bucket +
-        "/" +
-        params.Key
-    );
-    return data;
-  } catch (err) {
-    console.log("Error", err);
-  }
-};
+  const uploadObject = async () => {
+    try {
+      const data = await s3Client.send(new PutObjectCommand(params));
+      console.log(
+        "Successfully uploaded object: " +
+          params.Bucket +
+          "/" +
+          params.Key
+      );
+      return data;
+    } catch (err) {
+      console.log("Error", err);
+    }
+  };
 
+  uploadObject();
+}
 
-// Step 5: Call the uploadObject function.
-uploadObject();
+upload("../object_storage/test/IML_2_short.mp4", "videos/IML_2_short.mp4");
 
 
 

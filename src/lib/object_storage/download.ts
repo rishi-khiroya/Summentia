@@ -3,16 +3,18 @@
 // Import the S3Client object and necessary SDK command.
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
-import { s3Client } from '../space_object_storage/s3_client';
+import { s3Client } from '../object_storage/s3_client';
+import fs from 'fs'; 
 // use npm install @aws-sdk/client-s3
+
+export async function download(bucketFilePath: string, destPath: string){
 
 // Define params for video to download.
 const params = {
     Bucket: "summentia-storage", // The bucket name
-    Key: "folder-path/my_video.mp4", // The key of the object you want to download
+    Key: bucketFilePath, // The key of the object you want to download
 };
   
-import fs from 'fs'; 
 // download video.
 const downloadVideo = async () => {
   try {
@@ -26,7 +28,7 @@ const downloadVideo = async () => {
     const bodyStream = response.Body as Readable;
 
     // Create a write stream to save the downloaded file
-    const fileStream = fs.createWriteStream('path_to_save_downloaded_file');
+    const fileStream = fs.createWriteStream(destPath);
 
     // Pipe the response body stream to the file stream
     bodyStream.pipe(fileStream);
@@ -44,3 +46,7 @@ const downloadVideo = async () => {
 };
 
 downloadVideo();
+}
+
+download("videos/IML_2_short.mp4", '../object_storage/output/IML_download.mp4');
+
