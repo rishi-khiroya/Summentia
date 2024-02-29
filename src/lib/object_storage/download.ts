@@ -8,7 +8,7 @@ import { s3Client } from '../space_object_storage/s3_client';
 
 // Define params for video to download.
 const params = {
-    Bucket: "example-space", // The bucket name
+    Bucket: "summentia-storage", // The bucket name
     Key: "folder-path/my_video.mp4", // The key of the object you want to download
 };
   

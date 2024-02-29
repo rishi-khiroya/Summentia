@@ -9,7 +9,7 @@ import fs from 'fs'; // Import the file system module
 
 // Step 3: Define the parameters for the object you want to upload.
 const params = {
-  Bucket: "example-space", // The path to the directory you want to upload the object to, starting with your Space name.
+  Bucket: "summentia-storage", // The path to the directory you want to upload the object to, starting with your Space name.
   Key: "folder-path/my_video.mp4", // Object key, referenced whenever you want to access this file later.
   Body: fs.createReadStream('path_to_your_video_file'), // The object's contents. This variable is an object, not a string.
   
