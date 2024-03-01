@@ -3,8 +3,8 @@ import type { PageServerLoad } from '../../$types';
 import { redirect, error } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
 import type { Project } from '@prisma/client'
-import { addToTemplate } from '$lib/server/latex_generation';
-import type { PrismaBasicData } from '$lib/types/Prisma';
+import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
+import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
 import { OutputType, output } from '$lib/server/output_engine';
 import { PATH_TO_DATA, PATH_TO_DOWNLOAD } from '$env/static/private';
 import { fstat, readFile, readFileSync } from 'fs';
@@ -35,10 +35,11 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
     download: async ({ request, params, locals }) => {
-        try{
+        
         const form = await request.formData();
 
         let type = form.get('type')?.toString();
+        const filename = form.get('filename')?.toString();
 
         if (!type) error(400, "Invalid form data.");
 
@@ -55,8 +56,14 @@ export const actions = {
         if (data.userId != userId) redirect(303, `/dashboard`);
 
         if (data.hasSlides) {
-            //TODO
-            
+            const slidesData = (JSON.parse(JSON.stringify(data.data)) as PrismaSlidesData[]);
+            const slides:string[] = [];
+            slidesData.forEach(slideData => {slides.push(slideData.slide)});
+            const summaries:string[] = [];
+            slidesData.forEach(slideData => {summaries.push(slideData.summary)});
+            const latexBody = getBodyLatexCode(slides, summaries);
+            const latexCode = addToTemplate(data.title, session?.user.name??"", latexBody);
+
         } else {
             const latex: string = addToTemplate(data.title, session?.user.name??"", (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary);
             const outputType: OutputType = OutputType[type.toUpperCase()]
@@ -64,18 +71,10 @@ export const actions = {
             const path = `${PATH_TO_DATA}/output.${type}`;
             await output(latex, `${PATH_TO_DATA}/output`, outputType);
             
-            upload(path, `summaries/output.${type}`);
-            download(`summaries/output.${type}`, `${PATH_TO_DOWNLOAD}/summary.${type}`);
+            upload(path, `summaries/${filename}`);
+            //download(`summaries/output.${type}`, `${PATH_TO_DOWNLOAD}/summary.${type}`);
 
-           //const file = readFileSync(path, 'utf8');
-           
-           // console.log("tipi i file " + (typeof file));
-        
-            //return file;
         }
-    } catch (error) {
-        console.error("Error downloading file:", error.message);
-        return new Response({ error: error.message }, { status: 500 });
-    }
+    
     }
 }

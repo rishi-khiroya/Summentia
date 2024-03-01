@@ -12,7 +12,7 @@ export async function upload(filePath: string, destPath: string){
     Bucket: "summentia-storage", // The path to the directory you want to upload the object to, starting with your Space name.
     Key: destPath, // Object key, referenced whenever you want to access this file later.
     Body: fs.createReadStream(filePath), // The object's contents. This variable is an object, not a string.
-
+    ACL: "public-read",
   
     Metadata: { // Defines metadata tags.
       "x-amz-meta-my-key": "DO00LTWRAXLVDGZTFZ2W"
@@ -37,7 +37,7 @@ export async function upload(filePath: string, destPath: string){
   uploadObject();
 }
 
-upload("../object_storage/test/IML_2_short.mp4", "videos/IML_2_short.mp4");
+//upload("../object_storage/test/IML_2_short.mp4", "videos/IML_2_short.mp4");
 
 
 

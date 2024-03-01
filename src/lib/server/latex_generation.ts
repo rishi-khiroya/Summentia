@@ -1,4 +1,4 @@
-function getBodyLatexCode(slides: string[], summaries: string[]): string {
+export function getBodyLatexCode(slides: string[], summaries: string[]): string {
     // const slide_paths = getSlidePaths(slides);
     let body = '';
     for (let i = 0; i < slides.length; i++) {

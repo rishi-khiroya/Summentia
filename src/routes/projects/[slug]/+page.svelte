@@ -21,8 +21,6 @@
 		Video
 	} from 'flowbite-svelte';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
-	
-	import {S3Client } from '@aws-sdk/client-s3';
 
 	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
 		let basicData: PrismaBasicData;
@@ -65,16 +63,22 @@
 
 	const downloadOptionPressed = async (e: MouseEvent) => {
 		let option = e.target?.textContent ?? 'unknown';
-		
+		const outputType = option.substring(1);
+		const filename = `test1.${outputType}`;
 		const form = new FormData();
-		form.append('type', option.substring(1));
+		form.append('type', outputType);
+		form.append('filename', filename);
 		
 		const response = await fetch(`?/download`, {
 			method:'POST',
 			body: form
 		})
 
-		alert(`File Downloaded`);
+		const downloadableLink = `https://summentia-storage.fra1.digitaloceanspaces.com/summaries/${filename}`;
+		let link = document.createElement('a');
+		
+		link.href = downloadableLink;
+		link.click();
 	};
 
 	const changeView = () => {
