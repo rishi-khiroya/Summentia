@@ -13,8 +13,9 @@ export const load: PageServerLoad = async (event) => {
     const session: Session | null = await event.locals.auth();
     if (!session?.user) throw redirect(303, "/");
 
-    const pageNoParam: string | null = event.url.searchParams.get('page');
-    const pageNo: number = pageNoParam ? Number(pageNoParam) : 0;
+    const pageNoParam: string = event.url.searchParams.get('page') ?? "1";
+	let pageNo: number = pageNoParam ? Number(pageNoParam) : 1;
+	if (pageNo <= 0) pageNo = 1;
 
     const slug = event.params.slug;
 
