@@ -21,6 +21,7 @@
 		Video
 	} from 'flowbite-svelte';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
+	import { DIGITAL_OCEAN_SUMMARIES_ENDPOINT } from '$lib/object_storage/static';
 
 	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
 		let basicData: PrismaBasicData;
@@ -64,28 +65,29 @@
 		overviewData = JSON.parse(JSON.stringify(data.project.data));
 	}
 
+
 	const downloadOptionPressed = async (e: MouseEvent) => {
 		let option = e.target?.textContent ?? 'unknown';
+		const outputType = option.substring(1);
 
+		// the filename will be stored in the S3 storage with the format title_id
+		const filename = `${data.project.title}_${data.project.id}`;
 		const form = new FormData();
-		form.append('type', option.substring(1));
-
+		form.append('type', outputType);
+		form.append('filename', filename);
+		
 		const response = await fetch(`?/download`, {
 			method:'POST',
 			body: form
 		})
 
-		const blob = await response.blob();
-		const url = window.URL || window.webkitURL;
-		const link = url.createObjectURL(blob);
-		let a = document.createElement("a");
-		a.setAttribute("download", `summary.${option.substring(1)}`);
-		a.setAttribute("href", link);
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-
-		// alert(`Download option ${option} pressed`);
+		if(response.ok) {
+			const downloadableLink = `${DIGITAL_OCEAN_SUMMARIES_ENDPOINT}/${filename}.${outputType}`;
+			let link = document.createElement('a');
+		
+			link.href = downloadableLink;
+			link.click();
+		}
 	};
 
 	const changeView = () => {
@@ -142,10 +144,11 @@
 						</div>
 						<DropdownItem on:click={downloadOptionPressed}>.pdf</DropdownItem>
 						<DropdownItem on:click={downloadOptionPressed}>.tex</DropdownItem>
-						<DropdownItem on:click={downloadOptionPressed}>.doc</DropdownItem>
+						<DropdownItem on:click={downloadOptionPressed}>.docx</DropdownItem>
 						<DropdownItem on:click={downloadOptionPressed}>.txt</DropdownItem>
 					</Dropdown>
 				</ButtonGroup>
+
 			</div>
 			{#if data.project.hasSlides}
 				<div class="float-right justify-end items-center flex">

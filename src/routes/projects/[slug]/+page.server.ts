@@ -3,11 +3,13 @@ import type { PageServerLoad } from '../../$types';
 import { redirect, error } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
 import type { Project } from '@prisma/client'
-import { addToTemplate } from '$lib/server/latex_generation';
-import type { PrismaBasicData } from '$lib/types/Prisma';
+import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
+import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
 import { OutputType, output } from '$lib/server/output_engine';
 import { PATH_TO_DATA } from '$env/static/private';
-import { fstat, readFile, readFileSync } from 'fs';
+import { unlinkSync } from 'fs';
+import { upload } from '$lib/object_storage/upload';
+import { DIGITAL_OCEAN_SUMMARIES_FOLDER } from '$lib/object_storage/static';
 
 export const load: PageServerLoad = async (event) => {
     const session: Session | null = await event.locals.auth();
@@ -34,10 +36,14 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
     download: async ({ request, params, locals }) => {
-
+        
         const form = await request.formData();
 
         const type = form.get('type')?.toString();
+        const outputType: OutputType = OutputType[type.toUpperCase()]
+
+        const filename = form.get('filename')?.toString();
+        let latexCode = "";
 
         if (!type) error(400, "Invalid form data.");
 
@@ -54,16 +60,23 @@ export const actions = {
         if (data.userId != userId) redirect(303, `/dashboard`);
 
         if (data.hasSlides) {
-            // TODO
+            const slidesData = (JSON.parse(JSON.stringify(data.data)) as PrismaSlidesData[]);
+            const slides:string[] = [];
+            slidesData.forEach(slideData => {slides.push(slideData.slide)});
+            const summaries:string[] = [];
+            slidesData.forEach(slideData => {summaries.push(slideData.summary)});
+            const latexBody = getBodyLatexCode(slides, summaries);
+            latexCode = addToTemplate(data.title, session?.user.name??"", latexBody);
+
         } else {
-            const latex: string = addToTemplate(data.title, session?.user.name, (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary);
-            const outputType: OutputType = OutputType[type.toUpperCase()]
-            const path = `${PATH_TO_DATA}/output.${type}`;
-            await output(latex, `${PATH_TO_DATA}/output`, outputType);
-
-            const file = readFileSync(path, 'binary');
-            return { file };
-
+            latexCode = addToTemplate(data.title, session?.user.name??"", (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary);
         }
+        const path = `${PATH_TO_DATA}/${filename}.${type}`;
+        await output(latexCode, `${PATH_TO_DATA}/${filename}`, outputType);
+        await upload(path, `${DIGITAL_OCEAN_SUMMARIES_FOLDER}/${filename}.${type}`);
+        // has to sleep as the link does not become available to use immediately
+        await new Promise(resolve => setTimeout(resolve, 500));
+        unlinkSync(path);
+        return true
     }
 }
