@@ -21,6 +21,7 @@
 		Video
 	} from 'flowbite-svelte';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
+	import { DIGITAL_OCEAN_SUMMARIES_ENDPOINT } from '$lib/object_storage/static';
 
 	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
 		let basicData: PrismaBasicData;
@@ -64,7 +65,9 @@
 	const downloadOptionPressed = async (e: MouseEvent) => {
 		let option = e.target?.textContent ?? 'unknown';
 		const outputType = option.substring(1);
-		const filename = `test1.${outputType}`;
+
+		// the filename will be stored in the S3 storage with the format title_id
+		const filename = `${data.project.title}_${data.project.id}`;
 		const form = new FormData();
 		form.append('type', outputType);
 		form.append('filename', filename);
@@ -74,11 +77,13 @@
 			body: form
 		})
 
-		const downloadableLink = `https://summentia-storage.fra1.digitaloceanspaces.com/summaries/${filename}`;
-		let link = document.createElement('a');
+		if(response.ok) {
+			const downloadableLink = `${DIGITAL_OCEAN_SUMMARIES_ENDPOINT}/${filename}.${outputType}`;
+			let link = document.createElement('a');
 		
-		link.href = downloadableLink;
-		link.click();
+			link.href = downloadableLink;
+			link.click();
+		}
 	};
 
 	const changeView = () => {

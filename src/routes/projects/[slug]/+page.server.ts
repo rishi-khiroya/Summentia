@@ -6,10 +6,10 @@ import type { Project } from '@prisma/client'
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
 import { OutputType, output } from '$lib/server/output_engine';
-import { PATH_TO_DATA, PATH_TO_DOWNLOAD } from '$env/static/private';
-import { fstat, readFile, readFileSync } from 'fs';
+import { PATH_TO_DATA } from '$env/static/private';
+import { unlinkSync } from 'fs';
 import { upload } from '$lib/object_storage/upload';
-import { download } from '$lib/object_storage/download';
+import { DIGITAL_OCEAN_SUMMARIES_FOLDER } from '$lib/object_storage/static';
 
 export const load: PageServerLoad = async (event) => {
     const session: Session | null = await event.locals.auth();
@@ -38,8 +38,11 @@ export const actions = {
         
         const form = await request.formData();
 
-        let type = form.get('type')?.toString();
+        const type = form.get('type')?.toString();
+        const outputType: OutputType = OutputType[type.toUpperCase()]
+
         const filename = form.get('filename')?.toString();
+        let latexCode = "";
 
         if (!type) error(400, "Invalid form data.");
 
@@ -62,19 +65,17 @@ export const actions = {
             const summaries:string[] = [];
             slidesData.forEach(slideData => {summaries.push(slideData.summary)});
             const latexBody = getBodyLatexCode(slides, summaries);
-            const latexCode = addToTemplate(data.title, session?.user.name??"", latexBody);
+            latexCode = addToTemplate(data.title, session?.user.name??"", latexBody);
 
         } else {
-            const latex: string = addToTemplate(data.title, session?.user.name??"", (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary);
-            const outputType: OutputType = OutputType[type.toUpperCase()]
-            
-            const path = `${PATH_TO_DATA}/output.${type}`;
-            await output(latex, `${PATH_TO_DATA}/output`, outputType);
-            
-            upload(path, `summaries/${filename}`);
-            //download(`summaries/output.${type}`, `${PATH_TO_DOWNLOAD}/summary.${type}`);
-
+            latexCode = addToTemplate(data.title, session?.user.name??"", (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary);
         }
-    
+        const path = `${PATH_TO_DATA}/${filename}.${type}`;
+        await output(latexCode, `${PATH_TO_DATA}/${filename}`, outputType);
+        await upload(path, `${DIGITAL_OCEAN_SUMMARIES_FOLDER}/${filename}.${type}`);
+        // has to sleep as the link does not become available to use immediately
+        await new Promise(resolve => setTimeout(resolve, 500));
+        unlinkSync(path);
+        return true
     }
 }

@@ -37,8 +37,6 @@ export async function upload(filePath: string, destPath: string){
   uploadObject();
 }
 
-//upload("../object_storage/test/IML_2_short.mp4", "videos/IML_2_short.mp4");
-
 
 
 
