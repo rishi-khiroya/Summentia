@@ -4,24 +4,13 @@
 	import {
 		EditSolid,
 		DownloadSolid,
-		AngleDownSolid,
 		ChevronLeftOutline,
 		ChevronRightOutline
 	} from 'flowbite-svelte-icons';
-	import {
-		ButtonGroup,
-		Button,
-		Dropdown,
-		DropdownItem,
-		ImagePlaceholder,
-		VideoPlaceholder,
-		TextPlaceholder,
-		CardPlaceholder,
-		Pagination,
-		Video
-	} from 'flowbite-svelte';
+	import { ButtonGroup, Button, Pagination, Video } from 'flowbite-svelte';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
-	import { DIGITAL_OCEAN_SUMMARIES_ENDPOINT } from '$lib/object_storage/static';
+	import DownloadModal from './DownloadModal.svelte';
+	import type { Customisation } from '$lib/types/Customisation';
 
 	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
 		let basicData: PrismaBasicData;
@@ -45,6 +34,16 @@
 	let slideNo: number;
 	let pages: { name: string; href: string }[];
 
+	let showDownloadModal: boolean = false;
+	let customisation: Customisation = data.project.customisation
+		? JSON.parse(JSON.stringify(data.project.customisation))
+		: {
+				highlight_keywords: false,
+				questions: false,
+				summary_format: '',
+				length: 1
+			};
+
 	$: displayButtonText = displaySlides ? 'Slides View' : 'Overview';
 
 	console.log(data.project);
@@ -55,8 +54,8 @@
 		slideNo = data.pageNo - 1;
 
 		pages = slideData.map((slide, index) => {
-			return { 
-				name: (index + 1).toString(), 
+			return {
+				name: (index + 1).toString(),
 				href: `/projects/${data.project.id}?page=${index + 1}`,
 				active: index + 1 === data.pageNo
 			};
@@ -64,31 +63,6 @@
 	} else {
 		overviewData = JSON.parse(JSON.stringify(data.project.data));
 	}
-
-
-	const downloadOptionPressed = async (e: MouseEvent) => {
-		let option = e.target?.textContent ?? 'unknown';
-		const outputType = option.substring(1);
-
-		// the filename will be stored in the S3 storage with the format title_id
-		const filename = `${data.project.title}_${data.project.id}`;
-		const form = new FormData();
-		form.append('type', outputType);
-		form.append('filename', filename);
-		
-		const response = await fetch(`?/download`, {
-			method:'POST',
-			body: form
-		})
-
-		if(response.ok) {
-			const downloadableLink = `${DIGITAL_OCEAN_SUMMARIES_ENDPOINT}/${filename}.${outputType}`;
-			let link = document.createElement('a');
-		
-			link.href = downloadableLink;
-			link.click();
-		}
-	};
 
 	const changeView = () => {
 		displaySlides = !displaySlides;
@@ -122,33 +96,28 @@
 	}
 </script>
 
+<!--  the filename will be stored in the S3 storage with the format title_id -->
+<DownloadModal
+	bind:open={showDownloadModal}
+	{customisation}
+	filename={`${data.project.title}_${data.project.id}`}
+/>
+
 <div class="flex-1">
 	<div class="flex-col px-10 pt-10">
 		<div class="flow-root">
 			<div class="float-left justify-start items-center flex">
-				<Button class="h-10 w-10" pill color="dark" on:click={edit}
-					><EditSolid class="focus:!outline-none" /></Button
-				>
 				<h1 class="text-4xl p-5 font-bold dark:text-white">{data.project.title}</h1>
-				<ButtonGroup>
-					<Button pill color="dark"
-						><DownloadSolid class="me-2 focus:!outline-none" />Download Summary</Button
-					>
-
-					<Button class="border-l border-gray-500 w-5" color="dark">
-						<AngleDownSolid class="focus:!outline-none"></AngleDownSolid>
+				<ButtonGroup class="space-x-px">
+					<Button pill color="dark" on:click={edit}>
+						<EditSolid class="focus:!outline-none" />
+						Edit
 					</Button>
-					<Dropdown>
-						<div slot="header">
-							<span class="font-medium py-2 px-4 text-md">Summary File Type</span>
-						</div>
-						<DropdownItem on:click={downloadOptionPressed}>.pdf</DropdownItem>
-						<DropdownItem on:click={downloadOptionPressed}>.tex</DropdownItem>
-						<DropdownItem on:click={downloadOptionPressed}>.docx</DropdownItem>
-						<DropdownItem on:click={downloadOptionPressed}>.txt</DropdownItem>
-					</Dropdown>
+					<Button pill color="dark" on:click={() => (showDownloadModal = true)}>
+						<DownloadSolid class="me-2 focus:!outline-none" />
+						Download
+					</Button>
 				</ButtonGroup>
-
 			</div>
 			{#if data.project.hasSlides}
 				<div class="float-right justify-end items-center flex">
@@ -172,10 +141,11 @@
 				</div>
 				<div class="flex">
 					<div class="flex justify-center">
-						<img 
-							class="m-5 h-72 rounded-xl outline-1 outline-transparent shadow-md shadow-black" 
-							src={slideData[slideNo].slide} 
-							alt="Slide 1">
+						<img
+							class="m-5 h-72 rounded-xl outline-1 outline-transparent shadow-md shadow-black"
+							src={slideData[slideNo].slide}
+							alt="Slide 1"
+						/>
 					</div>
 					<InformationBox title="Summary:" maxHeight="72" additionalAttributes="flex-1">
 						<p>{slideData[slideNo].summary}</p>
