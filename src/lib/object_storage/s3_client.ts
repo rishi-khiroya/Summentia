@@ -6,7 +6,7 @@ import {S3Client } from '@aws-sdk/client-s3';
 export const s3Client = new S3Client({
     endpoint: "https://fra1.digitaloceanspaces.com", // Find your endpoint in the control panel, under Settings. Prepend "https://".
     forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-    region: "us-east-1", // Must be "us-east-1" when creating new Spaces. Otherwise, use the region in your endpoint (for example, nyc3).
+    region: "fra1", // Must be "us-east-1" when creating new Spaces. Otherwise, use the region in your endpoint (for example, nyc3).
     credentials: {
       accessKeyId: "", // Access key pair. You can create access key pairs using the control panel or API.
       secretAccessKey: "" // Secret access key defined through an environment variable.
