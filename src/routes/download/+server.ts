@@ -4,7 +4,7 @@ import { upload } from '$lib/object_storage/upload';
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
 import { prisma } from '$lib/server/prisma';
-import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
+import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 import type { Session } from '@auth/core/types';
 import { error, json } from '@sveltejs/kit';
 import { OutputType } from '$lib/server/output_engine';
@@ -45,7 +45,11 @@ export async function POST({ request, locals }) {
 		const slidesData = JSON.parse(JSON.stringify(data.data)) as PrismaSlidesData[];
 		const latexBody = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
-			slidesData.map((slideData) => slideData.summary)
+			slidesData.map((slideData) => {
+				const finalSummary = "";
+				slideData.summaries.forEach((summary) => finalSummary.concat(summary));
+				return finalSummary;
+			})
 		);
 		latexCode = addToTemplate(data.title, session?.user.name ?? '', latexBody);
 	} else {

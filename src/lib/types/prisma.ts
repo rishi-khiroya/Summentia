@@ -21,8 +21,8 @@ export interface PrismaProject {
 
 export interface PrismaSlidesData {
 	slide: string; // path of the slide (as an img) on the vm
-	transcript: string[];
-	summary: string[];
+	transcripts: string[];
+	summaries: string[];
 	squashed: boolean;
 }
 

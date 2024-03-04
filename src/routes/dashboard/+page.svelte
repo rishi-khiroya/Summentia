@@ -29,7 +29,9 @@
 </script>
 
 <!--  the filename will be stored in the S3 storage with the format title_id -->
-<DownloadModal bind:open={showDownloadModal} bind:project={currentProject} />
+{#if currentProject}
+	<DownloadModal bind:open={showDownloadModal} bind:project={currentProject} />
+{/if}
 
 <div class="flex flex-col p-10">
 	<h1 class="text-4xl p-10 font-bold dark:text-white">Dashboard</h1>

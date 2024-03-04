@@ -5,22 +5,35 @@ export abstract class Project {
 	readonly title: string;
 	readonly date: Date;
 	readonly video: string;
+	readonly uuid: string;
 
 	// Optional info.
 	readonly userId: string | undefined;
-	readonly customisation: { summaryLevel: number, questions: boolean };
+	readonly customisation: {
+		highlight_keywords: boolean; // default false
+		questions: boolean; // default false
+		summary_format: string; // default ""
+		length: number; // default 1
+	};
 
 	public constructor(
 		title: string,
 		date: Date,
 		video: string,
 		userId: string | undefined,
-		customisation: { summaryLevel: number, questions: boolean }
+		uuid: string,
+		customisation: {
+			highlight_keywords: boolean; // default false
+			questions: boolean; // default false
+			summary_format: string; // default ""
+			length: number; // default 1
+		}
 	) {
 		this.title = title;
 		this.date = date;
 		this.video = video;
 		this.userId = userId;
+		this.uuid = uuid;
 		this.customisation = customisation;
 	}
 
@@ -28,12 +41,13 @@ export abstract class Project {
 		video: string,
 		slides: string,
 		userId: string,
+		uuid: string,
 		info: { title: string; date: string },
 		customisation: { summaryLevel: number, questions: boolean }
 	}): Promise<Project> {
 		return data.slides ?
-			new SlidesProject(data.info.title, new Date(data.info.date), data.video, data.userId, data.customisation, data.slides) :
-			new BasicProject(data.info.title, new Date(data.info.date), data.video, data.userId, data.customisation);
+			new SlidesProject(data.info.title, new Date(data.info.date), data.video, data.userId, data.uuid, data.customisation, data.slides) :
+			new BasicProject(data.info.title, new Date(data.info.date), data.video, data.userId, data.uuid, data.customisation);
 	}
 
 	public abstract saveToDB(): Promise<number>;
@@ -46,6 +60,7 @@ class BasicProject extends Project {
 				title: this.title,
 				date: this.date,
 				userId: this.userId,
+				uuid: this.uuid,
 				video: this.video,
 				status: 'SPLIT',
 				customisation: this.customisation
@@ -63,10 +78,11 @@ class SlidesProject extends Project {
 		date: Date,
 		video: string,
 		userId: string | undefined,
+		uuid: string,
 		customisation: { summaryLevel: number, questions: boolean },
 		slides: string
 	) {
-		super(title, date, video, userId, customisation);
+		super(title, date, video, userId, uuid, customisation);
 		this.slides = slides;
 	}
 
@@ -76,6 +92,7 @@ class SlidesProject extends Project {
 				title: this.title,
 				date: this.date,
 				userId: this.userId,
+				uuid: this.uuid,
 				video: this.video,
 				slides: this.slides,
 				hasSlides: true,

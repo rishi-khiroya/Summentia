@@ -89,8 +89,8 @@ export const actions = {
 					data = [
 						{
 							slide: 'Not implemented yet.',
-							transcript: 'Not implemented yet.',
-							summary: 'Not implemented yet.'
+							transcripts: ['Not implemented yet.'],
+							summaries: ['Not implemented yet.']
 						}
 					] as PrismaSlidesData[];
 
@@ -129,11 +129,16 @@ export const actions = {
 				if (project.hasSlides) {
 					const slidesData: PrismaSlidesData[] = project.data as PrismaSlidesData[];
 					slidesData.forEach(async (slideData) => {
-						const summary: string | null = await summarise(
-							slideData.transcript,
-							project.customisation.summaryLevel - 1
-						);
-						slideData.summary = summary ? summary : 'Error...';
+						const summaries:string[] = [];
+						slideData.transcripts.forEach(async (transcript) => {
+							const summary: string | null = await summarise(
+								transcript,
+								project.customisation.summaryLevel - 1
+							);
+							summaries.push(summary?? "");	
+						})
+						
+						slideData.summaries = summaries;
 					});
 					data = slidesData.map((data) => JSON.stringify(data));
 				} else {

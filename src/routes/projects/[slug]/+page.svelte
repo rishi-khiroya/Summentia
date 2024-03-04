@@ -8,7 +8,7 @@
 		ChevronRightOutline
 	} from 'flowbite-svelte-icons';
 	import { ButtonGroup, Button, Pagination, Video } from 'flowbite-svelte';
-	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
+	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 	import DownloadModal from '../../DownloadModal.svelte';
 	import type { Customisation } from '$lib/types/Customisation';
 
@@ -18,8 +18,8 @@
 		let transcripts: string[] = [];
 		let summaries: string[] = [];
 		slideData.forEach((element) => {
-			transcripts.push(element.transcript);
-			summaries.push(element.summary);
+			transcripts.concat(element.transcripts);
+			summaries.concat(element.summaries);
 		});
 
 		basicData = { transcript: transcripts.join(' '), summary: summaries.join(' ') };

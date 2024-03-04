@@ -11,12 +11,14 @@ import { upload } from '$lib/object_storage/upload';
 // TODO: complete definition
 export class Lecture {
 	readonly userId: string | undefined;
+	uuid: string;
 	video: Video;
 	slides: string | undefined;
 	info: { title: string; date: string } | undefined;
 	customisation: { summaryLevel: number; questions: boolean };
 
 	public constructor(video: Video, userId: string | undefined) {
+		this.uuid = randomUUID();
 		this.video = video;
 		this.userId = userId;
 		this.customisation = { summaryLevel: 2, questions: false };
@@ -78,7 +80,7 @@ export class Lecture {
 	public async toJSON(): Promise<string> {
 		return JSON.stringify({
 			uuid: this.video.uuid,
-			video: `${DIGITAL_OCEAN_ENDPOINT}/${this.video.uuid}/video.mp4`,
+			video: `${DIGITAL_OCEAN_ENDPOINT}/${this.uuid}/video.mp4`,
 			slides: this.slides,
 			userId: this.userId,
 			info: this.info ? this.info : await this.video.getTitleDate(),
