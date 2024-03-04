@@ -1,29 +1,44 @@
 <script lang="ts">
 	import { Button, Checkbox, Hr, Input, Label, Modal, Radio } from 'flowbite-svelte';
-	import { type Customisation as CustomisationObj } from '$lib/types/Customisation';
+	import {
+		DEFAULT_CUSTOMISATION,
+		type Customisation as CustomisationObj
+	} from '$lib/types/Customisation';
 	import { DIGITAL_OCEAN_SUMMARIES_ENDPOINT } from '$lib/object_storage/static';
+	import type { Project } from '@prisma/client';
 
 	export let open: boolean;
-	export let customisation: CustomisationObj;
-	export let filename: string;
+	export let project: Project;
+
+	let customisation: CustomisationObj = project.customisation
+		? (JSON.parse(JSON.stringify(project.customisation)) as CustomisationObj)
+		: DEFAULT_CUSTOMISATION;
 
 	let outputType: string;
+
+	function sanitiseTitle(title: string): string {
+		return `Download '${title}'`;
+	}
 
 	async function download() {
 		if (!outputType) return;
 
+		const filename = `${project.title}_${project.id}`;
+
 		const form = new FormData();
+		form.append('id', project.id.toString());
 		form.append('type', outputType);
 		form.append('filename', filename);
+		form.append('customisation', JSON.stringify(project.customisation));
 
-		const response = await fetch(`?/download`, {
+		const response = await fetch(`/download`, {
 			method: 'POST',
 			body: form
 		});
 
 		if (response.ok) {
 			const url = `${DIGITAL_OCEAN_SUMMARIES_ENDPOINT}/${filename}.${outputType}`;
-			
+
 			let link = document.createElement('a');
 
 			link.href = url;
@@ -32,7 +47,7 @@
 	}
 </script>
 
-<Modal title="Download" bind:open autoclose outsideclose class="flex flex-col">
+<Modal title={sanitiseTitle(project.title)} bind:open autoclose outsideclose class="flex flex-col">
 	<div class="flex flex-col w-full space-y-3">
 		<div>
 			<Label for="number_pages" class="mb-2">Enter max number of pages for the summary</Label>

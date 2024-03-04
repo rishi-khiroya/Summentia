@@ -4,3 +4,10 @@ export interface Customisation {
 	summary_format: string; // default ""
 	length: number; // default 1
 }
+
+export const DEFAULT_CUSTOMISATION: Customisation = {
+	highlight_keywords: false,
+	questions: false,
+	summary_format: '',
+	length: 1
+};

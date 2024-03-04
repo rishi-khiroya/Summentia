@@ -1,6 +1,5 @@
 <script lang="ts">
 	import {
-		Table,
 		TableBody,
 		TableBodyCell,
 		TableBodyRow,
@@ -8,13 +7,13 @@
 		TableHeadCell,
 		TableSearch,
 		Pagination,
-		Button,
 		Tooltip
 	} from 'flowbite-svelte';
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { reformat_date } from '$lib/utils.js';
 	import { DownloadOutline, EditOutline, EyeOutline } from 'flowbite-svelte-icons';
+	import type { Project } from '@prisma/client';
+	import DownloadModal from '../DownloadModal.svelte';
 
 	export let data;
 
@@ -56,11 +55,13 @@
 		window.location.search = params.toString();
 	};
 
-	function nav_to_project_page(project_id: number) {
-		console.log(project_id);
-		goto('projects/' + project_id.toString());
-	}
+	let showDownloadModal: boolean = false;
+	let currentProject: Project = data.projects[0];
+
 </script>
+
+<!--  the filename will be stored in the S3 storage with the format title_id -->
+<DownloadModal bind:open={showDownloadModal} bind:project={currentProject} />
 
 <div class="flex flex-col w-full p-10 space-y-3 justify-center align-top">
 	<h1 class="text-4xl px-10 font-bold">Projects</h1>
@@ -91,7 +92,13 @@
 								<EditOutline size="lg" id="edit" />
 								<Tooltip triggeredBy="#edit">Edit Project</Tooltip>
 							</button>
-							<button class="hover:cursor-pointer">
+							<button
+								class="hover:cursor-pointer"
+								on:click={() => {
+									currentProject = item;
+									showDownloadModal = true;
+								}}
+							>
 								<DownloadOutline size="lg" id="download" />
 								<Tooltip triggeredBy="#download">Download Project</Tooltip>
 							</button>

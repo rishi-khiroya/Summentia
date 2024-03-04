@@ -9,7 +9,7 @@
 	} from 'flowbite-svelte-icons';
 	import { ButtonGroup, Button, Pagination, Video } from 'flowbite-svelte';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/Prisma';
-	import DownloadModal from './DownloadModal.svelte';
+	import DownloadModal from '../../DownloadModal.svelte';
 	import type { Customisation } from '$lib/types/Customisation';
 
 	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
@@ -97,11 +97,7 @@
 </script>
 
 <!--  the filename will be stored in the S3 storage with the format title_id -->
-<DownloadModal
-	bind:open={showDownloadModal}
-	{customisation}
-	filename={`${data.project.title}_${data.project.id}`}
-/>
+<DownloadModal bind:open={showDownloadModal} project={data.project} />
 
 <div class="flex-1">
 	<div class="flex-col px-10 pt-10">

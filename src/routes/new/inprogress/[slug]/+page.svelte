@@ -63,7 +63,7 @@
 </script>
 
 <div class="flex flex-col w-full p-10 m-20 bg-white dark:bg-slate-800 shadow-xl rounded-2xl">
-	{#key project}
+	{#key fetching}
 		<div class="flex-col text-center p-10 space-y-5">
 			<Spinner size="16" />
 			{#if fetched}

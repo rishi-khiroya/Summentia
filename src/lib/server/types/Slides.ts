@@ -1,5 +1,8 @@
 export type Slides = {
 	noSlides: number;
-	slides: string[]; // list of paths to individual slide imgs
+	slides: {
+		path: string; // path to slide img
+		squashed: boolean;
+	}[];
 	file: File;
 };

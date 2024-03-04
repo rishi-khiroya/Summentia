@@ -109,7 +109,7 @@ class VideoFromFile extends Video {
 	}
 
 	static async from(file: File): Promise<VideoFromFile> {
-		const path: string = `${PATH_TO_DATA}/${randomUUID()}.mp4`;
+		const path: string = `${PATH_TO_DATA}/${randomUUID()}/video.mp4`;
 		await writeFile(path, Buffer.from(await file.arrayBuffer()));
 		return new VideoFromFile(path, file);
 	}
