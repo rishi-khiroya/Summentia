@@ -1,17 +1,20 @@
+import { DIGITAL_OCEAN_ENDPOINT } from './../../object_storage/static';
 import { PATH_TO_DATA } from '$env/static/private';
 import { formatDate } from '$lib/utils';
 import { randomUUID } from 'node:crypto';
 import { VideoURLHandler } from './URLHandler';
 import path from 'node:path';
 import { writeFile } from 'node:fs/promises';
+import { mkdirSync } from 'node:fs';
+import { upload } from '$lib/object_storage/upload';
 
 // TODO: complete definition
 export class Lecture {
 	readonly userId: string | undefined;
 	video: Video;
 	slides: string | undefined;
-	info: { title: string, date: string } | undefined;
-	customisation: { summaryLevel: number, questions: boolean };
+	info: { title: string; date: string } | undefined;
+	customisation: { summaryLevel: number; questions: boolean };
 
 	public constructor(video: Video, userId: string | undefined) {
 		this.video = video;
@@ -59,11 +62,11 @@ export class Lecture {
 
 	public static fromJSON(json: string): Lecture {
 		const data: {
-			video: string,
-			slides: string,
-			userId: string,
-			info: { title: string, date: string },
-			customisation: { summaryLevel: number, questions: boolean }
+			video: string;
+			slides: string;
+			userId: string;
+			info: { title: string; date: string };
+			customisation: { summaryLevel: number; questions: boolean };
 		} = JSON.parse(json);
 		const lecture = new Lecture(new Video(data.video), data.userId);
 		lecture.slides = data.slides;
@@ -74,7 +77,8 @@ export class Lecture {
 
 	public async toJSON(): Promise<string> {
 		return JSON.stringify({
-			video: this.video.path,
+			uuid: this.video.uuid,
+			video: `${DIGITAL_OCEAN_ENDPOINT}/${this.video.uuid}/video.mp4`,
 			slides: this.slides,
 			userId: this.userId,
 			info: this.info ? this.info : await this.video.getTitleDate(),
@@ -84,34 +88,38 @@ export class Lecture {
 }
 
 class Video {
+	readonly uuid: string;
 
-	readonly path: string;
-
-	public constructor(path: string) {
-		this.path = path;
+	public constructor(uuid: string) {
+		this.uuid = uuid;
 	}
 
 	public async getTitleDate(): Promise<{ title: string; date: string }> {
 		return { title: 'Lecture', date: formatDate(new Date()) };
-	};
+	}
 
 	// public saveToUrl();
-
 }
 
 class VideoFromFile extends Video {
-
 	private readonly file: File;
 
-	private constructor(path: string, file: File) {
-		super(path);
+	private constructor(uuid: string, file: File) {
+		super(uuid);
 		this.file = file;
 	}
 
 	static async from(file: File): Promise<VideoFromFile> {
-		const path: string = `${PATH_TO_DATA}/${randomUUID()}/video.mp4`;
-		await writeFile(path, Buffer.from(await file.arrayBuffer()));
-		return new VideoFromFile(path, file);
+		const uuid: string = randomUUID();
+		const folder: string = `${PATH_TO_DATA}/${uuid}`;
+		mkdirSync(folder);
+		console.log(`mkdir ${folder}`);
+		const filepath: string = `${folder}/video.mp4`;
+		await writeFile(filepath, Buffer.from(await file.arrayBuffer()));
+		// console.log(`Written file to ${path}`)
+		const destination = path.join(DIGITAL_OCEAN_ENDPOINT, `${uuid}/video.mp4`);
+		await upload(filepath, destination);
+		return new VideoFromFile(filepath, file);
 	}
 
 	// public async toFilePath(): Promise<string> {
@@ -120,16 +128,15 @@ class VideoFromFile extends Video {
 	// }
 
 	public async getTitleDate(): Promise<{ title: string; date: string }> {
-
 		const date = new Date();
 
 		return {
-			title: path.parse(this.file.name).
-				name.
-				replaceAll(/[^a-zA-Z\d]/g, ' ').
-				split(" ").
-				map(word => word[0].toUpperCase() + word.substring(1)).
-				join(" "),
+			title: path
+				.parse(this.file.name)
+				.name.replaceAll(/[^a-zA-Z\d]/g, ' ')
+				.split(' ')
+				.map((word) => word[0].toUpperCase() + word.substring(1))
+				.join(' '),
 			date: formatDate(date)
 		};
 	}
@@ -141,7 +148,6 @@ class VideoFromFile extends Video {
 
 // TODO: check if can be combined with URLHandler
 class VideoFromUrl extends Video {
-
 	private readonly handler: VideoURLHandler;
 
 	static from(url: URL): VideoFromUrl {

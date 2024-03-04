@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import { PrismaProjectStatus, type PrismaProject } from '$lib/types/Prisma.js';
+	import { PrismaProjectStatus, type PrismaProject } from '$lib/types/prisma';
 	import { formResponseToJSON } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
 	import { onDestroy } from 'svelte';

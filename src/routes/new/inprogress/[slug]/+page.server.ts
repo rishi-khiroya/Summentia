@@ -6,7 +6,7 @@ import {
 	type PrismaProject,
 	type PrismaSlidesData,
 	type PrismaBasicData
-} from '$lib/types/Prisma';
+} from '$lib/types/prisma';
 import { summarise } from '$lib/server/summariser';
 import { redirect } from '@sveltejs/kit';
 import { process_noslides } from '$lib/server/python'

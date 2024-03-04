@@ -62,9 +62,9 @@ export async function POST({ request, locals }) {
 
 	console.log(`Output to ${filepath}`);
 
-	const url = path.join(DIGITAL_OCEAN_SUMMARIES_FOLDER, `${filename}.${type}`);
-	console.log(`Uploading ${filepath}.${type} to S3: ${url}.`);
-	await upload(`${filepath}.${type}`, url);
+	const destination = path.join(DIGITAL_OCEAN_SUMMARIES_FOLDER, `${filename}.${type}`);
+	console.log(`Uploading ${filepath}.${type} to S3: ${destination}.`);
+	await upload(`${filepath}.${type}`, destination);
 
 	console.log(`Uploaded to S3.`);
 
