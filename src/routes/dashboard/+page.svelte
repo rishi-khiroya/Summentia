@@ -26,6 +26,10 @@
 
 	let showDownloadModal: boolean = false;
 	let currentProject = data.projects[0];
+
+	// let previewURL = 'https://summentia-storage.fra1.cdn.digitaloceanspaces.com/summaries/Intro%20to%20ML_16.docx';
+	// let previewURL = 'https://summentia-storage.fra1.digitaloceanspaces.com/summaries/Intro%20to%20ML_16.docx';  
+	let previewURL = 'https://summentia-storage.fra1.cdn.digitaloceanspaces.com/summaries/IML%20Lecture%201_13.pdf';  
 </script>
 
 <!--  the filename will be stored in the S3 storage with the format title_id -->
@@ -51,7 +55,24 @@
 				<div class="flex w-full justify-end p-5">
 					<Button href={`/projects/${projects[0].id}`}>View</Button>
 				</div>
-			{:else}
+				{:else}
+				<object
+				title="cdsd"
+					data={previewURL}
+					type="application/pdf"
+					width="500"
+					height="678"
+				>
+
+					<iframe
+					title="xcd"
+						src={previewURL}
+						width="500"
+						height="678"
+					>
+					<p>This browser does not support PDF!</p>
+					</iframe>
+				</object>
 				<h1>You have no recent projects.</h1>
 			{/if}
 		</div>
