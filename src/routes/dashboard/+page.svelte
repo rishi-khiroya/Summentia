@@ -55,20 +55,20 @@
 				<div class="flex w-full justify-end p-5">
 					<Button href={`/projects/${projects[0].id}`}>View</Button>
 				</div>
-				{:else}
+			{:else}
 				<object
 				title="cdsd"
 					data={previewURL}
 					type="application/pdf"
 					width="500"
-					height="678"
+					height="500"
 				>
 
 					<iframe
 					title="xcd"
 						src={previewURL}
 						width="500"
-						height="678"
+						height="500"
 					>
 					<p>This browser does not support PDF!</p>
 					</iframe>
@@ -78,7 +78,7 @@
 		</div>
 
 		<div
-			class="flex flex-col bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl p-10 space-y-3 justify-center align-top"
+			class="flex flex-col bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl p-10 space-y-3 align-top"
 		>
 			<h2 class="text-xl px-2 font-semibold dark:text-white">Recent Projects:</h2>
 			<Table>
