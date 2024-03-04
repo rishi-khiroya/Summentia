@@ -20,6 +20,7 @@ model Project {
   id            Int      @id @default(autoincrement())
   title         String
   userId        String?
+  uuid          String   @unique @db.Text
   date          DateTime
   createdAt     DateTime @default(now())
   status        Status   @default(UNPROCESSED)

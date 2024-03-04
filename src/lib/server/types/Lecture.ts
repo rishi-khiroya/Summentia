@@ -111,14 +111,15 @@ class VideoFromFile extends Video {
 
 	static async from(file: File): Promise<VideoFromFile> {
 		const uuid: string = randomUUID();
-		const folder: string = `${PATH_TO_DATA}/${uuid}`;
+		const folder: string = path.join(PATH_TO_DATA, uuid);
+		console.log(folder);
 		mkdirSync(folder);
 		console.log(`mkdir ${folder}`);
 		const filepath: string = `${folder}/video.mp4`;
 		await writeFile(filepath, Buffer.from(await file.arrayBuffer()));
-		// console.log(`Written file to ${path}`)
-		const destination = path.join(DIGITAL_OCEAN_ENDPOINT, `${uuid}/video.mp4`);
-		await upload(filepath, destination);
+		console.log(`Written file to ${path}`)
+		const destination = `${uuid}/video.mp4`;
+		upload(filepath, destination);
 		return new VideoFromFile(filepath, file);
 	}
 
