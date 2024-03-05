@@ -1,6 +1,9 @@
 
+import { PATH_TO_DATA } from '$env/static/private';
+import { writeFileSync } from 'fs';
 import pdflatex from 'node-pdflatex'
 import { Pandoc, type PandocOutFormat } from 'pandoc-ts';
+import path from 'node:path';
 
 const DEFAULT_FILE_NAME: string = 'summary';
 
@@ -29,11 +32,13 @@ export async function output(
 	latexCode: string,
 	fileName: string = DEFAULT_FILE_NAME,
 	outputType: OutputType = OutputType.PDF
+
 ) {
 	const pandocFormat = createOuts(fileName)[outputType][0];
 	if (outputType === OutputType.PDF) {
-		console.log("pdf uee")
-		await pdflatex(latexCode);
+		writeFileSync('output.tex', latexCode);
+		console.log("made the latex file");
+		await pdflatex('output.tex');
 	} else {
 		const pandocInstance = new Pandoc('latex', [pandocFormat]);
 		await pandocInstance.convertAsync(latexCode);
