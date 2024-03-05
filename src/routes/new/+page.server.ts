@@ -25,11 +25,11 @@ export const actions = {
 
 	addSlides: async ({ request }) => {
 		const form = await request.formData();
-
+		
 		const data = form.get('lecture')?.toString();
 		if (!data) return { success: false, error: 'Invalid Form: No lecture found.' };
 
-		const lecture: Lecture = Lecture.fromJSON(data);
+				const lecture: Lecture = Lecture.fromJSON(data);
 		if (form.get('slidesFromFile') === 'true') {
 			await lecture.withSlidesFromFile(form.get(`slidesFile`) as File);
 		} else {

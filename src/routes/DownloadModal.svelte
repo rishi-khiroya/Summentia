@@ -4,8 +4,9 @@
 		DEFAULT_CUSTOMISATION,
 		type Customisation as CustomisationObj
 	} from '$lib/types/Customisation';
-	import { DIGITAL_OCEAN_SUMMARIES_ENDPOINT } from '$lib/object_storage/static';
+	import { DIGITAL_OCEAN_ENDPOINT, DIGITAL_OCEAN_SUMMARIES_ENDPOINT } from '$lib/object_storage/static';
 	import type { Project } from '@prisma/client';
+	import path from 'node:path';
 
 	export let open: boolean;
 	export let project: Project;
@@ -28,6 +29,7 @@
 		const form = new FormData();
 		form.append('id', project.id.toString());
 		form.append('type', outputType);
+		form.append('uuid', project.uuid);
 		form.append('filename', filename);
 		form.append('customisation', JSON.stringify(project.customisation));
 
@@ -37,7 +39,8 @@
 		});
 
 		if (response.ok) {
-			const url = `${DIGITAL_OCEAN_SUMMARIES_ENDPOINT}/${filename}.${outputType}`;
+			const url = (`${DIGITAL_OCEAN_ENDPOINT}/${project.uuid}/summaries/${filename}.${outputType}`);
+		//	const url = path.join(DIGITAL_OCEAN_SUMMARIES_ENDPOINT, `${filename}.${outputType}`);
 
 			let link = document.createElement('a');
 

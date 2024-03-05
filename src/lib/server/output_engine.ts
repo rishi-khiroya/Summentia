@@ -1,4 +1,5 @@
-import * as childProcess from 'child_process';
+
+import pdflatex from 'node-pdflatex'
 import { Pandoc, type PandocOutFormat } from 'pandoc-ts';
 
 const DEFAULT_FILE_NAME: string = 'summary';
@@ -31,12 +32,8 @@ export async function output(
 ) {
 	const pandocFormat = createOuts(fileName)[outputType][0];
 	if (outputType === OutputType.PDF) {
-		const pdfEngine = 'xelatex';
-		const pandocCommand = `pandoc -f latex -s -o "${pandocFormat.fname}" --pdf-engine=${pdfEngine}`;
-		const child = childProcess.execSync(pandocCommand);
-
-		child.stdin.write(latexCode);
-		child.stdin.end();
+		console.log("pdf uee")
+		await pdflatex(latexCode);
 	} else {
 		const pandocInstance = new Pandoc('latex', [pandocFormat]);
 		await pandocInstance.convertAsync(latexCode);

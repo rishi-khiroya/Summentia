@@ -1,5 +1,5 @@
 import { PATH_TO_DATA } from '$env/static/private';
-import { DIGITAL_OCEAN_SUMMARIES_FOLDER } from '$lib/object_storage/static';
+import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
 import { upload } from '$lib/object_storage/upload';
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
@@ -18,6 +18,7 @@ export async function POST({ request, locals }) {
 
 	const type = form.get('type')?.toString();
 	const id = form.get('id')?.toString();
+	const uuid = form.get('uuid')?.toString();
 
 	// @ts-expect-error: Use of unsafe enum acccss.
 	const outputType: OutputType = OutputType[type.toUpperCase()];
@@ -66,7 +67,7 @@ export async function POST({ request, locals }) {
 
 	console.log(`Output to ${filepath}`);
 
-	const destination = path.join(DIGITAL_OCEAN_SUMMARIES_FOLDER, `${filename}.${type}`);
+	const destination = `${uuid}/summaries/${filename}.${type}`;
 	console.log(`Uploading ${filepath}.${type} to S3: ${destination}.`);
 	await upload(`${filepath}.${type}`, destination);
 

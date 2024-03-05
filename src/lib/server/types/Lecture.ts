@@ -18,16 +18,19 @@ export class Lecture {
 	customisation: { summaryLevel: number; questions: boolean };
 
 	public constructor(video: Video, userId: string | undefined) {
-		this.uuid = randomUUID();
+		this.uuid = video.uuid;
 		this.video = video;
 		this.userId = userId;
 		this.customisation = { summaryLevel: 2, questions: false };
 	}
 
 	public async withSlidesFromFile(slides: File): Promise<Lecture> {
-		const path: string = `${PATH_TO_DATA}/${randomUUID()}.pdf`;
-		await writeFile(path, Buffer.from(await slides.arrayBuffer()));
-		this.slides = path;
+		
+		const filepath: string = path.join(PATH_TO_DATA, this.uuid, 'slides.pdf');
+		console.log("slides file path" + filepath);
+		console.log("uuid: " + this.uuid);
+		await writeFile(filepath, Buffer.from(await slides.arrayBuffer()));
+		this.slides = filepath;
 		return this;
 	}
 
@@ -64,13 +67,14 @@ export class Lecture {
 
 	public static fromJSON(json: string): Lecture {
 		const data: {
+			uuid: string;
 			video: string;
 			slides: string;
 			userId: string;
 			info: { title: string; date: string };
 			customisation: { summaryLevel: number; questions: boolean };
 		} = JSON.parse(json);
-		const lecture = new Lecture(new Video(data.video), data.userId);
+		const lecture = new Lecture(new Video(data.uuid), data.userId);
 		lecture.slides = data.slides;
 		lecture.info = data.info;
 		lecture.customisation = data.customisation;
@@ -79,7 +83,7 @@ export class Lecture {
 
 	public async toJSON(): Promise<string> {
 		return JSON.stringify({
-			uuid: this.video.uuid,
+			uuid: this.uuid,
 			video: `${DIGITAL_OCEAN_ENDPOINT}/${this.uuid}/video.mp4`,
 			slides: this.slides,
 			userId: this.userId,
@@ -94,6 +98,7 @@ class Video {
 
 	public constructor(uuid: string) {
 		this.uuid = uuid;
+		console.log(`Init with uuid=${uuid}`)
 	}
 
 	public async getTitleDate(): Promise<{ title: string; date: string }> {
@@ -117,12 +122,13 @@ class VideoFromFile extends Video {
 		console.log(folder);
 		mkdirSync(folder);
 		console.log(`mkdir ${folder}`);
-		const filepath: string = `${folder}/video.mp4`;
+		const filepath: string = path.join(folder, 'video.mp4');
 		await writeFile(filepath, Buffer.from(await file.arrayBuffer()));
 		console.log(`Written file to ${path}`)
+		
 		const destination = `${uuid}/video.mp4`;
 		upload(filepath, destination);
-		return new VideoFromFile(filepath, file);
+		return new VideoFromFile(uuid, file);
 	}
 
 	// public async toFilePath(): Promise<string> {
@@ -138,7 +144,7 @@ class VideoFromFile extends Video {
 				.parse(this.file.name)
 				.name.replaceAll(/[^a-zA-Z\d]/g, ' ')
 				.split(' ')
-				.map((word) => word[0].toUpperCase() + word.substring(1))
+				.map((word) => word.length > 0 ? word[0].toUpperCase(): "" + word.length > 1 ? word.substring(1) : "")
 				.join(' '),
 			date: formatDate(date)
 		};

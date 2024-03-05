@@ -60,6 +60,7 @@ export const actions = {
 			id: data.id,
 			title: data.title,
 			userId: data.userId,
+			uuid: data.uuid,
 			date: data.date,
 			createdAt: data.createdAt,
 			hasSlides: data.hasSlides,
