@@ -75,7 +75,7 @@ export async function POST({ request, locals }) {
 
 	// has to sleep as the link does not become available to use immediately
 	await new Promise((resolve) => setTimeout(resolve, 500));
-	unlinkSync(filepath);
+	unlinkSync(`${filepath}.${type}`);
 
 	return json({ success: true });
 }
