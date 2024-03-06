@@ -8,6 +8,7 @@ export interface PrismaProject {
 	id: number,
 	title: string;
 	userId: string | null;
+	uuid: string;
 	date: Date;
 	createdAt: Date;
 	hasSlides: boolean;
