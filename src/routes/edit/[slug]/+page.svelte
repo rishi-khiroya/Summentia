@@ -69,6 +69,12 @@
 	<h1 class="text-5xl p-10 font-bold dark:text-white">Summary Editor</h1>
 
 	{#if data.hasSlides}
+		<div class="flex">
+			<div class="inline-flex items-center justify-center w-full">
+				<hr class="w-64 h-px my-8 bg-gray-600 border-1">
+				<span class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900">Add hidden slides</span>
+			</div>
+		</div>
 		{#each slidesData as { slide, summary }, index}
 			<div class="justify-between flex w-full space-x-6 m-4">
 				<div
