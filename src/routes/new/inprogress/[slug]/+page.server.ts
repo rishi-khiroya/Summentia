@@ -9,7 +9,9 @@ import {
 } from '$lib/types/prisma';
 import { summarise } from '$lib/server/summariser';
 import { redirect } from '@sveltejs/kit';
-import { process_noslides } from '$lib/server/python'
+import { process_genslides, process_noslides, process_slides } from '$lib/server/python';
+import path from 'node:path';
+import { PATH_TO_DATA } from '$env/static/private';
 
 const setWaiting = async (id: number) =>
 	await prisma.project.update({
@@ -76,7 +78,24 @@ export const actions = {
 
 		if (project.waiting) {
 			if (project.status == PrismaProjectStatus.UNPROCESSED) {
-				console.log('Sending request to Python back-end to complete splitting.');
+				console.log('Sending request to Python back-end to complete splitting and transcription.');
+
+				await setWaiting(project.id);
+				const projectFolder = path.join(PATH_TO_DATA, project.uuid + '/');
+				const data = project.hasSlides
+					? await process_slides(projectFolder)
+					: await process_genslides(projectFolder);
+
+				record = await prisma.project.update({
+					where: { id: project.id },
+					data: {
+						data,
+						waiting: true,
+						status: 'TRANSCRIBED'
+					}
+				});
+
+				console.log("Received from back-end.");
 			}
 
 			if (project.status == PrismaProjectStatus.SPLIT) {
@@ -87,14 +106,7 @@ export const actions = {
 
 				let data;
 				if (project.hasSlides) {
-					data = [
-						{
-							slide: 'Not implemented yet.',
-							transcripts: ['Not implemented yet.'],
-							summaries: ['Not implemented yet.']
-						}
-					] as PrismaSlidesData[];
-
+					console.log('should not reach here.'); // TODO: throw error/remove dead code
 					// const transcript = process_noslides()
 				} else {
 					// const transcript = await transcribe(extlessPath);
@@ -130,15 +142,15 @@ export const actions = {
 				if (project.hasSlides) {
 					const slidesData: PrismaSlidesData[] = project.data as PrismaSlidesData[];
 					slidesData.forEach(async (slideData) => {
-						const summaries:string[] = [];
+						const summaries: string[] = [];
 						slideData.transcripts.forEach(async (transcript) => {
 							const summary: string | null = await summarise(
 								transcript,
 								project.customisation.summaryLevel - 1
 							);
-							summaries.push(summary?? "");	
-						})
-						
+							summaries.push(summary ?? '');
+						});
+
 						slideData.summaries = summaries;
 					});
 					data = slidesData.map((data) => JSON.stringify(data));
