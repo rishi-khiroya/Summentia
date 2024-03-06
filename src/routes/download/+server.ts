@@ -10,6 +10,7 @@ import { error, json } from '@sveltejs/kit';
 import { OutputType } from '$lib/server/output_engine';
 import path from 'node:path';
 import { unlinkSync } from 'node:fs';
+import { format } from '$lib/server/formatter';
 
 export async function POST({ request, locals }) {
 	console.log('Downloading...');
@@ -19,7 +20,12 @@ export async function POST({ request, locals }) {
 	const type = form.get('type')?.toString();
 	const id = form.get('id')?.toString();
 	const uuid = form.get('uuid')?.toString();
+	const customisation = form.get('customisation');
 
+	const jsonCustomisation = JSON.parse(customisation);
+
+	console.log("Customisations: " + customisation);
+	console.log("Json Customisations: " + jsonCustomisation);
 	// @ts-expect-error: Use of unsafe enum acccss.
 	const outputType: OutputType = OutputType[type.toUpperCase()];
 	console.log(`Output Type = ${outputType}`);
@@ -60,6 +66,9 @@ export async function POST({ request, locals }) {
 			(JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary
 		);
 	}
+
+	// format the code according to the customisations
+	latexCode = (await format(latexCode, jsonCustomisation))??latexCode;
 
 	const filepath = path.join(PATH_TO_DATA, filename);
 	console.log(`Outputting to ${filepath}`);

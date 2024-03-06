@@ -1,6 +1,6 @@
 import { OPENAI_API_KEY } from '$env/static/private';
 import OpenAI from 'openai';
-import type { Customisation } from '$lib/server/types/Customisation';
+import type { Customisation } from '$lib/types/Customisation';
 
 // TODO: extract openai client to its own exported thing
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
@@ -43,10 +43,23 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	const summary = completion.choices[0]['message']['content'];
 
-	// console.log('Prompt : ');
-	// console.log(prompt);
-	// console.log('Customised Code : ');
-	// console.log(summary);
+	console.log('Prompt : ');
+	console.log(prompt);
+	console.log('Customised Code : ');
+	console.log(summary);
 
 	return summary;
+}
+
+export async function generateFlashCards(summary: string){
+	const prompt: string = 'Can you generate flash cards for this text: ' + summary;
+	const completion = await openai.chat.completions.create({
+		messages: [{ role: 'system', content: prompt }],
+		model: 'gpt-3.5-turbo'
+	});
+
+	const response = completion.choices[0]['message']['content'];
+
+	console.log("response: " + response);
+	return response;
 }
