@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 	import { Button, Modal, Textarea } from 'flowbite-svelte';
-	import { ExclamationCircleOutline, FileCheckSolid } from 'flowbite-svelte-icons';
+	import { ExclamationCircleOutline, FileCheckSolid, PlusSolid } from 'flowbite-svelte-icons';
 
 	export let data;
 
@@ -9,6 +10,27 @@
 	let saved: boolean = true;
 	let backModal: boolean = false;
 	let dirty: boolean = false;
+	let slideGroups: {squashed: boolean, values: [number, PrismaSlidesData][]}[];
+	let numSlides = 0;
+
+	if (data.hasSlides) {
+		slideGroups = slidesData.reduce(
+			(curr: {squashed: boolean, values: [number, PrismaSlidesData][]}[], val: PrismaSlidesData) => {
+				let group = curr.length ? curr[curr.length - 1] : undefined;
+				numSlides += val.squashed ? 0 : 1;
+				const currSlideNo = val.squashed ? -1 : numSlides;
+				if (group && group.squashed === val.squashed) {
+					group.values.push([currSlideNo, val]);
+				} else {
+					curr.push({ squashed: val.squashed, values: [[currSlideNo, val]] });
+				}
+				return curr;
+			}, 
+			[]
+		)
+
+		console.log(slideGroups)
+	}
 
 	async function save() {
 		const form: FormData = new FormData();
@@ -17,11 +39,14 @@
 		if (data.session) form.append('userId', data.session.user.id);
 
 		form.append('hasSlides', data.hasSlides.toString())
-		if (data.hasSlides)
-			slidesData.forEach((data) => {
+		if (data.hasSlides) {
+			slidesData.forEach((data: PrismaSlidesData) => {
 				form.append('data', JSON.stringify(data));
 			});
-		else form.append('data', JSON.stringify(slidesData));
+		}
+		else {
+			form.append('data', JSON.stringify(slidesData));
+		}
 
 		form.append('id', data.id.toString());
 
@@ -69,34 +94,43 @@
 	<h1 class="text-5xl p-10 font-bold dark:text-white">Summary Editor</h1>
 
 	{#if data.hasSlides}
-		<div class="flex">
-			<div class="inline-flex items-center justify-center w-full">
-				<hr class="w-64 h-px my-8 bg-gray-600 border-1">
-				<span class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900">Add hidden slides</span>
-			</div>
-		</div>
-		{#each slidesData as { slide, summary }, index}
-			<div class="justify-between flex w-full space-x-6 m-4">
-				<div
-					class="flex flex-col w-full bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
-				>
-					<h2 class="text-xl px-2 font-semibold text-center pb-5 dark:text-white">
-						Slide {index + 1}/{slidesData.length}
-					</h2>
-
-					<!-- svelte-ignore a11y-img-redundant-alt -->
-					<img class="flex-1" src={slide} alt="Slide {index + 1}" />
+		{#each slideGroups as { squashed, values }}
+			{#if squashed}
+				<div class="flex">
+					<Button pill class="!p-2" color="dark" on:click={() => {}}><PlusSolid class="w-4 h-4" /></Button>
+					<div class="w-full">
+						<p class="text-center overflow-hidden before:ml-0 before:h-0.5 after:h-0.5 after:bg-black 
+						after:inline-block after:relative after:align-middle after:w-2/5
+						before:bg-black before:inline-block before:relative before:align-middle 
+						before:w-2/5 before:right-2 after:left-2 text-md">Add hidden slides
+						</p>
+					</div>
 				</div>
-
-				<div
-					class="flex flex-col w-full bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
-				>
-					<h2 class="text-xl px-2 font-semibold text-center pb-5 dark:text-white">
-						Summary {index + 1}/{slidesData.length}
-					</h2>
-					<Textarea rows="13" cols="100" bind:value={summary} on:change={() => (saved = false)} />
-				</div>
-			</div>
+			{:else}
+				{#each values as [ slideNo, slideData ]}
+					<div class="justify-between flex w-full space-x-6 m-4">
+						<div
+							class="flex flex-col w-full bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
+						>
+							<h2 class="text-xl px-2 font-semibold text-center pb-5 dark:text-white">
+								Slide {slideNo}/{numSlides}
+							</h2>
+		
+							<!-- svelte-ignore a11y-img-redundant-alt -->
+							<img class="flex-1" src={slideData.slide} alt="Slide {slideNo}" />
+						</div>
+		
+						<div
+							class="flex flex-col w-full bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-1 px-10 pt-5 pb-10"
+						>
+							<h2 class="text-xl px-2 font-semibold text-center pb-5 dark:text-white">
+								Summary {slideNo}/{numSlides}
+							</h2>
+							<Textarea rows="13" cols="100" bind:value={slideData.summaries} on:change={() => (saved = false)} />
+						</div>
+					</div>
+				{/each}
+			{/if}
 		{/each}
 	{:else}
 		<div
