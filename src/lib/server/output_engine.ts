@@ -1,7 +1,9 @@
 
 import { PATH_TO_DATA } from '$env/static/private';
-import { writeFileSync } from 'fs';
-import pdflatex from 'node-pdflatex'
+import * as childProcess from 'child_process';
+import { writeFileSync, createWriteStream, unlinkSync } from 'fs';
+import pdflatex  from 'node-pdflatex'
+import latex from 'node-latex'
 import { Pandoc, type PandocOutFormat } from 'pandoc-ts';
 import path from 'node:path';
 
@@ -36,9 +38,11 @@ export async function output(
 ) {
 	const pandocFormat = createOuts(fileName)[outputType][0];
 	if (outputType === OutputType.PDF) {
-		writeFileSync('output.tex', latexCode);
-		console.log("made the latex file");
-		await pdflatex('output.tex');
+
+		writeFileSync(`${fileName}.tex`, latexCode);
+		const pandocCommand = `pdflatex ${fileName}.tex`;
+		childProcess.execSync(pandocCommand);
+		unlinkSync(`${fileName}.tex`);
 	} else {
 		const pandocInstance = new Pandoc('latex', [pandocFormat]);
 		await pandocInstance.convertAsync(latexCode);

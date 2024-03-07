@@ -19,13 +19,18 @@
 		EyeOutline
 	} from 'flowbite-svelte-icons';
 	import DownloadModal from '../DownloadModal.svelte';
+	import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
 
 	export let data;
 
 	const projects = data.projects;
 
-	let showDownloadModal: boolean = false;
-	let currentProject = data.projects[0];
+	let showDownloadModal: boolean = false;;
+	let currentProject = projects.filter((item) => {return item.status == "SUMMARISED"})[0];
+ 
+	let previewURL =  currentProject ? (`${DIGITAL_OCEAN_ENDPOINT}/${currentProject.uuid}/summaries/${currentProject.title}_${currentProject.id}.pdf`): "";  
+	//previewURL = 'https://summentia-storage.fra1.cdn.digitaloceanspaces.com/fssaf-asda-fsfsa/summaries/Test_2.pdf';
+	previewURL = 'https://summentia-storage.fra1.cdn.digitaloceanspaces.com/summaries/IML%20Lecture%201_13.pdf';
 </script>
 
 <!--  the filename will be stored in the S3 storage with the format title_id -->
@@ -41,23 +46,33 @@
 		>
 			<h2 class="text-xl px-2 font-semibold dark:text-white">Your most recent summary:</h2>
 			<!-- FIXME: not null-safe, doesn't work if latest project has slides -->
-			{#if projects?.length && projects[0].data}
-				<div class="flex flex-row justify-between space-x-5 p-3">
-					<h1 class="text-2xl">{projects[0].title}</h1>
-					<h3 class="text-xl">{reformat_date(projects[0].date)}</h3>
-				</div>
-				<Hr />
-				<h3>{projects[0].data.summary}</h3>
-				<div class="flex w-full justify-end p-5">
-					<Button href={`/projects/${projects[0].id}`}>View</Button>
-				</div>
+			{#if projects.filter((item) => {return item.status === "SUMMARISED"}).length > 0}
+				<object
+					title="cdsd"
+					data={previewURL}
+					type="application/pdf"
+					width="500"
+					height="500"
+				>
+
+					<iframe
+						title="xcd"
+						src={previewURL}
+						width="500"
+						height="500"
+					>
+						<p>This browser does not support PDF!</p>
+					</iframe>
+				</object>
+				
 			{:else}
+				
 				<h1>You have no recent projects.</h1>
 			{/if}
 		</div>
 
 		<div
-			class="flex flex-col bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl p-10 space-y-3 justify-center align-top"
+			class="flex flex-col bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl p-10 space-y-3 align-top"
 		>
 			<h2 class="text-xl px-2 font-semibold dark:text-white">Recent Projects:</h2>
 			<Table>
