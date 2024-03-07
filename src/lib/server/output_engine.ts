@@ -1,11 +1,7 @@
 
-import { PATH_TO_DATA } from '$env/static/private';
 import * as childProcess from 'child_process';
-import { writeFileSync, createWriteStream, unlinkSync } from 'fs';
-import pdflatex  from 'node-pdflatex'
-import latex from 'node-latex'
+import { writeFileSync, unlinkSync } from 'fs';
 import { Pandoc, type PandocOutFormat } from 'pandoc-ts';
-import path from 'node:path';
 
 const DEFAULT_FILE_NAME: string = 'summary';
 
