@@ -143,7 +143,7 @@
 						<DownloadSolid class="me-2 focus:!outline-none" />
 						Download
 					</Button>
-					<Button pill color="dark" on:click{handleFlashCards}>
+					<Button pill color="dark" on:click={() => console.log("generate flashcards")}>
 						<CreditCardOutline class="me-2 focus:!outline-none"/>
 						Generate Flash Cards
 					</Button>
