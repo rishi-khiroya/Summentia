@@ -52,7 +52,7 @@ export async function format(transcript_code: string, customisations: Customisat
 }
 
 export async function generateFlashCards(summary: string){
-	const prompt: string = 'Can you generate flash cards for this text: ' + summary;
+	const prompt: string = 'Can you generate flash cards in format Front: Back:, Front: Back: : ' + summary;
 	const completion = await openai.chat.completions.create({
 		messages: [{ role: 'system', content: prompt }],
 		model: 'gpt-3.5-turbo'

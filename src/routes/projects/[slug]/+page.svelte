@@ -72,28 +72,7 @@
 	};
 	
 	async function handleFlashCards() {
-		console.log("sfnewisfjew");
-		let summary = "";
-		if(data.project.hasSlides){
-			slideData.forEach((item) => item.summaries.forEach((summary_object) => {summary = summary + " " + summary_object}));
-		} else {
-			summary = overviewData.summary
-		}
-		
-		const form = new FormData();
-		form.append('summary', summary);
-
-		const response = await fetch('?/flashCards', {
-			method: 'POST',
-			body: form
-		})
-		if (response.ok) {
-			const json = await response.json();
-			const responseData = formResponseToJSON(json.flashCards.toString());
-
-			console.log("e morem ktu: " + responseData);
-		}
-
+		goto(`/flashcards/${data.project.id}`)
 	};
 
 	const previous = () => {
@@ -143,7 +122,7 @@
 						<DownloadSolid class="me-2 focus:!outline-none" />
 						Download
 					</Button>
-					<Button pill color="dark" on:click={() => handleFlashCards}>
+					<Button pill color="dark" on:click={() => handleFlashCards()}>
 						<CreditCardOutline class="me-2 focus:!outline-none"/>
 						Generate Flash Cards
 					</Button>

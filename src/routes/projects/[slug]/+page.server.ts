@@ -3,7 +3,6 @@ import type { PageServerLoad } from '../../$types';
 import { redirect, error } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
 import type { Project } from '@prisma/client';
-import { generateFlashCards } from '$lib/server/formatter';
 
 export const load: PageServerLoad = async (event) => {
 	const session: Session | null = await event.locals.auth();
@@ -27,13 +26,4 @@ export const load: PageServerLoad = async (event) => {
 
 	return { pageNo, project };
 };
-
-export const actions = {
-	flashCards: async ({ request }) => {
-		const form = await request.formData();
-		const summary: string = form.get('summary')?.toString()??"";
-
-		return {flashCards:generateFlashCards(summary)};
-	}
-}  
 
