@@ -1,7 +1,7 @@
 // https://docs.digitalocean.com/reference/api/spaces-api/
 
 // Step 1: Import the S3Client object and all necessary SDK commands.
-import { ObjectCannedACL, PutObjectCommand } from '@aws-sdk/client-s3';
+import { ObjectCannedACL, PutObjectCommand, HeadObjectCommand} from '@aws-sdk/client-s3';
 import { s3Client } from '../object_storage/s3_client';
 // use npm install @aws-sdk/client-s3
 import fs from 'fs'; // Import the file system module
@@ -30,6 +30,19 @@ export async function upload(filePath: string, destPath: string) {
 	};
 
 	uploadObject();
+}
+
+async function check_exists(destPath: string){
+  const input = {
+		Bucket: 'summentia-storage', // The path to the directory you want to upload the object to, starting with your Space name.
+		Key: destPath
+  }
+
+  const command = new HeadObjectCommand(input)
+  const response = await s3Client.send(command)
+  console.log(response)
+  const http_status_code = response["$metadata"]["httpStatusCode"]
+  return http_status_code == 200
 }
 
 /* from linked in: https://www.linkedin.com/pulse/upload-images-video-files-using-aws-s3-sdknodejs-react-birendra-jha-fdqnc/?trk=article-ssr-frontend-pulse_more-articles_related-content-card
