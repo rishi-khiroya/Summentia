@@ -1,6 +1,6 @@
 import { PATH_TO_DATA } from '$env/static/private';
 import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
-import { upload } from '$lib/object_storage/upload';
+import { check_exists, upload } from '$lib/object_storage/upload';
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
 import { prisma } from '$lib/server/prisma';
@@ -60,14 +60,18 @@ export async function POST({ request, locals }) {
 			(JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary
 		);
 	}
+	
+	const destination = `${uuid}/summaries/${filename}.${type}`;
+	const does_it_exist = await check_exists(destination);
 
+	if(!does_it_exist){
 	const filepath = path.join(PATH_TO_DATA, filename);
 	console.log(`Outputting to ${filepath}`);
 	await output(latexCode, filepath, outputType);
 
 	console.log(`Output to ${filepath}`);
 
-	const destination = `${uuid}/summaries/${filename}.${type}`;
+	
 	console.log(`Uploading ${filepath}.${type} to S3: ${destination}.`);
 	await upload(`${filepath}.${type}`, destination);
 
@@ -75,7 +79,7 @@ export async function POST({ request, locals }) {
 
 	// has to sleep as the link does not become available to use immediately
 	await new Promise((resolve) => setTimeout(resolve, 500));
-	unlinkSync(filepath);
-
+	unlinkSync(`${filepath}.${type}`);
+	}
 	return json({ success: true });
 }
