@@ -1,6 +1,8 @@
 import { PYTHON_URL } from '$env/static/private';
 import { fetch, Agent, Response } from 'undici';
 
+const PROCESS_TIMEOUT = 7200000;
+
 const processResponse = async (response: Response) => ({
 	success: response.ok,
 	data: response.ok ? await response.json() : await response.text()
@@ -18,33 +20,33 @@ export async function handshake(): Promise<boolean> {
 	}
 }
 
-export async function process_noslides(project_folder: string): Promise<string> {
+export async function process_noslides(uuid: string): Promise<string> {
 	const response = await fetch(`${PYTHON_URL}/process_noslides`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ project_folder }),
-		dispatcher: new Agent({ headersTimeout: 3600000 })
+		body: JSON.stringify({ uuid }),
+		dispatcher: new Agent({ headersTimeout: PROCESS_TIMEOUT })
 	});
 	const transcript = await response.text();
 	return transcript;
 }
 
-export async function process_slides(project_folder: string) {
+export async function process_slides(uuid: string) {
 	const response = await fetch(`${PYTHON_URL}/process_slides`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ project_folder }),
-		dispatcher: new Agent({ headersTimeout: 3600000 })
+		body: JSON.stringify({ uuid }),
+		dispatcher: new Agent({ headersTimeout: PROCESS_TIMEOUT })
 	});
 	return processResponse(response);
 }
 
-export async function process_genslides(project_folder: string) {
+export async function process_genslides(uuid: string) {
 	const response = await fetch(`${PYTHON_URL}/process_genslides`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ project_folder }),
-		dispatcher: new Agent({ headersTimeout: 3600000 })
+		body: JSON.stringify({ uuid }),
+		dispatcher: new Agent({ headersTimeout: PROCESS_TIMEOUT })
 	});
 	return processResponse(response);
 }
