@@ -1,35 +1,59 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
-	import { Button, Modal, Textarea } from 'flowbite-svelte';
+	import { Button, Modal, Textarea, Checkbox } from 'flowbite-svelte';
 	import { ExclamationCircleOutline, FileCheckSolid, PlusSolid } from 'flowbite-svelte-icons';
 
 	export let data;
-
-	let slidesData = data.data;
-	let saved: boolean = true;
-	let backModal: boolean = false;
-	let dirty: boolean = false;
-	let slideGroups: {squashed: boolean, values: [number, PrismaSlidesData][]}[];
-	let numSlides = 0;
-
-	if (data.hasSlides) {
+	
+	const groupSlides = (slidesData: PrismaSlidesData[]) => {
+		let index = 0;
 		slideGroups = slidesData.reduce(
 			(curr: {squashed: boolean, values: [number, PrismaSlidesData][]}[], val: PrismaSlidesData) => {
 				let group = curr.length ? curr[curr.length - 1] : undefined;
 				numSlides += val.squashed ? 0 : 1;
-				const currSlideNo = val.squashed ? -1 : numSlides;
+				const currSlideNo = val.squashed ? index : numSlides;
 				if (group && group.squashed === val.squashed) {
 					group.values.push([currSlideNo, val]);
 				} else {
 					curr.push({ squashed: val.squashed, values: [[currSlideNo, val]] });
 				}
+				
+				if (val.squashed) {
+					hiddenSlidesToAddBack.set(index, false);
+				}
+				index++;
 				return curr;
 			}, 
 			[]
-		)
+			);
+		}
+		
+	let backModal: boolean = false;
+	let addHiddenSlidesModal: boolean = false;
+	let squashedSlides: [number, PrismaSlidesData][];
+	let hiddenSlidesToAddBack: Map<number, boolean> = new Map();
+	
+	let slidesData = data.data;
+	let saved: boolean = true;
+	let dirty: boolean = false;
+	let slideGroups: {squashed: boolean, values: [number, PrismaSlidesData][]}[];
+	let numSlides = 0;
 
-		console.log(slideGroups)
+	if (data.hasSlides) {
+		groupSlides(slidesData);
+	}
+
+	const addHiddenSlides = () => {
+		hiddenSlidesToAddBack.forEach((value, index) => {
+			if (value) {
+				slidesData[index].squashed = false;
+			}
+		})
+		hiddenSlidesToAddBack.clear();
+		numSlides = 0;
+		saved = false;
+		groupSlides(slidesData);
 	}
 
 	async function save() {
@@ -85,8 +109,31 @@
 		<h3 class="mb-5 text-lg text-gray-500 dark:text-gray-400">
 			Are you sure you want to go back? Your changes will not be saved.
 		</h3>
-		<Button color="red" class="me-2" href={`projects/${data.id}`}>Yes, I'm sure</Button>
+		<Button color="red" class="me-2" href={`../projects/${data.id}`}>Yes, I'm sure</Button>
 		<Button color="alternative">No, cancel</Button>
+	</div>
+</Modal>
+
+<Modal bind:open={addHiddenSlidesModal} autoclose size="lg">
+	<div class="text-center">
+		<h1 class="mb-5 text-xl font-bold dark:text-white">Select which slides you want to add back.</h1>
+		<div class="flex flex-col justify-center items-center">
+			{#key squashedSlides}
+				{#each squashedSlides as [ slideIndex, slideData ], index}
+					<Checkbox custom on:change={() => {
+						const value = hiddenSlidesToAddBack.get(slideIndex);
+						hiddenSlidesToAddBack.set(slideIndex, value !== undefined ? !value : true);
+					}}>
+						<img 
+							class="m-5 h-72 rounded-xl outline outline-4 outline-transparent shadow-md shadow-black cursor-pointer peer-checked:outline-blue-500"
+							src={slideData.slide}
+							alt="Squashed Slide {index + 1}"
+						>
+					</Checkbox>
+				{/each}
+			{/key}
+		</div>
+		<Button color="green" on:click={addHiddenSlides}>Add hidden slides</Button>
 	</div>
 </Modal>
 
@@ -97,7 +144,10 @@
 		{#each slideGroups as { squashed, values }}
 			{#if squashed}
 				<div class="flex">
-					<Button pill class="!p-2" color="dark" on:click={() => {}}><PlusSolid class="w-4 h-4" /></Button>
+					<Button pill class="!p-2" color="dark" on:click={() => {
+						squashedSlides = values;
+						addHiddenSlidesModal = true;
+					}}><PlusSolid class="w-4 h-4" /></Button>
 					<div class="w-full">
 						<p class="text-center overflow-hidden before:ml-0 before:h-0.5 after:h-0.5 after:bg-black 
 						after:inline-block after:relative after:align-middle after:w-2/5
