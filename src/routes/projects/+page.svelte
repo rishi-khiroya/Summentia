@@ -23,6 +23,10 @@
 		(project) => project.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
 	);
 
+	function isSummarised(project): boolean{
+		return project.status == "SUMMARISED"
+	}
+
 	let pages = Array.from(
 		{
 			length: NO_PAGES
@@ -82,7 +86,9 @@
 					<TableBodyCell>
 						{item.status[0].toUpperCase() + item.status.substring(1).toLowerCase()}
 					</TableBodyCell>
+					
 					<TableBodyCell>
+						{#if isSummarised(item)}
 						<div class="flex flex-row space-x-5">
 							<button class="hover:cursor-pointer" on:click={() => goto(`/projects/${item.id}`)}>
 								<EyeOutline size="lg" id="view" />
@@ -103,7 +109,9 @@
 								<Tooltip triggeredBy="#download">Download Project</Tooltip>
 							</button>
 						</div>
+						{/if}
 					</TableBodyCell>
+					
 				</TableBodyRow>
 			{/each}
 		</TableBody>
