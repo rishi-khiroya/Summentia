@@ -53,7 +53,7 @@ export const actions = {
 		const data = form.get('lecture')?.toString();
 		if (!data) return { success: false, error: 'Invalid Form: No lecture found.' };
 
-		const genSlides = Boolean(form.get('genSlides')?.toString() ?? 'false');
+		const genSlides = form.get('genSlides') === 'true';
 
 		const project: Project = await Project.from(JSON.parse(data), genSlides);
 

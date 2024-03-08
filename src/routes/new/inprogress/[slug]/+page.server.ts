@@ -103,6 +103,7 @@ export const actions = {
 					data: {
 						data,
 						waiting: true,
+						hasSlides: true,
 						status: 'TRANSCRIBED'
 					}
 				});

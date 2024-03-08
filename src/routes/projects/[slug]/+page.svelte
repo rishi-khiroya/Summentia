@@ -145,7 +145,7 @@
 					</div>
 					<InformationBox title="Transcript:" maxHeight="72" additionalAttributes="flex-1">
 						<!-- <p>{slideData[slideNo].transcripts.reduce((a, b) => a + ' ' + b, '')}</p> -->
-						<p>{slideData[slideNo].transcripts}</p>
+						<!-- <p>{slideData[slideNo].transcripts.reduce((a, b) => a + ' ' + b, '')}</p> -->
 					</InformationBox>
 				</div>
 				<div class="flex">
