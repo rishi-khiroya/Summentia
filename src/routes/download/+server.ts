@@ -1,6 +1,7 @@
 import { PATH_TO_DATA } from '$env/static/private';
 import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
-import { check_exists, upload } from '$lib/object_storage/upload';
+import { upload } from '$lib/object_storage/upload';
+import { check_exists } from '$lib/object_storage/helper.js';
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
 import { prisma } from '$lib/server/prisma';
@@ -54,9 +55,9 @@ export async function POST({ request, locals }) {
 		const latexBody = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
-				const finalSummary = '';
-				slideData.summaries.forEach((summary) => finalSummary.concat(summary));
-				return finalSummary;
+				
+				return slideData.summaries.reduce((a, b) => a + " " + b, "");
+				
 			})
 		);
 		latexCode = addToTemplate(data.title, session?.user.name ?? '', latexBody);
@@ -69,7 +70,7 @@ export async function POST({ request, locals }) {
 	}
 
 	// format the code according to the customisations
-	latexCode = (await format(latexCode, customisations)) ?? latexCode;
+	//latexCode = (await format(latexCode, customisations)) ?? latexCode;
 
 	const destination = `${uuid}/summaries/${filename}.${type}`;
 	const does_it_exist = await check_exists(destination);
