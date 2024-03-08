@@ -4,7 +4,7 @@ import {
 	AUTH0_SECRET,
 	AUTH0_CLIENT_SECRET
 } from '$env/static/private';
-import { prisma } from '$lib/server/prisma';
+import prisma from '$lib/server/prisma';
 import type { Adapter } from '@auth/core/adapters';
 import { SvelteKitAuth } from '@auth/sveltekit';
 import Auth0 from '@auth/sveltekit/providers/auth0';

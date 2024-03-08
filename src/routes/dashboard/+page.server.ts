@@ -1,7 +1,7 @@
 import type { Session } from '@auth/core/types';
 import type { PageServerLoad } from '../$types';
 import { redirect } from '@sveltejs/kit';
-import { prisma } from '$lib/server/prisma';
+import prisma from '$lib/server/prisma';
 import type { Project } from '@prisma/client';
 import { OutputType, output } from '$lib/server/output_engine';
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';

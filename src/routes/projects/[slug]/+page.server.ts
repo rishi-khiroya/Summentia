@@ -1,7 +1,7 @@
 import type { Session } from '@auth/core/types';
 import type { PageServerLoad } from '../../$types';
 import { redirect, error } from '@sveltejs/kit';
-import { prisma } from '$lib/server/prisma';
+import prisma from '$lib/server/prisma';
 import type { Project } from '@prisma/client';
 
 export const load: PageServerLoad = async (event) => {

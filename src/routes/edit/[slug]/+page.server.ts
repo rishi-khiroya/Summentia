@@ -1,4 +1,4 @@
-import { prisma } from "$lib/server/prisma";
+import prisma from "$lib/server/prisma";
 import { error, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import type { Session } from "@auth/core/types";
