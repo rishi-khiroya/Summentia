@@ -1,6 +1,6 @@
 import { PATH_TO_DATA } from '$env/static/private';
 import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
-import { upload } from '$lib/object_storage/upload';
+import { check_exists, upload } from '$lib/object_storage/upload';
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
 import { prisma } from '$lib/server/prisma';
@@ -24,8 +24,8 @@ export async function POST({ request, locals }) {
 
 	const jsonCustomisation = JSON.parse(customisation);
 
-	console.log("Customisations: " + customisation);
-	console.log("Json Customisations: " + jsonCustomisation);
+	console.log('Customisations: ' + customisation);
+	console.log('Json Customisations: ' + jsonCustomisation);
 	// @ts-expect-error: Use of unsafe enum acccss.
 	const outputType: OutputType = OutputType[type.toUpperCase()];
 	console.log(`Output Type = ${outputType}`);
@@ -53,7 +53,7 @@ export async function POST({ request, locals }) {
 		const latexBody = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
-				const finalSummary = "";
+				const finalSummary = '';
 				slideData.summaries.forEach((summary) => finalSummary.concat(summary));
 				return finalSummary;
 			})
@@ -68,23 +68,26 @@ export async function POST({ request, locals }) {
 	}
 
 	// format the code according to the customisations
-	latexCode = (await format(latexCode, jsonCustomisation))??latexCode;
-
-	const filepath = path.join(PATH_TO_DATA, filename);
-	console.log(`Outputting to ${filepath}`);
-	await output(latexCode, filepath, outputType);
-
-	console.log(`Output to ${filepath}`);
+	latexCode = (await format(latexCode, jsonCustomisation)) ?? latexCode;
 
 	const destination = `${uuid}/summaries/${filename}.${type}`;
-	console.log(`Uploading ${filepath}.${type} to S3: ${destination}.`);
-	await upload(`${filepath}.${type}`, destination);
+	const does_it_exist = await check_exists(destination);
 
-	console.log(`Uploaded to S3.`);
+	if (!does_it_exist) {
+		const filepath = path.join(PATH_TO_DATA, filename);
+		console.log(`Outputting to ${filepath}`);
+		await output(latexCode, filepath, outputType);
 
-	// has to sleep as the link does not become available to use immediately
-	await new Promise((resolve) => setTimeout(resolve, 500));
-	unlinkSync(`${filepath}.${type}`);
+		console.log(`Output to ${filepath}`);
 
+		console.log(`Uploading ${filepath}.${type} to S3: ${destination}.`);
+		await upload(`${filepath}.${type}`, destination);
+
+		console.log(`Uploaded to S3.`);
+
+		// has to sleep as the link does not become available to use immediately
+		await new Promise((resolve) => setTimeout(resolve, 500));
+		unlinkSync(`${filepath}.${type}`);
+	}
 	return json({ success: true });
 }
