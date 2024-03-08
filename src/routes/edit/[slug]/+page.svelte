@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
-	import { Button, Modal, Textarea, Checkbox } from 'flowbite-svelte';
+	import { Button, Modal, Textarea, Checkbox, Alert } from 'flowbite-svelte';
 	import { ExclamationCircleOutline, FileCheckSolid, PlusSolid } from 'flowbite-svelte-icons';
 
 	export let data;
@@ -99,6 +99,7 @@
 		});
 
 		if (response.ok) saved = true;
+		alert("The change is saved")
 		// TODO: trigger toast
 	}
 
