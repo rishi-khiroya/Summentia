@@ -5,12 +5,15 @@
 		EditSolid,
 		DownloadSolid,
 		ChevronLeftOutline,
-		ChevronRightOutline
+		ChevronRightOutline,
+		CreditCardOutline
 	} from 'flowbite-svelte-icons';
 	import { ButtonGroup, Button, Pagination, Video } from 'flowbite-svelte';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 	import DownloadModal from '../../DownloadModal.svelte';
 	import type { Customisation } from '$lib/types/Customisation';
+	import { formResponseToJSON } from '$lib/utils';
+
 
 	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
 		let basicData: PrismaBasicData;
@@ -67,6 +70,10 @@
 	const changeView = () => {
 		displaySlides = !displaySlides;
 	};
+	
+	async function handleFlashCards() {
+		goto(`/flashcards/${data.project.id}`)
+	};
 
 	const previous = () => {
 		const params = new URLSearchParams(window.location.search);
@@ -94,6 +101,8 @@
 	function edit() {
 		goto(`/edit/${data.project.id}`);
 	}
+
+	
 </script>
 
 <!--  the filename will be stored in the S3 storage with the format title_id -->
@@ -112,6 +121,10 @@
 					<Button pill color="dark" on:click={() => (showDownloadModal = true)}>
 						<DownloadSolid class="me-2 focus:!outline-none" />
 						Download
+					</Button>
+					<Button pill color="dark" on:click={() => handleFlashCards()}>
+						<CreditCardOutline class="me-2 focus:!outline-none"/>
+						Generate Flash Cards
 					</Button>
 				</ButtonGroup>
 			</div>
@@ -132,7 +145,9 @@
 						/>
 					</div>
 					<InformationBox title="Transcript:" maxHeight="72" additionalAttributes="flex-1">
-						<p>{slideData[slideNo].transcript}</p>
+						<p>{
+							slideData[slideNo].transcripts.reduce((a, b) => a + " " + b, "")
+							}</p>
 					</InformationBox>
 				</div>
 				<div class="flex">
@@ -144,7 +159,9 @@
 						/>
 					</div>
 					<InformationBox title="Summary:" maxHeight="72" additionalAttributes="flex-1">
-						<p>{slideData[slideNo].summary}</p>
+						<p>{
+							slideData[slideNo].summaries.reduce((a, b) => a + " " + b, "")
+						}</p>
 					</InformationBox>
 				</div>
 			</div>
