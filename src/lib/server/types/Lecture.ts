@@ -160,24 +160,16 @@ class VideoFromUrl extends Video {
 	private readonly handler: VideoURLHandler;
 
 	static from(url: URL): VideoFromUrl {
-		return new VideoFromUrl(VideoURLHandler.create(url));
+		const uuid: string = randomUUID();
+		return new VideoFromUrl(VideoURLHandler.create(url), uuid);
 	}
 
-	private constructor(urlHandler: VideoURLHandler) {
-		super(urlHandler.download().name);
+	private constructor(urlHandler: VideoURLHandler, uuid: string) {
+		super(urlHandler.download(uuid).name);
 		this.handler = urlHandler;
 	}
 
 	public getTitleDate(): Promise<{ title: string; date: string }> {
 		return this.handler.getTitleDate();
 	}
-
-	// public async toFilePath(): Promise<string> {
-	// 	this.urlHandler.download();
-	// 	return this.video;
-	// }
-
-	// public saveToUrl(): URL {
-	//     throw new Error("Method not implemented.");
-	// }
 }

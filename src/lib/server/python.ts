@@ -23,7 +23,7 @@ export async function process_noslides(project_folder: string): Promise<string> 
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ project_folder }),
-		dispatcher: new Agent({ headersTimeout: 3600000 })
+		dispatcher: new Agent({ headersTimeout: 7200000 })
 	});
 	const transcript = await response.text();
 	return transcript;
@@ -34,7 +34,7 @@ export async function process_slides(project_folder: string) {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ project_folder }),
-		dispatcher: new Agent({ headersTimeout: 3600000 })
+		dispatcher: new Agent({ headersTimeout: 7200000 })
 	});
 	return processResponse(response);
 }
@@ -44,7 +44,7 @@ export async function process_genslides(project_folder: string) {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ project_folder }),
-		dispatcher: new Agent({ headersTimeout: 3600000 })
+		dispatcher: new Agent({ headersTimeout: 7200000 })
 	});
 	return processResponse(response);
 }

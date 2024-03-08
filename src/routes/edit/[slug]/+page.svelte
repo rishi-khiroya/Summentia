@@ -45,7 +45,9 @@
 
 	let slidesData;
 
+	// console.log(data);
 	if (data.hasSlides) {
+		console.log(data.data);
 		slidesData = data.data.map((slide) => {
 			return {
 				slide: slide.slide,
@@ -57,6 +59,7 @@
 				transcripts: slide.transcripts
 			};
 		});
+		console.log(`post: ${slidesData}`);
 		groupSlides(slidesData);
 	}
 
@@ -208,7 +211,7 @@
 							<Textarea
 								rows="13"
 								cols="100"
-								bind:value={slidesData[slideNo - 1].summaries}
+								bind:value={slideData.summaries}
 								on:change={() => (saved = false)}
 							/>
 						</div>

@@ -3,7 +3,6 @@
 	import { reformat_date } from '$lib/utils.js';
 	import {
 		Button,
-		Hr,
 		Table,
 		TableBody,
 		TableBodyCell,

@@ -1,3 +1,8 @@
+import { PATH_TO_DATA } from '$env/static/private';
+import { createWriteStream } from 'node:fs';
+import path from 'node:path';
+import ytdl from 'ytdl-core';
+
 export abstract class VideoURLHandler {
 	url: URL;
 
@@ -5,43 +10,41 @@ export abstract class VideoURLHandler {
 		this.url = url;
 	}
 
-	public abstract download(): File;
+	public abstract download(uuid: string): Promise<void>;
 
 	static create(url: URL): VideoURLHandler {
 		const name = url.hostname.replaceAll('.', '');
 
 		if (name.includes('youtube')) return new YoutubeHandler(url);
-		if (name.includes('panopto')) return new PanoptoHandler(url);
 		return new UnknownHandler(url);
 	}
 
 	public abstract getTitleDate(): Promise<{ title: string; date: string }>;
-
 }
 
 class UnknownHandler extends VideoURLHandler {
-	public getTitleDate(): Promise<{ title: string; date: string; }> {
-		throw new Error("Method not implemented.");
+	public getTitleDate(): Promise<{ title: string; date: string }> {
+		throw new Error('Method not implemented.');
 	}
-	public download(): File {
+	public download(uuid: string): Promise<void> {
 		throw new Error('Method not implemented.');
 	}
 }
 
 class YoutubeHandler extends VideoURLHandler {
-	public getTitleDate(): Promise<{ title: string; date: string; }> {
-		throw new Error("Method not implemented.");
-	}
-	public download(): File {
+	public getTitleDate(): Promise<{ title: string; date: string }> {
 		throw new Error('Method not implemented.');
 	}
-}
-
-class PanoptoHandler extends VideoURLHandler {
-	public getTitleDate(): Promise<{ title: string; date: string; }> {
-		throw new Error("Method not implemented.");
-	}
-	public download(): File {
-		throw new Error('Method not implemented.');
+	public async download(uuid: string): Promise<void> {
+		const info = await ytdl.getInfo(this.url.toString());
+		const options = ytdl.filterFormats(info.formats, 'audioandvideo');
+		if (options.length) {
+			await new Promise((resolve) => {
+				ytdl
+					.downloadFromInfo(info, { quality: options[0].itag })
+					.pipe(createWriteStream(`${path.join(PATH_TO_DATA, uuid, 'video.mp4')}`))
+					.on('close', resolve);
+			});
+		}
 	}
 }
