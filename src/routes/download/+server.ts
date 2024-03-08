@@ -1,6 +1,7 @@
 import { PATH_TO_DATA } from '$env/static/private';
 import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
-import { check_exists, upload } from '$lib/object_storage/upload';
+import { upload } from '$lib/object_storage/upload';
+import { check_exists } from '$lib/object_storage/helper.js';
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
 import { prisma } from '$lib/server/prisma';
