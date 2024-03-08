@@ -43,12 +43,14 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	const summary = completion.choices[0]['message']['content'];
 
-	console.log('Prompt : ');
-	console.log(prompt);
-	console.log('Customised Code : ');
-	console.log(summary);
+	let latex_code: string = "";
+	if (summary != null && summary.includes("\\documentclass{article}")){
+		latex_code  = "\\documentclass{article}" + ((summary.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
+	} else if (summary != null && summary.includes("\\begin{document}")){
+		latex_code  = "\\begin{document}" + ((summary.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
+	}
 
-	return summary;
+	return latex_code;
 }
 
 export async function generateFlashCards(summary: string){
