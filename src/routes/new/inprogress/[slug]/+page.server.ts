@@ -92,16 +92,17 @@ export const actions = {
 
 				console.log('Received from back-end.');
 
-				const data = response.data;
+				const data = JSON.parse(JSON.stringify(response.data));
+				console.log(data);
 
-				if (!response.success) {
+				if (!response.success || !data) {
 					error(400, data.toString());
 				}
 
 				record = await prisma.project.update({
 					where: { id: project.id },
 					data: {
-						data,
+						data: Object.values(data),
 						waiting: true,
 						hasSlides: true,
 						status: 'TRANSCRIBED'
@@ -150,19 +151,24 @@ export const actions = {
 				let data;
 				if (project.hasSlides) {
 					const slidesData: PrismaSlidesData[] = project.data as PrismaSlidesData[];
-					slidesData.forEach(async (slideData) => {
-						const summaries: string[] = [];
-						slideData.transcripts.forEach(async (transcript) => {
-							const summary: string | null = await summarise(
-								transcript,
-								project.customisation.summaryLevel - 1
+					await Promise.all(
+						slidesData.map(async (slideData) => {
+							const summaries: string[] = [];
+							await Promise.all(
+								slideData.transcripts.map(async (transcript) => {
+									const summary: string | null = await summarise(
+										transcript,
+										project.customisation.summaryLevel - 1
+									);
+									summaries.push(summary ?? '');
+								})
 							);
-							summaries.push(summary ?? '');
-						});
-
-						slideData.summaries = summaries;
-					});
-					data = slidesData.map((data) => JSON.stringify(data));
+							slideData.summaries = summaries;
+							console.log(summaries);
+						})
+					);
+					data = slidesData;
+					console.log(data);
 				} else {
 					const transcript: string = (project.data as PrismaBasicData).transcript;
 					const summary: string | null = await summarise(transcript);
