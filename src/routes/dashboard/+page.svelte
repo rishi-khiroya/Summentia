@@ -18,7 +18,10 @@
 		EyeOutline
 	} from 'flowbite-svelte-icons';
 	import DownloadModal from '../DownloadModal.svelte';
-	import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
+	import { onMount, onDestroy } from "svelte";
+
+  	let PdfViewer;
+
 
 	export let data;
 
@@ -26,11 +29,15 @@
 
 	let showDownloadModal: boolean = false;;
 	let currentProject = projects.filter((item) => {return item.status == "SUMMARISED"})[0];
- 
-	let previewURL =  currentProject ? (`${DIGITAL_OCEAN_ENDPOINT}/${currentProject.uuid}/summaries/${currentProject.title}_${currentProject.id}.pdf`): "";  
-	//previewURL = 'https://summentia-storage.fra1.cdn.digitaloceanspaces.com/fssaf-asda-fsfsa/summaries/Test_2.pdf';
-	previewURL = 'https://summentia-storage.fra1.cdn.digitaloceanspaces.com/summaries/IML%20Lecture%201_13.pdf';
-</script>
+
+	let previewURL = ( `./${currentProject.title}_${currentProject.id}.pdf`);
+
+	onMount(async () => {
+    	const module = await import("svelte-pdf");
+    	PdfViewer = module.default;
+  	});
+
+	</script>
 
 <!--  the filename will be stored in the S3 storage with the format title_id -->
 {#if currentProject}
@@ -41,30 +48,32 @@
 	<h1 class="text-4xl p-10 font-bold dark:text-white">Dashboard</h1>
 	<div class="flex space-x-10 py-5">
 		<div
-			class="flex-1 flex-col bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-5"
+			class="flex-1 flex-col bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl space-y-2 p-2"
 		>
 			<h2 class="text-xl px-2 font-semibold dark:text-white">Your most recent summary:</h2>
 			<!-- FIXME: not null-safe, doesn't work if latest project has slides -->
 			{#if projects.filter((item) => {return item.status === "SUMMARISED"}).length > 0}
+				<!-- <div class="w-[650px]">
+				<svelte:component class="w-[500px]" this={PdfViewer} url={previewURL}/>
+				</div> -->
 				<object
 					title="cdsd"
 					data={previewURL}
 					type="application/pdf"
-					width="500"
-					height="500"
+					width="650"
+					height="650"
 				>
 
 					<iframe
 						title="xcd"
 						src={previewURL}
-						width="500"
-						height="500"
+						width="650"
+						height="650"
 					>
 						<p>This browser does not support PDF!</p>
 					</iframe>
 				</object>
-				
-			{:else}
+				{:else}
 				
 				<h1>You have no recent projects.</h1>
 			{/if}
