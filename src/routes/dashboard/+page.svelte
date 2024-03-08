@@ -30,7 +30,7 @@
 	let showDownloadModal: boolean = false;;
 	let currentProject = projects.filter((item) => {return item.status == "SUMMARISED"})[0];
 
-	let previewURL = ( `./${currentProject.title}_${currentProject.id}.pdf`);
+	let previewURL = currentProject?( `./${currentProject.title}_${currentProject.id}.pdf`):"";
 
 	onMount(async () => {
     	const module = await import("svelte-pdf");
@@ -52,7 +52,7 @@
 		>
 			<h2 class="text-xl px-2 font-semibold dark:text-white">Your most recent summary:</h2>
 			<!-- FIXME: not null-safe, doesn't work if latest project has slides -->
-			{#if projects.filter((item) => {return item.status === "SUMMARISED"}).length > 0}
+			{#if (projects.filter((item) => {return item.status === "SUMMARISED"})) && (projects.filter((item) => {return item.status === "SUMMARISED"}).length > 0) }
 				<!-- <div class="w-[650px]">
 				<svelte:component class="w-[500px]" this={PdfViewer} url={previewURL}/>
 				</div> -->
@@ -83,6 +83,7 @@
 			class="flex flex-col bg-white dark:bg-slate-800 outline-1 outline-transparent shadow-md shadow-black rounded-xl p-10 space-y-3 align-top"
 		>
 			<h2 class="text-xl px-2 font-semibold dark:text-white">Recent Projects:</h2>
+			
 			<Table>
 				<TableHead>
 					<TableHeadCell>Title</TableHeadCell>
@@ -91,6 +92,7 @@
 					<TableHeadCell>Quick Actions</TableHeadCell>
 				</TableHead>
 				<TableBody>
+					
 					{#each projects as item}
 						<TableBodyRow>
 							<TableBodyCell>{item.title}</TableBodyCell>
@@ -98,6 +100,9 @@
 							<TableBodyCell>
 								{item.status[0].toUpperCase() + item.status.substring(1).toLowerCase()}
 							</TableBodyCell>
+							
+								
+							
 							<TableBodyCell>
 								<div class="flex flex-row space-x-5">
 									<button
@@ -123,10 +128,12 @@
 									</button>
 								</div>
 							</TableBodyCell>
+							
 						</TableBodyRow>
 					{/each}
 				</TableBody>
 			</Table>
+		
 			<div class="flex w-full mt-10 justify-end align-bottom">
 				<Button outline color="alternative" href="/projects">
 					All Projects <ArrowRightOutline class="w-3.5 h-3.5 ms-2" />
