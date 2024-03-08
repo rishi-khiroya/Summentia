@@ -95,6 +95,12 @@ export const actions = {
 				const data = response.data;
 
 				if (!response.success) {
+					record = await prisma.project.update({
+						where: { id: project.id },
+						data: {
+							waiting: true
+						}
+					});
 					error(400, data.toString());
 				}
 
