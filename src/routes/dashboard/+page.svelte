@@ -32,6 +32,10 @@
 
 	let previewURL = currentProject?( `./${currentProject.title}_${currentProject.id}.pdf`):"";
 
+	function isSummarised(project): boolean{
+		return project.status == "SUMMARISED"
+	}
+
 	onMount(async () => {
     	const module = await import("svelte-pdf");
     	PdfViewer = module.default;
@@ -102,7 +106,7 @@
 							</TableBodyCell>
 							
 								
-							
+							{#if isSummarised(item)}
 							<TableBodyCell>
 								<div class="flex flex-row space-x-5">
 									<button
@@ -128,7 +132,7 @@
 									</button>
 								</div>
 							</TableBodyCell>
-							
+							{/if}
 						</TableBodyRow>
 					{/each}
 				</TableBody>
