@@ -1,4 +1,5 @@
 import { PATH_TO_DATA } from '$env/static/private';
+import { formatDate } from '$lib/utils';
 import { createWriteStream } from 'node:fs';
 import path from 'node:path';
 import ytdl from 'ytdl-core';
@@ -23,9 +24,13 @@ export abstract class VideoURLHandler {
 }
 
 class UnknownHandler extends VideoURLHandler {
-	public getTitleDate(): Promise<{ title: string; date: string }> {
-		throw new Error('Method not implemented.');
+	public async getTitleDate(): Promise<{ title: string; date: string }> {
+		const info = await ytdl.getInfo(this.url.toString());
+		const title = info['player_response']['videoDetails']['title']
+		const date = formatDate(new Date(info['videoDetails']['publishDate']))
+		return {title, date}
 	}
+
 	public download(uuid: string): Promise<void> {
 		throw new Error('Method not implemented.');
 	}

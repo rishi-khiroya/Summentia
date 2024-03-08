@@ -76,19 +76,19 @@ export const actions = {
 
 		let record;
 
-		console.log(`waiting=${project.waiting}, ${data.waiting}`);
-		console.log(project);
+		// console.log(`waiting=${project.waiting}, ${data.waiting}`);
+		// console.log(project);
 		if (project.waiting) {
 			if (project.status == PrismaProjectStatus.UNPROCESSED) {
 				console.log('Sending request to Python back-end to complete splitting and transcription.');
 
 				await setWaiting(project.id);
-				const projectFolder = path.join(PATH_TO_DATA, project.uuid + '/');
+				const uuid = project.uuid;
 				console.log('project hasSlides = ' + project.hasSlides);
 				const response =
 					project.hasSlides && !!project.slides
-						? await process_slides(projectFolder)
-						: await process_genslides(projectFolder);
+						? await process_slides(uuid)
+						: await process_genslides(uuid);
 
 				console.log('Received from back-end.');
 
@@ -103,6 +103,7 @@ export const actions = {
 					data: {
 						data,
 						waiting: true,
+						hasSlides: true,
 						status: 'TRANSCRIBED'
 					}
 				});
@@ -120,12 +121,10 @@ export const actions = {
 					// const transcript = process_noslides()
 				} else {
 					// const transcript = await transcribe(extlessPath);
-					const lastSlash = project.video.lastIndexOf('/');
-					if (lastSlash == -1) error(503, 'Project video path is corrupt.');
+					const uuid = project.uuid;
+					// if (lastSlash == -1) error(503, 'Project video path is corrupt.');
 
-					const projectFolder = project.video.substring(0, lastSlash);
-
-					const transcript: string = await process_noslides(projectFolder);
+					const transcript: string = await process_noslides(uuid);
 					data = {
 						transcript: transcript ? transcript : 'Unable to transcribe.',
 						summary: ''

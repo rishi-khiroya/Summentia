@@ -8,8 +8,6 @@ import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 import path from 'path';
 import { PATH_TO_DATA } from '$env/static/private';
-import { upload } from '$lib/object_storage/upload';
-import { unlinkSync } from 'fs';
 
 const NO_PROJECTS: number = 5;
 
@@ -41,56 +39,45 @@ export const load: PageServerLoad = async (event) => {
 		}
 	});
 
-	// const summarised_projects = projects.filter((item) => {
-	// 	return item.status == 'SUMMARISED';
-	// });
-	// if (summarised_projects.length > 0) {
-	// 	uploadSummaryToS3(summarised_projects[0]);
-	// }
+	const summarised_projects = projects.filter((item) => {
+		return item.status == 'SUMMARISED';
+	});
+	if (summarised_projects.length > 0) {
+		generateRecentPDF(summarised_projects[0]);
+	}
 	return { noProjects, pageNo, projects };
 };
 
-// async function uploadSummaryToS3(project: any) {
-// 	//upload pdf to the s3
-// 	console.log(project);
-// 	let latexCode = '';
-// 	const filename = `${project.title}_${project.id}`;
-// 	const type = 'pdf';
-// 	const outputType: OutputType = OutputType.PDF;
-// 	const uuid = project.uuid;
+async function generateRecentPDF(project: any) {
+	//upload pdf to the s3
+	console.log(project);
+	let latexCode = '';
+	const filename = `${project.title}_${project.id}`;
+	const outputType: OutputType = OutputType.PDF;
 
-// 	if (project.hasSlides) {
-// 		const slidesData = JSON.parse(JSON.stringify(project.data)) as PrismaSlidesData[];
-// 		const latexBody = getBodyLatexCode(
-// 			slidesData.map((slideData) => slideData.slide),
-// 			slidesData.map((slideData) => {
-// 				const finalSummary = '';
-// 				slideData.summaries.forEach((summary) => finalSummary.concat(summary));
-// 				return finalSummary;
-// 			})
-// 		);
-// 		latexCode = addToTemplate(project.title, '', latexBody);
-// 	} else {
-// 		latexCode = addToTemplate(
-// 			project.title,
-// 			'',
-// 			(JSON.parse(JSON.stringify(project.data)) as PrismaBasicData).summary
-// 		);
-// 	}
+	if (project.hasSlides) {
+		const slidesData = JSON.parse(JSON.stringify(project.data)) as PrismaSlidesData[];
+		const latexBody = getBodyLatexCode(
+			slidesData.map((slideData) => slideData.slide),
+			slidesData.map((slideData) => {
+				if(slideData.summaries){	
+					let finalSummary = '';
+					slideData.summaries.forEach((summary) => {finalSummary = finalSummary + " " + (summary)});
+					return finalSummary;
+				} else { return ""}
+			})
+		);
+		console.log("Latex Body: "+ latexBody);
+		latexCode = addToTemplate(project.title, '', latexBody);
+	} else {
+		latexCode = addToTemplate(
+			project.title,
+			'',
+			(JSON.parse(JSON.stringify(project.data)) as PrismaBasicData).summary
+		);
+	}
 
-// 	const filepath = path.join(PATH_TO_DATA, filename);
-// 	console.log(`Outputting to ${filepath}`);
-// 	await output(latexCode, filepath, outputType);
-
-// 	console.log(`Output to ${filepath}`);
-
-// 	const destination = `${uuid}/summaries/${filename}.${type}`;
-// 	console.log(`Uploading ${filepath}.${type} to S3: ${destination}.`);
-// 	await upload(`${filepath}.${type}`, destination);
-
-// 	console.log(`Uploaded to S3.`);
-
-// 	// has to sleep as the link does not become available to use immediately
-// 	await new Promise((resolve) => setTimeout(resolve, 500));
-// 	unlinkSync(`${filepath}.${type}`);
-// }
+	const filepath = path.join(PATH_TO_DATA, filename);
+	console.log(`Outputting to ${filepath}`);
+	await output(latexCode, filepath, outputType);
+}
