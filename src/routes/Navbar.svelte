@@ -46,7 +46,6 @@
 					</DropdownHeader>
 					<DropdownItem href="/dashboard">Dashboard</DropdownItem>
 					<DropdownItem href="/projects">Projects</DropdownItem>
-					<DropdownItem href="/settings">Settings</DropdownItem>
 					<DropdownDivider />
 					<DropdownItem on:click={() => signOut()}>Sign out</DropdownItem>
 				</Dropdown>

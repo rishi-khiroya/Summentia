@@ -49,10 +49,11 @@
 		slides: string;
 		userId: string;
 		info: { title: string; date: string };
-		customisation: { summaryLevel: number, questions: boolean };
+		customisation: { summaryLevel: number; questions: boolean };
 	};
 
 	let slidesUpload: Upload;
+	let generateSlides: boolean = false;
 
 	// Stop the page from refreshing without confirmation of losing data.
 	function beforeUnload(event: BeforeUnloadEvent): string {
@@ -157,6 +158,7 @@
 		const form: FormData = new FormData();
 
 		form.append('lecture', JSON.stringify(lecture));
+		form.append('genSlides', generateSlides.toString());
 
 		waiting = true;
 
@@ -186,7 +188,7 @@
 			try {
 				return { success: true, msg: undefined };
 			} finally {
-				console.log("Try to redirect.");
+				console.log('Try to redirect.');
 				goto(`/new/inprogress/${responseData.projectId}`);
 			}
 		} else return { success: false, msg: responseData.error };
@@ -208,6 +210,7 @@
 		<FormStep
 			bind:step={steps[0]}
 			bind:currentStep
+			backStatus={data.backStatus}
 			isPopulated={() => (lectureUpload.fromFile ? !!lectureUpload.fileList : !!lectureUpload.url)}
 			submit={() => handleLecture()}
 		>
@@ -219,6 +222,7 @@
 		<FormStep
 			step={steps[1]}
 			bind:currentStep
+			backStatus={data.backStatus}
 			isPopulated={() => (slidesUpload.fromFile ? !!slidesUpload.fileList : !!slidesUpload.url)}
 			submit={() => handleSlides()}
 		>
@@ -230,6 +234,7 @@
 		<FormStep
 			step={steps[2]}
 			bind:currentStep
+			backStatus={data.backStatus}
 			isPopulated={() => !!lecture.info.date && !!lecture.info.title}
 		>
 			<h1 class="text-2xl font-bold dark:text-white">Project Information:</h1>
@@ -259,31 +264,49 @@
 				populated: false
 			}}
 			bind:currentStep
+			backStatus={data.backStatus}
 			submit={() => handleSubmit()}
 		>
 			<h1 class="text-2xl font-bold dark:text-white">Review & Submit:</h1>
 			<div class="flex flex-row justify-between w-full space-x-5">
-				<div class="flex flex-col w-full shadow-md shadow-black outline-1 outline-black p-5 m-5 rounded-xl space-y-5">
+				<div
+					class="flex flex-col w-full shadow-md shadow-black outline-1 outline-black p-5 m-5 rounded-xl space-y-5"
+				>
 					<div class="flex flex-row w-full justify-between mb-5">
 						<h1 class="font-bold text-xl text-clip">{lecture.info.title}</h1>
 						<h1 class="text-lg text-clip">{lecture.info.date}</h1>
 					</div>
+					<!-- TODO: remove full path and only show stem -->
 					<h1 class="text-lg text-clip">Video: {lecture.video}</h1>
-					<h1 class="text-lg text-clip">Slides: {lecture.slides ?? "None"}</h1>
+					<h1 class="text-lg text-clip">Slides: {lecture.slides ?? 'None'}</h1>
 				</div>
 				<div class="flex flex-col w-full m-5 space-y-5">
 					<div class="flex flex-col shadow-md shadow-black outline-1 outline-black p-5 rounded-xl">
 						<Label class="pb-4 text-lg">How detailed should the summary be:</Label>
-						<Range id="range-steps" min="1" max="3" bind:value={lecture.customisation.summaryLevel} step="1" />
+						<Range
+							id="range-steps"
+							min="1"
+							max="3"
+							bind:value={lecture.customisation.summaryLevel}
+							step="1"
+						/>
 						<div class="pt-4 flex w-full justify-between">
-							<h1 class={lecture.customisation.summaryLevel === 1 ? "font-semibold" : ""}>Concise</h1>
-							<h1 class={lecture.customisation.summaryLevel === 3 ? "font-semibold" : ""}>Detailed</h1>
+							<h1 class={lecture.customisation.summaryLevel === 1 ? 'font-semibold' : ''}>
+								Concise
+							</h1>
+							<h1 class={lecture.customisation.summaryLevel === 3 ? 'font-semibold' : ''}>
+								Detailed
+							</h1>
 						</div>
 					</div>
-					<div class="flex flex-row space-x-5 align-middle shadow-md shadow-black outline-1 outline-black p-5 rounded-xl">
-						<Label class="text-lg align-middle">Generate Questions:</Label>
-						<Toggle bind:checked={lecture.customisation.questions}/>
-					</div>
+					{#if !lecture.slides}
+						<div
+							class="flex flex-row space-x-5 align-middle shadow-md shadow-black outline-1 outline-black p-5 rounded-xl"
+						>
+							<Label class="text-lg align-middle">Generate Slides from Video:</Label>
+							<Toggle bind:checked={generateSlides} />
+						</div>
+					{/if}
 				</div>
 			</div>
 			{#if !data.session?.user}

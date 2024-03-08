@@ -76,15 +76,27 @@ export const actions = {
 
 		let record;
 
+		console.log(`waiting=${project.waiting}, ${data.waiting}`);
+		console.log(project);
 		if (project.waiting) {
 			if (project.status == PrismaProjectStatus.UNPROCESSED) {
 				console.log('Sending request to Python back-end to complete splitting and transcription.');
 
 				await setWaiting(project.id);
 				const projectFolder = path.join(PATH_TO_DATA, project.uuid + '/');
-				const data = project.hasSlides
-					? await process_slides(projectFolder)
-					: await process_genslides(projectFolder);
+				console.log('project hasSlides = ' + project.hasSlides);
+				const response =
+					project.hasSlides && !!project.slides
+						? await process_slides(projectFolder)
+						: await process_genslides(projectFolder);
+
+				console.log('Received from back-end.');
+
+				const data = response.data;
+
+				if (!response.success) {
+					error(400, data.toString());
+				}
 
 				record = await prisma.project.update({
 					where: { id: project.id },
@@ -94,8 +106,6 @@ export const actions = {
 						status: 'TRANSCRIBED'
 					}
 				});
-
-				console.log("Received from back-end.");
 			}
 
 			if (project.status == PrismaProjectStatus.SPLIT) {
@@ -170,7 +180,7 @@ export const actions = {
 				});
 				console.log('Finished summarisation.');
 			}
-		}
+		} else return { project: JSON.stringify(project) };
 
 		return {
 			project: JSON.stringify(record)

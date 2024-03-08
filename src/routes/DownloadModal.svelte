@@ -4,7 +4,10 @@
 		DEFAULT_CUSTOMISATION,
 		type Customisation as CustomisationObj
 	} from '$lib/types/Customisation';
-	import { DIGITAL_OCEAN_ENDPOINT, DIGITAL_OCEAN_SUMMARIES_ENDPOINT } from '$lib/object_storage/static';
+	import {
+		DIGITAL_OCEAN_ENDPOINT,
+		DIGITAL_OCEAN_SUMMARIES_ENDPOINT
+	} from '$lib/object_storage/static';
 	import type { Project } from '@prisma/client';
 	import path from 'node:path';
 
@@ -39,8 +42,8 @@
 		});
 
 		if (response.ok) {
-			const url = (`${DIGITAL_OCEAN_ENDPOINT}/${project.uuid}/summaries/${filename}.${outputType}`);
-		//	const url = path.join(DIGITAL_OCEAN_SUMMARIES_ENDPOINT, `${filename}.${outputType}`);
+			const url = `${DIGITAL_OCEAN_ENDPOINT}/${project.uuid}/summaries/${filename}.${outputType}`;
+			//	const url = path.join(DIGITAL_OCEAN_SUMMARIES_ENDPOINT, `${filename}.${outputType}`);
 
 			let link = document.createElement('a');
 
@@ -53,16 +56,6 @@
 <Modal title={sanitiseTitle(project.title)} bind:open autoclose outsideclose class="flex flex-col">
 	<div class="flex flex-col w-full space-y-3">
 		<div>
-			<Label for="number_pages" class="mb-2">Enter max number of pages for the summary</Label>
-			<Input
-				type="number"
-				id="nr-pages"
-				placeholder="1 (default)"
-				bind:value={customisation.length}
-			/>
-		</div>
-		<Checkbox checked={customisation.highlight_keywords}>Highlight Key Words</Checkbox>
-		<div>
 			<Label for="summary-types" class="mb-2">Types of Summary:</Label>
 			<Radio name="type" value={''} bind:group={customisation.summary_format}>Text Format</Radio>
 			<Radio name="type" value={' as bullet points'} bind:group={customisation.summary_format}
@@ -71,6 +64,7 @@
 		</div>
 		<div>
 			<Label for="extra-features" class="mb-2">Extra Features:</Label>
+			<Checkbox checked={customisation.highlight_keywords}>Highlight Key Words</Checkbox>
 			<Checkbox checked={customisation.questions}>Generate Questions and Answers</Checkbox>
 		</div>
 	</div>

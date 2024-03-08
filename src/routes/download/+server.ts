@@ -11,6 +11,7 @@ import { OutputType } from '$lib/server/output_engine';
 import path from 'node:path';
 import { unlinkSync } from 'node:fs';
 import { format } from '$lib/server/formatter';
+import type { Customisation } from '$lib/types/Customisation.js';
 
 export async function POST({ request, locals }) {
 	console.log('Downloading...');
@@ -20,19 +21,16 @@ export async function POST({ request, locals }) {
 	const type = form.get('type')?.toString();
 	const id = form.get('id')?.toString();
 	const uuid = form.get('uuid')?.toString();
-	const customisation = form.get('customisation');
+	const customisation = form.get('customisation')?.toString();
 
-	const jsonCustomisation = JSON.parse(customisation);
-
-	console.log('Customisations: ' + customisation);
-	console.log('Json Customisations: ' + jsonCustomisation);
 	// @ts-expect-error: Use of unsafe enum acccss.
 	const outputType: OutputType = OutputType[type.toUpperCase()];
 	console.log(`Output Type = ${outputType}`);
 
 	const filename = form.get('filename')?.toString();
 
-	if (!id || !type || !filename) error(400, 'Invalid form data.');
+	if (!id || !type || !filename || !customisation) error(400, 'Invalid form data.');
+	// (JSON.parse(JSON.stringify(project.customisation))
 
 	const session: Session | null = await locals.auth();
 	const userId: string | undefined = session?.user.id;
@@ -45,6 +43,9 @@ export async function POST({ request, locals }) {
 	});
 
 	if (!data) error(503, 'No project found');
+
+	const customisations: Customisation = JSON.parse(customisation);
+	console.log(customisations);
 
 	let latexCode = '';
 
@@ -68,7 +69,7 @@ export async function POST({ request, locals }) {
 	}
 
 	// format the code according to the customisations
-	latexCode = (await format(latexCode, jsonCustomisation)) ?? latexCode;
+	latexCode = (await format(latexCode, customisations)) ?? latexCode;
 
 	const destination = `${uuid}/summaries/${filename}.${type}`;
 	const does_it_exist = await check_exists(destination);

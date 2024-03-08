@@ -2,10 +2,14 @@ import type { Session } from '@auth/core/types';
 import type { PageServerLoad } from './$types';
 import { Lecture } from '$lib/server/types/Lecture';
 import { Project } from '$lib/server/types/Project';
+import { handshake } from '$lib/server/python';
 
 export const load: PageServerLoad = async (event) => {
 	const session: Session | null = await event.locals.auth();
-	return { session };
+
+	const backStatus: boolean = await handshake();
+
+	return { session, backStatus };
 };
 
 export const actions = {
@@ -25,11 +29,11 @@ export const actions = {
 
 	addSlides: async ({ request }) => {
 		const form = await request.formData();
-		
+
 		const data = form.get('lecture')?.toString();
 		if (!data) return { success: false, error: 'Invalid Form: No lecture found.' };
 
-				const lecture: Lecture = Lecture.fromJSON(data);
+		const lecture: Lecture = Lecture.fromJSON(data);
 		if (form.get('slidesFromFile') === 'true') {
 			await lecture.withSlidesFromFile(form.get(`slidesFile`) as File);
 		} else {
@@ -49,10 +53,14 @@ export const actions = {
 		const data = form.get('lecture')?.toString();
 		if (!data) return { success: false, error: 'Invalid Form: No lecture found.' };
 
-		const project: Project = await Project.from(JSON.parse(data));
+		const genSlides = Boolean(form.get('genSlides')?.toString() ?? 'false');
+
+		const project: Project = await Project.from(JSON.parse(data), genSlides);
+
+		console.log(`genSlides=${genSlides}`);
 
 		// console.log(project);
-		const id: number | undefined = await project.saveToDB();
+		const id: number | undefined = await project.saveToDB(genSlides);
 
 		// redirect(303, `/new/inprogess/${id}`);
 		return { success: true, projectId: id };

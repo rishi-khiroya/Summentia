@@ -64,7 +64,7 @@
 <DownloadModal bind:open={showDownloadModal} bind:project={currentProject} />
 
 <div class="flex flex-col w-full p-10 space-y-3 justify-center align-top">
-	<h1 class="text-4xl px-10 font-bold">Projects</h1>
+	<h1 class="text-4xl px-10 font-bold dark:text-white">Projects</h1>
 	<TableSearch placeholder="Search by project title" hoverable={true} bind:inputValue={searchTerm}>
 		<TableHead>
 			<TableHeadCell>Title</TableHeadCell>

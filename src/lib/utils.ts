@@ -3,6 +3,8 @@ import moment from 'moment';
 export function formResponseToJSON(response: string) {
 	const data = JSON.parse(response);
 
+	// console.log("data: " + data);
+
 	const process = (object: object) => {
 		const map = new Map();
 		for (const [key, value] of Object.entries(object)) {
