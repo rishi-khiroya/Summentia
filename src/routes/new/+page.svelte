@@ -84,6 +84,7 @@
 		if (!response.ok) {
 			waiting = false;
 			console.log(response.statusText);
+			alert(response.statusText);
 			return { success: false, msg: response.statusText };
 		}
 
@@ -104,12 +105,17 @@
 		if (responseData.success) {
 			lecture = JSON.parse(responseData.lecture.toString());
 			return { success: true, msg: undefined };
-		} else return { success: false, msg: responseData.error };
+		} else {
+			alert(responseData.error);
+			return { success: false, msg: responseData.error }
+		};
 	}
 
 	async function handleSlides(): Promise<{ success: boolean; msg: string | undefined }> {
-		if (slidesUpload.fromFile ? !slidesUpload.fileList : !slidesUpload.url)
+		if (slidesUpload.fromFile ? !slidesUpload.fileList : !slidesUpload.url){
+			alert("Error: 'submit' should not have been called for a skip.");
 			return { success: false, msg: "Error: 'submit' should not have been called for a skip." };
+		}
 
 		const form: FormData = new FormData();
 
@@ -131,6 +137,7 @@
 		if (!response.ok) {
 			waiting = false;
 			console.log(response.statusText);
+			alert(response.statusText);
 			return { success: false, msg: response.statusText };
 		}
 
@@ -151,7 +158,10 @@
 		if (responseData.success) {
 			lecture = JSON.parse(responseData.lecture.toString());
 			return { success: true, msg: undefined };
-		} else return { success: false, msg: responseData.error };
+		} else {
+			alert(responseData.error);
+			return { success: false, msg: responseData.error }
+		};
 	}
 
 	async function handleSubmit(): Promise<{ success: boolean; msg: string | undefined }> {
@@ -170,6 +180,7 @@
 		if (!response.ok) {
 			waiting = false;
 			console.log(response.statusText);
+			alert(response.statusText);
 			return { success: false, msg: response.statusText };
 		}
 
@@ -191,11 +202,15 @@
 				console.log('Try to redirect.');
 				goto(`/new/inprogress/${responseData.projectId}`);
 			}
-		} else return { success: false, msg: responseData.error };
+		} else {
+			alert(responseData.error);
+			return { success: false, msg: responseData.error }
+		};
 	}
 </script>
 
 <svelte:window on:beforeunload={beforeUnload} />
+
 
 <div class="flex flex-col w-full p-5 m-10 bg-white dark:bg-slate-800 shadow-xl rounded-2xl">
 	<ProgressIndicator bind:currentStep bind:steps bind:waiting />
