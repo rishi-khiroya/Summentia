@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { reformat_date } from '$lib/utils.js';
 	import {
 		Button,
@@ -9,16 +9,22 @@
 		TableBodyRow,
 		TableHead,
 		TableHeadCell,
-		Tooltip
+		Tooltip,
+		Modal, 
+		Textarea, 
+		Checkbox, 
+		Alert
 	} from 'flowbite-svelte';
 	import {
 		ArrowRightOutline,
 		DownloadOutline,
 		EditOutline,
-		EyeOutline
+		EyeOutline,
+		TrashBinOutline
 	} from 'flowbite-svelte-icons';
 	import DownloadModal from '../DownloadModal.svelte';
 	import { onMount, onDestroy } from "svelte";
+	import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
 
   	let PdfViewer;
 
@@ -36,10 +42,23 @@
 		return project.status == "SUMMARISED"
 	}
 
+	async function deleteProject(item){
+		const form = new FormData();
+		console.log(item.id)
+		form.append('id', item.id)
+		await fetch('?/delete', {
+			method: 'POST',
+			body: form
+		})
+		invalidateAll()
+	}
+
 	onMount(async () => {
     	const module = await import("svelte-pdf");
     	PdfViewer = module.default;
   	});
+
+	let showDeleteModal: [boolean, any] = [false, null];
 
 	</script>
 
@@ -47,6 +66,17 @@
 {#if currentProject}
 	<DownloadModal bind:open={showDownloadModal} bind:project={currentProject} />
 {/if}
+
+<Modal bind:open={showDeleteModal[0]} size="xs"  autoclose>
+	<div class="text-center" id="deletemodal">
+		<ExclamationCircleOutline class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" />
+		<h3 class="mb-5 text-lg text-gray-500 dark:text-gray-400">
+			Are you sure you want to delete this project?
+		</h3>
+		<Button color="red" on:click={() => deleteProject(showDeleteModal[1])}>Yes, I'm sure</Button>
+		<Button color="alternative">No, cancel</Button>
+	</div>
+</Modal>
 
 <div class="flex flex-col p-10">
 	<h1 class="text-4xl p-10 font-bold dark:text-white">Dashboard</h1>
@@ -129,6 +159,10 @@
 									>
 										<DownloadOutline size="lg" id="download" />
 										<Tooltip triggeredBy="#download">Download Project</Tooltip>
+									</button>
+									<button class="hover:cursor-pointer" on:click={() => {showDeleteModal = [true, item]}}>
+										<TrashBinOutline size="lg" id="delete" />
+										<Tooltip triggeredBy="#delete">Delete Project</Tooltip>
 									</button>
 								</div>
 							</TableBodyCell>

@@ -8,6 +8,7 @@ import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 import path from 'path';
 import { PATH_TO_DATA } from '$env/static/private';
+import { removeFromDB } from '$lib/server/types/Project';
 
 const NO_PROJECTS: number = 5;
 
@@ -47,6 +48,15 @@ export const load: PageServerLoad = async (event) => {
 	}
 	return { noProjects, pageNo, projects };
 };
+
+export const actions = {
+	delete: async ({request}) => {
+		const form = await request.formData();
+		const id = Number(form.get('id').toString());
+		await removeFromDB(id)
+		console.log("finished delete")
+	}
+}
 
 async function generateRecentPDF(project: any) {
 	//upload pdf to the s3

@@ -2,6 +2,7 @@ import type { Session } from '@auth/core/types';
 import type { PageServerLoad } from '../$types';
 import { redirect } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
+import { removeFromDB } from '$lib/server/types/Project';
 import type { Project } from '@prisma/client';
 
 const ITEMS_PER_PAGE: number = 10;
@@ -39,3 +40,12 @@ export const load: PageServerLoad = async (event) => {
 
 	return { noProjects, pageNo, projects };
 };
+
+export const actions = {
+	delete: async ({request}) => {
+		const form = await request.formData();
+		const id = Number(form.get('id').toString());
+		await removeFromDB(id)
+		console.log("finished delete")
+	}
+}
