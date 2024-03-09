@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 //import {Transcript} from "../src/lib/transcript";
-import { transcribe } from '../src/lib/transcriber';
+import { transcribe } from '../src/lib/server/transcriber';
 
 test('able to split video from audio', async () => {
 	const transcript = await transcribe('./static/test_longer');

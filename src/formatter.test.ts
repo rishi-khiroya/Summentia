@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { format } from '../src/lib/formatter';
+import { format } from '../src/lib/server/formatter';
 
 const lecture1_latex: string = `\\documentclass{article}
 \\usepackage[utf8]{inputenc}

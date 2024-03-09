@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { summarise } from '../src/lib/summariser';
+import { summarise } from '../src/lib/server/summariser';
 
 const lecture1: string = `I'm Preesha Gehlot, currently in my third year studying Computing at Imperial College London. Nestled near Chelsea in the heart of London, I'm deeply engaged in a captivating software engineering project focused on the auto summarization of lectures. 
 This endeavor allows me to blend my passion for technology with the dynamic world of education. Within my academic journey, I've found particular joy in exploring the intricacies of data processing, concurrency, and compilers. These modules have not only broadened my understanding but also fueled my curiosity for 
