@@ -77,9 +77,10 @@
 
 	async function save() {
 		const form: FormData = new FormData();
-
+		console.log("saving data")
 		// Add userId to the form
 		if (data.session) form.append('userId', data.session.user.id);
+		console.log("data", data.data)
 
 		form.append('hasSlides', data.hasSlides.toString());
 		if (data.hasSlides) {
@@ -88,7 +89,7 @@
 				form.append('data', JSON.stringify(data));
 			});
 		} else {
-			form.append('data', JSON.stringify(slidesData));
+			form.append('data', JSON.stringify(data.data));
 		}
 
 		form.append('id', data.id.toString());
@@ -238,7 +239,7 @@
 <div class="fixed bottom-0 left-0 p-5">
 	<Button color="red" size="xl" on:click={() => back()}>Back</Button>
 
-	<Button color="green" size="xl" on:click={() => save()}>
+	<Button color="green" size="xl" on:click={() => {save()}}>
 		Save
 		<FileCheckSolid />
 	</Button>
