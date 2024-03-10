@@ -12,7 +12,7 @@ export async function format(transcript_code: string, customisations: Customisat
 	if (customisations.highlight_keywords) {
 
 		const prompt =
-		'Give me this LaTeX code with highlighted keywords : ' +
+		'Give me this LaTeX code and make the keywords bold : ' +
 		transcript_code;
 
 		const completion = await openai.chat.completions.create({
@@ -26,7 +26,7 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	if (customisations.questions) {
 		const prompt =
-		'Plase give me this LaTeX code with a revision question answer section at the end: ' +
+		'Please give me this LaTeX code with a revision question answer section at the end: ' +
 		code_in_progress;
 
 		const completion = await openai.chat.completions.create({
@@ -39,7 +39,7 @@ export async function format(transcript_code: string, customisations: Customisat
 	}
 
 	const prompt =
-		'Plase give me this LaTeX code, ' +
+		'Please give me this LaTeX code, ' +
 		customisations.summary_format + ' :' +
 		code_in_progress;
 
