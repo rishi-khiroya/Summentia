@@ -8,6 +8,7 @@ import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 import path from 'path';
 import { PATH_TO_DATA } from '$env/static/private';
+import { sanitise_filename } from '$lib/utils';
 
 const NO_PROJECTS: number = 5;
 
@@ -42,29 +43,30 @@ export const load: PageServerLoad = async (event) => {
 	const summarised_projects = projects.filter((item) => {
 		return item.status == 'SUMMARISED';
 	});
+	let sanitised_filename = "Summary";
 	if (summarised_projects.length > 0) {
-		generateRecentPDF(summarised_projects[0]);
+		sanitised_filename = sanitise_filename(summarised_projects[0].title);
+		generateRecentPDF(summarised_projects[0], sanitised_filename);
 	}
-	return { noProjects, pageNo, projects };
+	return { noProjects, pageNo, projects, sanitised_filename };
 };
 
-async function generateRecentPDF(project: any) {
+async function generateRecentPDF(project: any, filename: string) {
 	//upload pdf to the s3
-	console.log(project);
 	let latexCode = '';
-	const filename = `${project.title}_${project.id}`;
 	const outputType: OutputType = OutputType.PDF;
+
+	let backupSummaryCode = '';
+	let backupLatexCode = '';
 
 	if (project.hasSlides) {
 		const slidesData = JSON.parse(JSON.stringify(project.data)) as PrismaSlidesData[];
 		const latexBody = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
-				if(slideData.summaries){	
-					let finalSummary = '';
-					slideData.summaries.forEach((summary) => {finalSummary = finalSummary + " " + (summary)});
-					return finalSummary;
-				} else { return ""}
+				const slideSummary = slideData.summaries.reduce((a, b) => a + " " + b, "");
+				backupSummaryCode = backupSummaryCode + ' ' + slideSummary;
+				return slideSummary;
 			})
 		);
 		console.log("Latex Body: "+ latexBody);
@@ -75,9 +77,17 @@ async function generateRecentPDF(project: any) {
 			'',
 			(JSON.parse(JSON.stringify(project.data)) as PrismaBasicData).summary
 		);
+		backupSummaryCode = (JSON.parse(JSON.stringify(project.data)) as PrismaBasicData).summary;
+
 	}
 
 	const filepath = path.join(PATH_TO_DATA, filename);
 	console.log(`Outputting to ${filepath}`);
-	await output(latexCode, filepath, outputType);
+	const isOutputCorrect = await output(latexCode, filepath, outputType);
+	if(!isOutputCorrect){
+		backupLatexCode = addToTemplate(project.title, '', backupSummaryCode);
+		await output(backupLatexCode, filepath, outputType);
+	}
+
+
 }

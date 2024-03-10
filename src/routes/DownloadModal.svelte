@@ -30,13 +30,13 @@
 
 		loading = true;
 
-		const filename = `${project.title}_${project.id}`;
+		const filetitle: string = project.title;
 
 		const form = new FormData();
 		form.append('id', project.id.toString());
 		form.append('type', outputType);
 		form.append('uuid', project.uuid);
-		form.append('filename', filename);
+		form.append('title', filetitle);
 		form.append('customisation', JSON.stringify(customisation));
 
 		const response = await fetch(`/download`, {
@@ -45,9 +45,14 @@
 		});
 
 		if (response.ok) {
-			const url = `${DIGITAL_OCEAN_ENDPOINT}/${project.uuid}/summaries/${filename}.${outputType}`;
-			//	const url = path.join(DIGITAL_OCEAN_SUMMARIES_ENDPOINT, `${filename}.${outputType}`);
+			const json: {
+				success: boolean;
+				sanitisedFilename: string;
+			}  = await response.json();
 
+			const sanitisedFilename = json.sanitisedFilename;
+			const url = `${DIGITAL_OCEAN_ENDPOINT}/${project.uuid}/summaries/${sanitisedFilename}.${outputType}`;
+			//	const url = path.join(DIGITAL_OCEAN_SUMMARIES_ENDPOINT, `${filename}.${outputType}`);
 			let link = document.createElement('a');
 
 			link.href = url;
