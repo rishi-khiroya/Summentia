@@ -19,6 +19,7 @@
 		: DEFAULT_CUSTOMISATION;
 
 	let outputType: string;
+	let loading = false;
 
 	function sanitiseTitle(title: string): string {
 		return `Download '${title}'`;
@@ -26,6 +27,8 @@
 
 	async function download() {
 		if (!outputType) return;
+
+		loading = true;
 
 		const filename = `${project.title}_${project.id}`;
 
@@ -50,10 +53,18 @@
 			link.href = url;
 			link.click();
 		}
+
+		loading = false;
+		open = false;
 	}
 </script>
 
-<Modal title={sanitiseTitle(project.title)} bind:open autoclose outsideclose class="flex flex-col">
+<Modal title={sanitiseTitle(project.title)} bind:open outsideclose class="flex flex-col">
+	{#if loading}
+	<div class="absolute top-0 left-0 w-full h-full bg-opacity-50 bg-gray-900 flex items-center justify-center">
+		<Spinner size="{12}" />
+	</div>
+    {/if}
 	<div class="flex flex-col w-full space-y-3">
 		<div>
 			<Label for="summary-types" class="mb-2">Types of Summary:</Label>
