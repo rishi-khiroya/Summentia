@@ -25,10 +25,7 @@ export abstract class VideoURLHandler {
 
 class UnknownHandler extends VideoURLHandler {
 	public async getTitleDate(): Promise<{ title: string; date: string }> {
-		const info = await ytdl.getInfo(this.url.toString());
-		const title = info['player_response']['videoDetails']['title']
-		const date = formatDate(new Date(info['videoDetails']['publishDate']))
-		return {title, date}
+		throw new Error('Method not implemented.');
 	}
 
 	public download(uuid: string): Promise<void> {
@@ -37,8 +34,11 @@ class UnknownHandler extends VideoURLHandler {
 }
 
 class YoutubeHandler extends VideoURLHandler {
-	public getTitleDate(): Promise<{ title: string; date: string }> {
-		throw new Error('Method not implemented.');
+	public async getTitleDate(): Promise<{ title: string; date: string }> {
+		const info = await ytdl.getInfo(this.url.toString());
+		const title = info['player_response']['videoDetails']['title']
+		const date = formatDate(new Date(info['videoDetails']['publishDate']))
+		return {title, date}
 	}
 	public async download(uuid: string): Promise<void> {
 		const info = await ytdl.getInfo(this.url.toString());

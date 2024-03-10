@@ -7,6 +7,7 @@ import path from 'node:path';
 import { writeFile } from 'node:fs/promises';
 import { mkdirSync } from 'node:fs';
 import { upload } from '$lib/object_storage/upload';
+import ytdl from 'ytdl-core';
 
 // TODO: complete definition
 export class Lecture {
@@ -58,7 +59,11 @@ export class Lecture {
 			video = await VideoFromFile.from(form.get(`lectureFile`) as File);
 		} else {
 			const data = form.get('lectureURL');
-			if (!data) throw new Error('Invalid URL');
+			const valid_url = await VideoFromUrl.check_url(data.toString())
+			if (!data || !valid_url) {
+				throw new Error('Invalid URL')
+			};
+
 			video = VideoFromUrl.from(new URL(data.toString()));
 		}
 
@@ -158,6 +163,16 @@ class VideoFromFile extends Video {
 // TODO: check if can be combined with URLHandler
 class VideoFromUrl extends Video {
 	private readonly handler: VideoURLHandler;
+
+	static async check_url(url: string) {
+		let value = true;
+		try{
+			await ytdl.getInfo(url.toString())
+		}catch {
+			value = false
+		}
+		return value
+	}
 
 	static from(url: URL): VideoFromUrl {
 		const uuid: string = randomUUID();
