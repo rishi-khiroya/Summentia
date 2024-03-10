@@ -37,12 +37,18 @@ export async function output(
 
 		writeFileSync(`${fileName}.tex`, latexCode);
 		const pandocCommand = `pdflatex ${fileName}.tex`;
-		childProcess.execSync(pandocCommand);
+		try{
+			childProcess.execSync(pandocCommand);
+		} catch(err){
+			console.log("ouptut engine pdf error");
+			return false;
+		}
 		unlinkSync(`${fileName}.tex`);
 	} else {
 		const pandocInstance = new Pandoc('latex', [pandocFormat]);
 		await pandocInstance.convertAsync(latexCode);
 	}
+	return true;
 }
 
 // function used for testing

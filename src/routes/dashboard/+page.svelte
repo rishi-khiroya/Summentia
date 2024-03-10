@@ -30,7 +30,9 @@
 	let showDownloadModal: boolean = false;;
 	let currentProject = projects.filter((item) => {return item.status == "SUMMARISED"})[0];
 
-	let previewURL = currentProject?( `./${currentProject.title}_${currentProject.id}.pdf`):"";
+	let filename = data.sanitised_filename;
+
+	let previewURL = currentProject?( `./${filename}.pdf`):"";
 
 	function isSummarised(project): boolean{
 		return project.status == "SUMMARISED"
@@ -57,10 +59,10 @@
 			<h2 class="text-xl px-2 font-semibold dark:text-white">Your most recent summary:</h2>
 			<!-- FIXME: not null-safe, doesn't work if latest project has slides -->
 			{#if (projects.filter((item) => {return item.status === "SUMMARISED"})) && (projects.filter((item) => {return item.status === "SUMMARISED"}).length > 0) }
-				<div class="w-[650px]">
+				<!-- <div class="w-[650px]">
 				<svelte:component class="w-[500px]" this={PdfViewer} url={previewURL}/>
-				</div>
-				<!-- <object
+				</div> -->
+				<object
 					title="cdsd"
 					data={previewURL}
 					type="application/pdf"
@@ -76,7 +78,7 @@
 					>
 						<p>This browser does not support PDF!</p>
 					</iframe>
-				</object> -->
+				</object>
 				{:else}
 				
 				<h1>You have no recent projects.</h1>

@@ -33,3 +33,7 @@ export function reformat_date(project_date:Date){
 	return moment(project_date).format('DD-MM-YYYY');
 }
 
+export function sanitise_filename(filename:string):string {
+	return filename.replace(/\s/g, "_");
+}
+
