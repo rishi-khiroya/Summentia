@@ -50,6 +50,8 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	const summary = completion.choices[0]['message']['content'];
 
+	console.log("\n\n-------------FORMAT-------------" + summary);
+
 	let latex_code: string = "";
 	if (summary != null && summary.includes("\\documentclass{article}")){
 		latex_code  = "\\documentclass{article}" + ((summary.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
