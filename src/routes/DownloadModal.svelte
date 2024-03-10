@@ -66,8 +66,9 @@
 
 <Modal title={sanitiseTitle(project.title)} bind:open outsideclose class="flex flex-col">
 	{#if loading}
-	<div class="absolute top-0 left-0 w-full h-full bg-opacity-50 bg-gray-900 flex items-center justify-center">
+	<div class="flex-col absolute top-0 left-0 w-full h-full bg-opacity-50 bg-gray-900 flex items-center justify-center">
 		<Spinner size="{12}" />
+		<span class="ml-2 text-white">Downloading...</span>
 	</div>
     {/if}
 	<div class="flex flex-col w-full space-y-3">
