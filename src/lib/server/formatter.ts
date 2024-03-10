@@ -12,7 +12,7 @@ export async function format(transcript_code: string, customisations: Customisat
 	if (customisations.highlight_keywords) {
 
 		const prompt =
-		'Give me this LaTeX code and make the keywords bold : ' +
+		'Give me this LaTeX code and make the keywords underlined : ' +
 		transcript_code;
 
 		const completion = await openai.chat.completions.create({
