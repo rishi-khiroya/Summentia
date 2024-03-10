@@ -70,7 +70,7 @@ export async function POST({ request, locals }) {
 	}
 
 	// format the code according to the customisations
-	//latexCode = (await format(latexCode, customisations)) ?? latexCode;
+	latexCode = (await format(latexCode, customisations)) ?? latexCode;
 
 	const destination = `${uuid}/summaries/${filename}.${type}`;
 	const does_it_exist = await check_exists(destination);

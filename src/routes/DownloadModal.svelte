@@ -34,7 +34,7 @@
 		form.append('type', outputType);
 		form.append('uuid', project.uuid);
 		form.append('filename', filename);
-		form.append('customisation', JSON.stringify(project.customisation));
+		form.append('customisation', JSON.stringify(customisation));
 
 		const response = await fetch(`/download`, {
 			method: 'POST',
@@ -64,8 +64,8 @@
 		</div>
 		<div>
 			<Label for="extra-features" class="mb-2">Extra Features:</Label>
-			<Checkbox checked={customisation.highlight_keywords}>Highlight Key Words</Checkbox>
-			<Checkbox checked={customisation.questions}>Generate Questions and Answers</Checkbox>
+			<Checkbox bind:checked={customisation.highlight_keywords}>Highlight Key Words</Checkbox>
+			<Checkbox bind:checked={customisation.questions}>Generate Questions and Answers</Checkbox>
 		</div>
 	</div>
 	<Hr />

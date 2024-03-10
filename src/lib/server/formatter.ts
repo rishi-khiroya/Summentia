@@ -17,7 +17,7 @@ export async function format(transcript_code: string, customisations: Customisat
 		questions_phrase = ' with a revision question answer section';
 	}
 
-	// adds length prompt for length upper bound in pages, default set to 1
+	/* adds length prompt for length upper bound in pages, default set to 1
 	let length_phrase = '';
 	if (customisations.length != -1) {
 		if (customisations.length == 1) {
@@ -25,11 +25,10 @@ export async function format(transcript_code: string, customisations: Customisat
 		} else {
 			length_phrase = ' in ' + customisations.length + ' pages ';
 		}
-	}
+	}*/
 
 	const prompt =
 		'Plase give me this LaTeX code, ' +
-		length_phrase +
 		highlight_phrase +
 		customisations.summary_format +
 		questions_phrase +
@@ -50,6 +49,9 @@ export async function format(transcript_code: string, customisations: Customisat
 		latex_code  = "\\begin{document}" + ((summary.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
 	}
 
+	console.log("--------PROMPT-----------\n" + prompt + "\n\n");
+	console.log("--------CODE-----------\n" + latex_code + "\n\n");
+	console.log("--------SUMMARY-----------\n" + summary + "\n\n");
 	return latex_code;
 }
 
