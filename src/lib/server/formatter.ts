@@ -52,12 +52,12 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	// reading list
 	
-	const p =
+	const prompt2 =
 		'Please give me this LaTeX code, with a relevant textbook reading list at the end:' +
 		code_in_progress;
 
 	const completion2 = await openai.chat.completions.create({
-		messages: [{ role: 'system', content: prompt }],
+		messages: [{ role: 'system', content: prompt2 }],
 		model: 'gpt-3.5-turbo'
 	});
 
