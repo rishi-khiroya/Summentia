@@ -12,7 +12,7 @@ export async function format(transcript_code: string, customisations: Customisat
 	if (customisations.highlight_keywords) {
 
 		const prompt =
-		'Plase give me this LaTeX code and highlight the keywords : ' +
+		'Give me this LaTeX code with highlighted keywords : ' +
 		transcript_code;
 
 		const completion = await openai.chat.completions.create({
