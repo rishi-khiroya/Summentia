@@ -9,7 +9,7 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 export async function format(transcript_code: string, customisations: Customisation) {
 	let highlight_phrase = '';
 	if (customisations.highlight_keywords) {
-		highlight_phrase = ' highlight keywords ';
+		highlight_phrase = ' with highlighted keywords ';
 	}
 
 	let questions_phrase = '';
@@ -29,8 +29,8 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	const prompt =
 		'Plase give me this LaTeX code, ' +
-		highlight_phrase +
 		customisations.summary_format +
+		highlight_phrase +
 		questions_phrase +
 		' :' +
 		transcript_code;
