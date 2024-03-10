@@ -20,7 +20,8 @@
 
 	export let data;
 
-	const NO_PAGES: number = 5;
+	const MAX_NO_PAGES: number = 5;
+	const ITEMS_PER_PAGE: number = 10;
 	let searchTerm: string = '';
 	$: filteredItems = data.projects.filter(
 		(project) => project.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
@@ -30,13 +31,14 @@
 		return project.status == "SUMMARISED"
 	}
 
+	let startPoint: number = Math.max(data.pageNo - 2, 1);
 	let pages = Array.from(
 		{
-			length: NO_PAGES
+			length: MAX_NO_PAGES
 		},
-		(value, index) => index + 1
+		(value, index) => startPoint + index
 	)
-		.filter((id: number) => id <= Math.min(1, Math.ceil(data.noProjects ?? 0 / NO_PAGES)))
+		.filter((id: number) => id <= Math.max(1, Math.ceil(data.noProjects / ITEMS_PER_PAGE)))
 		.map((id: number) => {
 			return {
 				name: id.toString(),
@@ -44,9 +46,12 @@
 				active: id === data.pageNo
 			};
 		});
-
+	
 	const previous = () => {
 		const params = new URLSearchParams(window.location.search);
+		if (parseInt(params.get('page')) == 1){
+			return
+		}
 		const page = Math.max(parseInt(params.get('page') ?? '1') - 1, 1);
 		params.set('page', page.toString());
 		window.location.search = params.toString();
@@ -56,8 +61,11 @@
 		const pageNo = parseInt(params.get('page') ?? '1');
 		const page = Math.min(
 			pageNo + 1,
-			Math.ceil(data.noProjects ? data.noProjects - 1 : 0 / NO_PAGES)
+			Math.ceil(data.noProjects / ITEMS_PER_PAGE)
 		);
+		if (pageNo == page){
+			return
+		}
 		params.set('page', page.toString());
 		window.location.search = params.toString();
 	};

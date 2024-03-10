@@ -25,7 +25,7 @@ export const load: PageServerLoad = async (event) => {
 				projects: true
 			}
 		})
-	)?.projects.length;
+	)?.projects.length ?? 0;
 
 	const projects: Project[] = await prisma.project.findMany({
 		where: {
