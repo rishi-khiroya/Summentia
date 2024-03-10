@@ -53,7 +53,7 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	if (customisations.key_definitions_list){
 		const prompt =
-		'Please give me this LaTeX code, with a list of key definitions at the end:' +
+		'Please give me as LaTeX code with a list of key definitions at the end:' +
 		code_in_progress;
 
 	const completion = await openai.chat.completions.create({
