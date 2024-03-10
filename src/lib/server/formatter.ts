@@ -13,7 +13,7 @@ export async function format(transcript_code: string, customisations: Customisat
 
 		const prompt =
 		'Give me this LaTeX code and make the keywords underlined : ' +
-		transcript_code;
+		code_in_progress;
 
 		const completion = await openai.chat.completions.create({
 			messages: [{ role: 'system', content: prompt }],
@@ -48,15 +48,26 @@ export async function format(transcript_code: string, customisations: Customisat
 		model: 'gpt-3.5-turbo'
 	});
 
-	const summary = completion.choices[0]['message']['content'];
+	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
 
-	console.log("\n\n-------------FORMAT-------------" + summary);
+	// reading list
+	
+	const p =
+		'Please give me this LaTeX code, with a relevant textbook reading list at the end:' +
+		code_in_progress;
+
+	const completion2 = await openai.chat.completions.create({
+		messages: [{ role: 'system', content: prompt }],
+		model: 'gpt-3.5-turbo'
+	});
+
+	code_in_progress = completion2.choices[0]['message']['content']??code_in_progress;
 
 	let latex_code: string = "";
-	if (summary != null && summary.includes("\\documentclass{article}")){
-		latex_code  = "\\documentclass{article}" + ((summary.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
-	} else if (summary != null && summary.includes("\\begin{document}")){
-		latex_code  = "\\begin{document}" + ((summary.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
+	if (code_in_progress != null && code_in_progress.includes("\\documentclass{article}")){
+		latex_code  = "\\documentclass{article}" + ((code_in_progress.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
+	} else if (code_in_progress != null && code_in_progress.includes("\\begin{document}")){
+		latex_code  = "\\begin{document}" + ((code_in_progress.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
 	}
 
 	return latex_code;
