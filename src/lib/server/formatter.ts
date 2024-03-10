@@ -25,7 +25,7 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	if (customisations.questions) {
 		const prompt =
-		'Plase give me this LaTeX code with a revision question answer section: ' +
+		'Plase give me this LaTeX code with a revision question answer section at the end: ' +
 		code_in_progress;
 
 		const completion = await openai.chat.completions.create({
