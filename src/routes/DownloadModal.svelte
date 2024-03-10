@@ -58,7 +58,7 @@
 		<div>
 			<Label for="summary-types" class="mb-2">Types of Summary:</Label>
 			<Radio name="type" value={''} bind:group={customisation.summary_format}>Text Format</Radio>
-			<Radio name="type" value={' as bullet points'} bind:group={customisation.summary_format}
+			<Radio name="type" value={'with each section organised into bullet points'} bind:group={customisation.summary_format}
 				>Bullet Points</Radio
 			>
 		</div>
