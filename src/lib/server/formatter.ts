@@ -7,33 +7,39 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 // we assumed that transcript_code is a string of LaTeX code containing the summary
 export async function format(transcript_code: string, customisations: Customisation) {
-	let highlight_phrase = '';
+	let code_in_progress: string = transcript_code??"";
+	
 	if (customisations.highlight_keywords) {
-		highlight_phrase = ' with highlighted keywords ';
+
+		const prompt =
+		'Plase give me this LaTeX code with highlighted keywords : ' +
+		transcript_code;
+
+		const completion = await openai.chat.completions.create({
+			messages: [{ role: 'system', content: prompt }],
+			model: 'gpt-3.5-turbo'
+		});
+
+		code_in_progress = completion.choices[0]['message']['content'];
 	}
 
-	let questions_phrase = '';
 	if (customisations.questions) {
-		questions_phrase = ' with a revision question answer section';
-	}
+		const prompt =
+		'Plase give me this LaTeX code with a revision question answer section: ' +
+		code_in_progress;
 
-	/* adds length prompt for length upper bound in pages, default set to 1
-	let length_phrase = '';
-	if (customisations.length != -1) {
-		if (customisations.length == 1) {
-			length_phrase = ' in 1 page ';
-		} else {
-			length_phrase = ' in ' + customisations.length + ' pages ';
-		}
-	}*/
+		const completion = await openai.chat.completions.create({
+			messages: [{ role: 'system', content: prompt }],
+			model: 'gpt-3.5-turbo'
+		});
+
+		code_in_progress = completion.choices[0]['message']['content'];
+	}
 
 	const prompt =
 		'Plase give me this LaTeX code, ' +
-		customisations.summary_format +
-		highlight_phrase +
-		questions_phrase +
-		' :' +
-		transcript_code;
+		customisations.summary_format + ' :' +
+		code_in_progress;
 
 	const completion = await openai.chat.completions.create({
 		messages: [{ role: 'system', content: prompt }],
