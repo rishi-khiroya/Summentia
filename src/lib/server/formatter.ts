@@ -12,7 +12,7 @@ export async function format(transcript_code: string, customisations: Customisat
 	if (customisations.highlight_keywords) {
 
 		const prompt =
-		'Plase give me this LaTeX code with highlighted keywords : ' +
+		'Plase give me this LaTeX code and highlight the keywords : ' +
 		transcript_code;
 
 		const completion = await openai.chat.completions.create({
@@ -21,6 +21,7 @@ export async function format(transcript_code: string, customisations: Customisat
 		});
 
 		code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+		console.log("\n\nHIGHLIGHTED-----------\n\n" + code_in_progress);
 	}
 
 	if (customisations.questions) {
@@ -34,6 +35,7 @@ export async function format(transcript_code: string, customisations: Customisat
 		});
 
 		code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+		console.log("\n\nQUESTIONS-----------\n\n" + code_in_progress);
 	}
 
 	const prompt =
@@ -55,9 +57,6 @@ export async function format(transcript_code: string, customisations: Customisat
 		latex_code  = "\\begin{document}" + ((summary.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
 	}
 
-	console.log("--------PROMPT-----------\n" + prompt + "\n\n");
-	console.log("--------CODE-----------\n" + latex_code + "\n\n");
-	console.log("--------SUMMARY-----------\n" + summary + "\n\n");
 	return latex_code;
 }
 
