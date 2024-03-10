@@ -7,8 +7,8 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 // we assumed that transcript_code is a string of LaTeX code containing the summary
 export async function format(transcript_code: string, customisations: Customisation) {
-	let code_in_progress: string = transcript_code??"";
-	
+	let code_in_progress: string = transcript_code;
+
 	if (customisations.highlight_keywords) {
 
 		const prompt =
@@ -20,7 +20,7 @@ export async function format(transcript_code: string, customisations: Customisat
 			model: 'gpt-3.5-turbo'
 		});
 
-		code_in_progress = completion.choices[0]['message']['content'];
+		code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
 	}
 
 	if (customisations.questions) {
@@ -33,7 +33,7 @@ export async function format(transcript_code: string, customisations: Customisat
 			model: 'gpt-3.5-turbo'
 		});
 
-		code_in_progress = completion.choices[0]['message']['content'];
+		code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
 	}
 
 	const prompt =
