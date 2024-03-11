@@ -1,5 +1,5 @@
 import { assert } from 'console';
-import { prisma } from '../prisma';
+import prisma from '../prisma';
 
 export abstract class Project {
 	// Basic information needed for a project.
@@ -124,4 +124,12 @@ class SlidesProject extends Project {
 		});
 		return record.id;
 	}
+}
+
+export async function removeFromDB(entry_id: number): Promise<void> {
+	await prisma.project.delete({
+		where: {
+		  id: entry_id,
+		},
+	})
 }

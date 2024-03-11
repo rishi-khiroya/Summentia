@@ -22,8 +22,7 @@ export const actions = {
 			// TODO: Put lecture in db
 			return { success: true, lecture: await lecture.toJSON() };
 		} catch (e) {
-			console.log(e);
-			return { success: false, error: JSON.stringify(e) };
+			return { success: false, error: JSON.stringify(e.message) };
 		}
 	},
 

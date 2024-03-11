@@ -4,7 +4,7 @@ import { upload } from '$lib/object_storage/upload';
 import { check_exists } from '$lib/object_storage/helper.js';
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
-import { prisma } from '$lib/server/prisma';
+import prisma from '$lib/server/prisma';
 import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 import type { Session } from '@auth/core/types';
 import { error, json } from '@sveltejs/kit';

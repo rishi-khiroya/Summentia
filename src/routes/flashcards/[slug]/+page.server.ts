@@ -1,4 +1,4 @@
-import { prisma } from '$lib/server/prisma';
+import prisma from '$lib/server/prisma';
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import type { Session } from '@auth/core/types';
@@ -63,12 +63,6 @@ export const load: PageServerLoad = async (event) => {
 				};
 				flashCards.push(card);
 			}
-			const [front, back] = parts[i].trim().split('Back:');
-			const card: Flashcard = {
-				front: front,
-				back: back
-			};
-			flashCards.push(card);
 		}
 		return flashCards;
 	}
@@ -86,3 +80,4 @@ function printFlashCards(flashCards: Flashcard[]) {
 	});
 	return print;
 }
+
