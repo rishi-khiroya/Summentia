@@ -64,18 +64,7 @@ export async function format(transcript_code: string, customisations: Customisat
 	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
 	}
 
-	if (customisations.summary_format != ''){
-		const prompt =
-		    'Please give me this LaTeX code, ' +
-		    customisations.summary_format + ' :' +
-		    code_in_progress;
 
-	    const completion = await openai.chat.completions.create({
-		    messages: [{ role: 'system', content: prompt }],
-		    model: 'gpt-3.5-turbo'
-	    });
-	    code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
-	}
 
 	let latex_code: string = "";
 	if (code_in_progress != null && code_in_progress.includes("\\documentclass{article}")){
@@ -89,6 +78,19 @@ export async function format(transcript_code: string, customisations: Customisat
 
 export async function generateFlashCards(summary: string){
 	const prompt: string = 'Can you generate flash cards in format Front: Back:, Front: Back: : ' + summary;
+	const completion = await openai.chat.completions.create({
+		messages: [{ role: 'system', content: prompt }],
+		model: 'gpt-3.5-turbo'
+	});
+
+	const response = completion.choices[0]['message']['content'];
+
+	console.log("response: " + response);
+	return response;
+}
+
+export async function generateDefs(summary: string){
+	const prompt: string = 'Can you generate a list of key definitions from this text, in the format keyword: def; keyword: def; ' + summary;
 	const completion = await openai.chat.completions.create({
 		messages: [{ role: 'system', content: prompt }],
 		model: 'gpt-3.5-turbo'
