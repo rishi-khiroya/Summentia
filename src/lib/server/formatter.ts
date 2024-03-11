@@ -51,17 +51,17 @@ export async function format(transcript_code: string, customisations: Customisat
 	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
 	}
 
-	if (customisations.key_definitions_list){
+	if (customisations.summary_format != ''){
 		const prompt =
-		    'Please give me as LaTeX code with a list of key definitions at the end:' +
+		    'Please give me this LaTeX code, ' +
+		    customisations.summary_format + ' :' +
 		    code_in_progress;
 
 	    const completion = await openai.chat.completions.create({
 		    messages: [{ role: 'system', content: prompt }],
 		    model: 'gpt-3.5-turbo'
 	    });
-
-	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+	    code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
 	}
 
 
