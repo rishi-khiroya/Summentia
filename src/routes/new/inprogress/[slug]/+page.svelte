@@ -19,7 +19,7 @@
 		// invalidateAll();
 
 		if (fetching) {
-			console.log("Waiting for data...");
+			console.log('Waiting for data...');
 			return;
 		}
 		console.log('Refreshing data...');
@@ -36,20 +36,22 @@
 		if (response.ok) {
 			console.log(response);
 			const json = await response.json();
-			// console.log(json.data);
-			const data = formResponseToJSON(json.data);
-			console.log(data);
-			// const responseData = JSON.parse(.project);
+			if (json) {
+				// console.log(json.data);
+				const data = formResponseToJSON(json.data);
+				console.log(data);
+				// const responseData = JSON.parse(.project);
 
-			// console.log(responseData + " " + typeof responseData);
-			project = data;
-			fetched = true;
+				// console.log(responseData + " " + typeof responseData);
+				project = data;
+				fetched = true;
+			}
 		}
 
 		fetching = false;
 
 		// console.log('id: ' + project.id);
-	}, 3000);
+	}, 30000);
 
 	onDestroy(() => clearInterval(interval));
 
@@ -88,7 +90,9 @@
 			{#if fetched}
 				<h1 class="text-4xl animate-bounce pt-3 dark:text-white">{status()}</h1>
 			{/if}
-			<h1 class="italic font-semibold mt-10 pt-10 animate-pulse text-red-700">Do not leave this page!</h1>
+			<h1 class="italic font-semibold mt-10 pt-10 animate-pulse text-red-700">
+				Do not leave this page!
+			</h1>
 		</div>
 	{/key}
 </div>

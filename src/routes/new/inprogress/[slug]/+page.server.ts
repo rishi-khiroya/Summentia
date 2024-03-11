@@ -97,7 +97,7 @@ export const actions = {
 				const data = JSON.parse(JSON.stringify(response.data));
 				console.log(data);
 
-				if (!response.success || !data) {
+				if (response.success && data) {
 					console.log('Updating db...');
 					record = await prisma.project.update({
 						where: { id: project.id },
@@ -195,10 +195,10 @@ export const actions = {
 				});
 				console.log('Finished summarisation.');
 			}
-		} else return { project: JSON.stringify(project) };
 
-		return {
-			project: JSON.stringify(record)
-		};
+			return {
+				project: JSON.stringify(record ?? project)
+			};
+		} else return { project: JSON.stringify(project) };
 	}
 };
