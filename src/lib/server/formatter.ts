@@ -24,7 +24,7 @@ export async function format(transcript_code: string, customisations: Customisat
 		console.log("\n\nHIGHLIGHTED-----------\n\n" + code_in_progress);
 	}
 
-	if (customisations.questions) {
+	/*if (customisations.questions) {
 		const prompt =
 		    'Please give me this LaTeX code with a revision question answer section at the end: ' +
 		    code_in_progress;
@@ -36,9 +36,9 @@ export async function format(transcript_code: string, customisations: Customisat
 
 		code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
 		console.log("\n\nQUESTIONS-----------\n\n" + code_in_progress);
-	}
+	}*/
 
-	if (customisations.reading_list){
+	/*if (customisations.reading_list){
 		const prompt =
 		    'Please give me this LaTeX code, with a relevant textbook reading list at the end:' +
 		    code_in_progress;
@@ -49,7 +49,7 @@ export async function format(transcript_code: string, customisations: Customisat
 	    });
 
 	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
-	}
+	}*/
 
 	if (customisations.summary_format != ''){
 		const prompt =
@@ -91,6 +91,33 @@ export async function generateFlashCards(summary: string){
 
 export async function generateDefs(summary: string){
 	const prompt: string = 'Can you generate a list of key definitions from this text, in the format keyword: definition; keyword: definition; ' + summary;
+	const completion = await openai.chat.completions.create({
+		messages: [{ role: 'system', content: prompt }],
+		model: 'gpt-3.5-turbo'
+	});
+
+	const response = completion.choices[0]['message']['content'];
+
+	console.log("response: " + response);
+	return response;
+}
+
+
+export async function generateQuestions(summary: string){
+	const prompt: string = 'Can you generate some revisition questions and answers for this text, in the format Question: Answer; Question: Answer : ' + summary;
+	const completion = await openai.chat.completions.create({
+		messages: [{ role: 'system', content: prompt }],
+		model: 'gpt-3.5-turbo'
+	});
+
+	const response = completion.choices[0]['message']['content'];
+
+	console.log("response: " + response);
+	return response;
+}
+
+export async function generateReadingList(summary: string){
+	const prompt: string = 'Can you generate a relevant reading list for the following text: ' + summary;
 	const completion = await openai.chat.completions.create({
 		messages: [{ role: 'system', content: prompt }],
 		model: 'gpt-3.5-turbo'
