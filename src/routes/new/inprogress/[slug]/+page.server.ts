@@ -42,6 +42,8 @@ export const load: PageServerLoad = async ({ params }) => {
 
 export const actions = {
 	fetch: async ({ params }) => {
+		// console.log("fetching")
+
 		const data = await prisma.project.findUnique({
 			where: {
 				id: Number(params.slug)
@@ -76,8 +78,8 @@ export const actions = {
 
 		let record;
 
-		// console.log(`waiting=${project.waiting}, ${data.waiting}`);
-		// console.log(project);
+		console.log(`waiting=${project.waiting}, ${data.waiting}`);
+		console.log(project);
 		if (project.waiting) {
 			if (project.status == PrismaProjectStatus.UNPROCESSED) {
 				console.log('Sending request to Python back-end to complete splitting and transcription.');
@@ -96,16 +98,7 @@ export const actions = {
 				console.log(data);
 
 				if (!response.success || !data) {
-					if (!response.success) {
-						record = await prisma.project.update({
-							where: { id: project.id },
-							data: {
-								waiting: true
-							}
-						});
-						error(400, data.toString());
-					}
-
+					console.log('Updating db...');
 					record = await prisma.project.update({
 						where: { id: project.id },
 						data: {
@@ -115,88 +108,97 @@ export const actions = {
 							status: 'TRANSCRIBED'
 						}
 					});
-				}
-
-				if (project.status == PrismaProjectStatus.SPLIT) {
-					console.log('Starting transcription.');
-					await setWaiting(project.id);
-
-					// const extlessPath: string = project.video.substring(0, project.video.lastIndexOf('.'));
-
-					let data;
-					if (project.hasSlides) {
-						console.log('should not reach here.'); // TODO: throw error/remove dead code
-						// const transcript = process_noslides()
-					} else {
-						// const transcript = await transcribe(extlessPath);
-						const uuid = project.uuid;
-						// if (lastSlash == -1) error(503, 'Project video path is corrupt.');
-
-						const transcript: string = await process_noslides(uuid);
-						data = {
-							transcript: transcript ? transcript : 'Unable to transcribe.',
-							summary: ''
-						} as PrismaBasicData;
-					}
-
+					console.log(`record=${record}`);
+				} else {
 					record = await prisma.project.update({
 						where: { id: project.id },
 						data: {
-							// @ts-expect-error: Cannot force the typecast.
-							data,
-							waiting: true,
-							status: 'TRANSCRIBED'
+							waiting: true
 						}
 					});
-					console.log('Finished transcription.');
+					error(400, data.toString());
+				}
+			}
+
+			if (project.status == PrismaProjectStatus.SPLIT) {
+				console.log('Starting transcription.');
+				await setWaiting(project.id);
+
+				// const extlessPath: string = project.video.substring(0, project.video.lastIndexOf('.'));
+
+				let data;
+				if (project.hasSlides) {
+					console.log('should not reach here.'); // TODO: throw error/remove dead code
+					// const transcript = process_noslides()
+				} else {
+					// const transcript = await transcribe(extlessPath);
+					const uuid = project.uuid;
+					// if (lastSlash == -1) error(503, 'Project video path is corrupt.');
+
+					const transcript: string = await process_noslides(uuid);
+					data = {
+						transcript: transcript ? transcript : 'Unable to transcribe.',
+						summary: ''
+					} as PrismaBasicData;
 				}
 
-				if (project.status == PrismaProjectStatus.TRANSCRIBED) {
-					console.log('Starting summarisation.');
-					await setWaiting(project.id);
-
-					let data;
-					if (project.hasSlides) {
-						const slidesData: PrismaSlidesData[] = project.data as PrismaSlidesData[];
-						await Promise.all(
-							slidesData.map(async (slideData) => {
-								const summaries: string[] = [];
-								await Promise.all(
-									slideData.transcripts.map(async (transcript) => {
-										const summary: string | null = await summarise(
-											transcript,
-											project.customisation.summaryLevel - 1
-										);
-										summaries.push(summary ?? '');
-									})
-								);
-								slideData.summaries = summaries;
-								console.log(summaries);
-							})
-						);
-						data = slidesData;
-						console.log(data);
-					} else {
-						const transcript: string = (project.data as PrismaBasicData).transcript;
-						const summary: string | null = await summarise(transcript, 2);
-						data = { transcript, summary: summary ? summary : 'Error...' };
+				record = await prisma.project.update({
+					where: { id: project.id },
+					data: {
+						// @ts-expect-error: Cannot force the typecast.
+						data,
+						waiting: true,
+						status: 'TRANSCRIBED'
 					}
+				});
+				console.log('Finished transcription.');
+			}
 
-					record = await prisma.project.update({
-						where: { id: project.id },
-						data: {
-							data,
-							waiting: false,
-							status: 'SUMMARISED'
-						}
-					});
-					console.log('Finished summarisation.');
+			if (project.status == PrismaProjectStatus.TRANSCRIBED) {
+				console.log('Starting summarisation.');
+				await setWaiting(project.id);
+
+				let data;
+				if (project.hasSlides) {
+					const slidesData: PrismaSlidesData[] = project.data as PrismaSlidesData[];
+					await Promise.all(
+						slidesData.map(async (slideData) => {
+							const summaries: string[] = [];
+							await Promise.all(
+								slideData.transcripts.map(async (transcript) => {
+									const summary: string | null = await summarise(
+										transcript,
+										project.customisation.summaryLevel - 1
+									);
+									summaries.push(summary ?? '');
+								})
+							);
+							slideData.summaries = summaries;
+							console.log(summaries);
+						})
+					);
+					data = slidesData;
+					console.log(data);
+				} else {
+					const transcript: string = (project.data as PrismaBasicData).transcript;
+					const summary: string | null = await summarise(transcript, 2);
+					data = { transcript, summary: summary ? summary : 'Error...' };
 				}
-			} else return { project: JSON.stringify(project) };
 
-			return {
-				project: JSON.stringify(record)
-			};
-		}
+				record = await prisma.project.update({
+					where: { id: project.id },
+					data: {
+						data,
+						waiting: false,
+						status: 'SUMMARISED'
+					}
+				});
+				console.log('Finished summarisation.');
+			}
+		} else return { project: JSON.stringify(project) };
+
+		return {
+			project: JSON.stringify(record)
+		};
 	}
 };
