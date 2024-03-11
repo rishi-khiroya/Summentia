@@ -125,3 +125,11 @@ class SlidesProject extends Project {
 		return record.id;
 	}
 }
+
+export async function removeFromDB(entry_id: number): Promise<void> {
+	await prisma.project.delete({
+		where: {
+		  id: entry_id,
+		},
+	})
+}

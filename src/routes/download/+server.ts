@@ -55,9 +55,9 @@ export async function POST({ request, locals }) {
 		const latexBody = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
-				const finalSummary = '';
-				slideData.summaries.forEach((summary) => finalSummary.concat(summary));
-				return finalSummary;
+				
+				return slideData.summaries.reduce((a, b) => a + " " + b, "");
+				
 			})
 		);
 		latexCode = addToTemplate(data.title, session?.user.name ?? '', latexBody);
@@ -70,7 +70,7 @@ export async function POST({ request, locals }) {
 	}
 
 	// format the code according to the customisations
-	latexCode = (await format(latexCode, customisations)) ?? latexCode;
+	//latexCode = (await format(latexCode, customisations)) ?? latexCode;
 
 	const destination = `${uuid}/summaries/${filename}.${type}`;
 	const does_it_exist = await check_exists(destination);
