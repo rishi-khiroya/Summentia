@@ -2,7 +2,8 @@ export function getBodyLatexCode(slides: string[], summaries: string[]): string 
     // const slide_paths = getSlidePaths(slides);
     let body = '';
     for (let i = 0; i < slides.length; i++) {
-        const path = slides[i].slice(1);
+        //const path = slides[i].slice(1);
+        const path = slides[i];
         body += `
             \\begin{center}
             \\includegraphics[width=0.75\\linewidth]{${path}}
@@ -17,17 +18,8 @@ export function getBodyLatexCode(slides: string[], summaries: string[]): string 
 export function addToTemplate(title: string, author: string, body: string): string {
     return `
     \\documentclass{article}
-
-    \\usepackage[none]{hyphenat}
     \\usepackage{graphicx}
-    \\usepackage{geometry}
-    \\geometry{
-        left=2cm,
-        right=2cm,
-        top=1.5cm, 
-        bottom=1.5cm, 
-      }
-    
+
     \\begin{document}
     
     \\title{${title}}

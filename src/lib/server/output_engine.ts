@@ -1,4 +1,5 @@
 
+import { PATH_TO_DATA } from '$env/static/private';
 import * as childProcess from 'child_process';
 import { writeFileSync, unlinkSync } from 'fs';
 import { Pandoc, type PandocOutFormat } from 'pandoc-ts';
@@ -37,7 +38,8 @@ export async function output(
 		if (outputType === OutputType.PDF) {
 
 			writeFileSync(`${fileName}.tex`, latexCode);
-			const pandocCommand = `pdflatex ${fileName}.tex`;
+		
+			const pandocCommand = `pdflatex -output-directory ${PATH_TO_DATA} ${fileName}.tex`;
 
 			childProcess.execSync(pandocCommand);
 
@@ -48,6 +50,7 @@ export async function output(
 		}
 	} catch (err) {
 		console.log("ouptut engine error: " + outputType);
+		console.log(err);
 		return false;
 	}
 	return true;
