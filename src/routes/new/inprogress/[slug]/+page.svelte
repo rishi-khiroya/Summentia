@@ -18,9 +18,12 @@
 	const interval = setInterval(async () => {
 		// invalidateAll();
 
-		if (fetching) return;
+		if (fetching) {
+			console.log("Waiting for data...");
+			return;
+		}
 		console.log('Refreshing data...');
-		fetching = false;
+		fetching = true;
 
 		const form = new FormData();
 		form.append('id', data.id.toString());
