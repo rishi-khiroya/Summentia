@@ -2,7 +2,8 @@ export function getBodyLatexCode(slides: string[], summaries: string[]): string 
     // const slide_paths = getSlidePaths(slides);
     let body = '';
     for (let i = 0; i < slides.length; i++) {
-        const path = slides[i].slice(1);
+        //const path = slides[i].slice(1);
+        const path = slides[i];
         body += `
             \\begin{center}
             \\includegraphics[width=0.75\\linewidth]{${path}}
