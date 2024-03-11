@@ -22,20 +22,18 @@ export function addToTemplate(title: string, author: string, body: string): stri
     \\usepackage{graphicx}
     \\usepackage{geometry}
     \\geometry{
-        a4paper,
-        total={200mm,277mm},
-        left=5mm,
-        top=5mm,
-    }
-
-    \\renewcommand{\\thesubsection}{\\arabic{subsection})}
-    \\renewcommand{\\thesubsubsection}{\\alph{subsubsection})}
-
+        left=2cm,
+        right=2cm,
+        top=1.5cm, 
+        bottom=1.5cm, 
+      }
+    
+    \\begin{document}
+    
     \\title{${title}}
     \\author{${author}}
-    \\date{}
-
-    \\begin{document}
+    \\date{\\vspace{-2em}}
+    
 
     \\maketitle
 

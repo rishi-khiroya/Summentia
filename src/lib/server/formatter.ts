@@ -12,8 +12,8 @@ export async function format(transcript_code: string, customisations: Customisat
 	if (customisations.highlight_keywords) {
 
 		const prompt =
-		'Give me this LaTeX code and make the keywords underlined : ' +
-		code_in_progress;
+		    'Give me this LaTeX code and make the keywords underlined : ' +
+		    code_in_progress;
 
 		const completion = await openai.chat.completions.create({
 			messages: [{ role: 'system', content: prompt }],
@@ -26,8 +26,8 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	if (customisations.questions) {
 		const prompt =
-		'Please give me this LaTeX code with a revision question answer section at the end: ' +
-		code_in_progress;
+		    'Please give me this LaTeX code with a revision question answer section at the end: ' +
+		    code_in_progress;
 
 		const completion = await openai.chat.completions.create({
 			messages: [{ role: 'system', content: prompt }],
@@ -40,41 +40,42 @@ export async function format(transcript_code: string, customisations: Customisat
 
 	if (customisations.reading_list){
 		const prompt =
-		'Please give me this LaTeX code, with a relevant textbook reading list at the end:' +
-		code_in_progress;
+		    'Please give me this LaTeX code, with a relevant textbook reading list at the end:' +
+		    code_in_progress;
 
-	const completion = await openai.chat.completions.create({
-		messages: [{ role: 'system', content: prompt }],
-		model: 'gpt-3.5-turbo'
-	});
+	    const completion = await openai.chat.completions.create({
+		    messages: [{ role: 'system', content: prompt }],
+		    model: 'gpt-3.5-turbo'
+	    });
 
 	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
 	}
 
 	if (customisations.key_definitions_list){
 		const prompt =
-		'Please give me as LaTeX code with a list of key definitions at the end:' +
-		code_in_progress;
+		    'Please give me as LaTeX code with a list of key definitions at the end:' +
+		    code_in_progress;
 
-	const completion = await openai.chat.completions.create({
-		messages: [{ role: 'system', content: prompt }],
-		model: 'gpt-3.5-turbo'
-	});
+	    const completion = await openai.chat.completions.create({
+		    messages: [{ role: 'system', content: prompt }],
+		    model: 'gpt-3.5-turbo'
+	    });
 
 	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
 	}
 
-	const prompt =
-		'Please give me this LaTeX code, ' +
-		customisations.summary_format + ' :' +
-		code_in_progress;
+	if (customisations.summary_format != ''){
+		const prompt =
+		    'Please give me this LaTeX code, ' +
+		    customisations.summary_format + ' :' +
+		    code_in_progress;
 
-	const completion = await openai.chat.completions.create({
-		messages: [{ role: 'system', content: prompt }],
-		model: 'gpt-3.5-turbo'
-	});
-
-	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+	    const completion = await openai.chat.completions.create({
+		    messages: [{ role: 'system', content: prompt }],
+		    model: 'gpt-3.5-turbo'
+	    });
+	    code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+	}
 
 	let latex_code: string = "";
 	if (code_in_progress != null && code_in_progress.includes("\\documentclass{article}")){
