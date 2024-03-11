@@ -1,6 +1,6 @@
 import { PATH_TO_DATA } from '$env/static/private'
 import { upload } from '$lib/object_storage/upload';
-import { addToTemplate, getBodyKeyDefCode, getBodyLatexCode } from '$lib/server/latex_generation';
+import { addToTemplate, getBodyKeyDefCode, getBodyLatexCode, getBodyReadingList, getBodyRevQuestionsCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
 import prisma from '$lib/server/prisma';
 import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
@@ -9,7 +9,7 @@ import { error, json } from '@sveltejs/kit';
 import { OutputType } from '$lib/server/output_engine';
 import path from 'node:path';
 import { unlinkSync } from 'node:fs';
-import { format, generateDefs } from '$lib/server/formatter';
+import { format, generateDefs, generateQuestions, generateReadingList } from '$lib/server/formatter';
 import type { Customisation } from '$lib/types/Customisation.js';
 import { sanitise_filename } from '$lib/utils.js';
 
@@ -86,6 +86,16 @@ export async function POST({ request, locals }) {
 		const defs: string = await generateDefs(backupSummary)??"";
 		const definitions: string[] = defs.split(";");
 		latexCode += getBodyKeyDefCode(definitions)
+	}
+	if(customisations.questions){
+		const questionsString: string = await generateQuestions(backupSummary)??"";
+		const questions: string[] = questionsString.split(";");
+		latexCode += getBodyRevQuestionsCode(questions);
+	}
+	if(customisations.reading_list){
+		const readingListString: string = await generateReadingList(backupSummary)??"";
+		const readingList: string[] = readingListString.split(";");
+		latexCode += getBodyReadingList(readingList);
 	}
 
 	const destination = `${uuid}/summaries/${filename}.${type}`;

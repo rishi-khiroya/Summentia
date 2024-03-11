@@ -22,10 +22,46 @@ export function getBodyKeyDefCode(definitions: string[]): string {
     \\section*{Key Definitions}
     \\begin{itemize}
     `
-
     for (let i = 0; i < definitions.length; i++){
         body += `
             \\item ${definitions[i]}
+        `;
+    }
+
+    body += `
+    \\end{itemize}
+    `
+    return body;
+}
+
+export function getBodyRevQuestionsCode(questions: string[]): string {
+    let body = '';
+
+    body += `
+    \\section*{Revision Questions}
+    `
+    for (let i = 0; i < questions.length; i++){
+        body += `
+            ${questions[i]}
+        `;
+    }
+
+    body += `
+    \\end{itemize}
+    `
+    return body;
+}
+
+export function getBodyReadingList(readingList: string[]): string {
+    let body = '';
+
+    body += `
+    \\section*{Relevant Reading List}
+    \\begin{itemize}
+    `
+    for (let i = 0; i < readingList.length; i++){
+        body += `
+            \\item ${readingList[i]}
         `;
     }
 

@@ -104,7 +104,7 @@ export async function generateDefs(summary: string){
 
 
 export async function generateQuestions(summary: string){
-	const prompt: string = 'Can you generate some revisition questions and answers for this text, in the format Question: Answer; Question: Answer : ' + summary;
+	const prompt: string = 'Can you generate some revisition questions and answers for this text, in the format Question; Answer; Question; Answer; ... ' + summary;
 	const completion = await openai.chat.completions.create({
 		messages: [{ role: 'system', content: prompt }],
 		model: 'gpt-3.5-turbo'
@@ -117,7 +117,7 @@ export async function generateQuestions(summary: string){
 }
 
 export async function generateReadingList(summary: string){
-	const prompt: string = 'Can you generate a relevant reading list for the following text: ' + summary;
+	const prompt: string = 'Can you generate a relevant reading list for the following text, in the format: book1; book2; book3; ... : ' + summary;
 	const completion = await openai.chat.completions.create({
 		messages: [{ role: 'system', content: prompt }],
 		model: 'gpt-3.5-turbo'
