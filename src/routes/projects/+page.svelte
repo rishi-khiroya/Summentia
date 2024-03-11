@@ -32,7 +32,8 @@
 	}
 
 	let startPoint: number = Math.max(data.pageNo - 2, 1);
-	let pages = Array.from(
+
+	$: pages = Array.from(
 		{
 			length: MAX_NO_PAGES
 		},
@@ -155,5 +156,7 @@
 		</TableBody>
 	</TableSearch>
 
-	<Pagination {pages} on:previous={previous} on:next={next} />
+	{#key pages}
+		<Pagination {pages} on:previous={previous} on:next={next} />
+	{/key}
 </div>
