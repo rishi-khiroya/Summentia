@@ -83,7 +83,7 @@ export async function POST({ request, locals }) {
 	
 
 	if(customisations.key_definitions_list){
-		const defs: string = generateDefs(backupSummary);
+		const defs: string = await generateDefs(backupSummary)??"";
 		const definitions: string[] = defs.split(";");
 		latexCode += getBodyKeyDefCode(definitions)
 	}
