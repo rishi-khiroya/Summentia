@@ -7,6 +7,7 @@
 	export let name: string;
 	export let required: boolean = true;
 	export let allowedFileType: string;
+	export let allowURL: boolean = true;
 
 	export let upload: Upload = {
 		fromFile: true,
@@ -56,13 +57,15 @@
 	};
 </script>
 
-<div class="flex py-3">
-	<!-- TODO: improve wording -->
-	<p class="pr-3 dark:text-white">{name} from File</p>
-	<Toggle on:change={() => (upload.fromFile = !upload.fromFile)} />
-	<p class="pl-0 dark:text-white">{name} from URL</p>
-</div>
-<div class="flex-1">
+{#if allowURL}
+	<div class="flex py-3">
+		<!-- TODO: improve wording -->
+		<p class="pr-3 dark:text-white">{name} from File</p>
+		<Toggle on:change={() => (upload.fromFile = !upload.fromFile)} />
+		<p class="pl-0 dark:text-white">{name} from URL</p>
+	</div>
+{/if}
+<div class="flex-1 pt-3">
 	{#if upload.fromFile}
 		<Dropzone
 			on:drop={dropHandle}
