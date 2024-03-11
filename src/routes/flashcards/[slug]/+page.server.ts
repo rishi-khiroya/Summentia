@@ -26,8 +26,7 @@ export const load: PageServerLoad = async (event) => {
 		if (project.hasSlides) {
 			summaryData.forEach((item) => {
 				const itemType = typeof item.summaries;
-				console.log(itemType);
-				console.log(item);
+				
 				if (itemType == 'string') {
 					summary = summary + item.summaries;
 				} else
@@ -38,14 +37,14 @@ export const load: PageServerLoad = async (event) => {
 		} else {
 			summary = summaryData.summary;
 		}
-        console.log(summary);
+        //console.log(summary);
 		return summary.toString();
 	};
 
 	async function getFlashCardsString() {
 		const summary: string = fullSummary();
 		const flashCardsString = await generateFlashCards(summary);
-		console.log('Flash Cards STring: ' + flashCardsString);
+		//console.log('Flash Cards STring: ' + flashCardsString);
 		return flashCardsString;
 	}
 
