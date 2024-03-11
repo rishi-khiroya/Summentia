@@ -1,7 +1,5 @@
-import { PATH_TO_DATA } from '$env/static/private';
-import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
+import { PATH_TO_DATA } from '$env/static/private'
 import { upload } from '$lib/object_storage/upload';
-import { check_exists } from '$lib/object_storage/helper.js';
 import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
 import prisma from '$lib/server/prisma';
@@ -13,6 +11,7 @@ import path from 'node:path';
 import { unlinkSync } from 'node:fs';
 import { format } from '$lib/server/formatter';
 import type { Customisation } from '$lib/types/Customisation.js';
+import { sanitise_filename } from '$lib/utils.js';
 
 export async function POST({ request, locals }) {
 	console.log('Downloading...');
@@ -28,7 +27,8 @@ export async function POST({ request, locals }) {
 	const outputType: OutputType = OutputType[type.toUpperCase()];
 	console.log(`Output Type = ${outputType}`);
 
-	const filename = form.get('filename')?.toString();
+	const title = form.get('title')?.toString()??"Summary";
+	const filename = sanitise_filename(title);
 
 	if (!id || !type || !filename || !customisation) error(400, 'Invalid form data.');
 	// (JSON.parse(JSON.stringify(project.customisation))
@@ -46,21 +46,23 @@ export async function POST({ request, locals }) {
 	if (!data) error(503, 'No project found');
 
 	const customisations: Customisation = JSON.parse(customisation);
-	console.log(customisations);
 
 	let latexCode = '';
 
 	if (data.hasSlides) {
+		console.log("Data has slides");
 		const slidesData = JSON.parse(JSON.stringify(data.data)) as PrismaSlidesData[];
 		const latexBody = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
-				
+
 				return slideData.summaries.reduce((a, b) => a + " " + b, "");
-				
+
 			})
 		);
+		console.log("GET body")
 		latexCode = addToTemplate(data.title, session?.user.name ?? '', latexBody);
+		console.log("Add to template")
 	} else {
 		latexCode = addToTemplate(
 			data.title,
@@ -70,26 +72,33 @@ export async function POST({ request, locals }) {
 	}
 
 	// format the code according to the customisations
-	//latexCode = (await format(latexCode, customisations)) ?? latexCode;
+	console.log("started formating")
+	const formattedlatexCode = (await format(latexCode, customisations)) ?? latexCode;
+	console.log("NEW FILENAMEA; " + filename);
 
 	const destination = `${uuid}/summaries/${filename}.${type}`;
-	const does_it_exist = await check_exists(destination);
 
-	if (!does_it_exist) {
-		const filepath = path.join(PATH_TO_DATA, filename);
-		console.log(`Outputting to ${filepath}`);
+	// do not check if it exists anymore as we always want to generate new documents in case the user does different customisations
+	const filepath = path.join(PATH_TO_DATA, filename);
+
+	console.log(`Outputting to ${filepath}`);
+	const correctOutput = await output(formattedlatexCode, filepath, outputType);
+	
+	if(!correctOutput){
 		await output(latexCode, filepath, outputType);
-
-		console.log(`Output to ${filepath}`);
-
-		console.log(`Uploading ${filepath}.${type} to S3: ${destination}.`);
-		await upload(`${filepath}.${type}`, destination);
-
-		console.log(`Uploaded to S3.`);
-
-		// has to sleep as the link does not become available to use immediately
-		await new Promise((resolve) => setTimeout(resolve, 500));
-		unlinkSync(`${filepath}.${type}`);
 	}
-	return json({ success: true });
+
+	console.log(`Output to ${filepath}`);
+
+	console.log(`Uploading ${filepath}.${type} to S3: ${destination}.`);
+	await upload(`${filepath}.${type}`, destination);
+
+	console.log(`Uploaded to S3.`);
+
+	// has to sleep as the link does not become available to use immediately
+	await new Promise((resolve) => setTimeout(resolve, 500));
+	console.log("Before unlink")
+	unlinkSync(`${filepath}.${type}`);
+	console.log("after unlink")
+	return json({ success: true, sanitisedFilename: filename });
 }

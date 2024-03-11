@@ -178,7 +178,7 @@ export const actions = {
 						console.log(data);
 					} else {
 						const transcript: string = (project.data as PrismaBasicData).transcript;
-						const summary: string | null = await summarise(transcript);
+						const summary: string | null = await summarise(transcript, 2);
 						data = { transcript, summary: summary ? summary : 'Error...' };
 					}
 

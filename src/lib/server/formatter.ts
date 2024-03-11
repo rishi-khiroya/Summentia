@@ -7,48 +7,83 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 // we assumed that transcript_code is a string of LaTeX code containing the summary
 export async function format(transcript_code: string, customisations: Customisation) {
-	let highlight_phrase = '';
+	let code_in_progress: string = transcript_code;
+
 	if (customisations.highlight_keywords) {
-		highlight_phrase = ' highlight keywords ';
+
+		const prompt =
+		'Give me this LaTeX code and make the keywords underlined : ' +
+		code_in_progress;
+
+		const completion = await openai.chat.completions.create({
+			messages: [{ role: 'system', content: prompt }],
+			model: 'gpt-3.5-turbo'
+		});
+
+		code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+		console.log("\n\nHIGHLIGHTED-----------\n\n" + code_in_progress);
 	}
 
-	let questions_phrase = '';
 	if (customisations.questions) {
-		questions_phrase = ' with a revision question answer section';
+		const prompt =
+		'Please give me this LaTeX code with a revision question answer section at the end: ' +
+		code_in_progress;
+
+		const completion = await openai.chat.completions.create({
+			messages: [{ role: 'system', content: prompt }],
+			model: 'gpt-3.5-turbo'
+		});
+
+		code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+		console.log("\n\nQUESTIONS-----------\n\n" + code_in_progress);
 	}
 
-	// adds length prompt for length upper bound in pages, default set to 1
-	let length_phrase = '';
-	if (customisations.length != -1) {
-		if (customisations.length == 1) {
-			length_phrase = ' in 1 page ';
-		} else {
-			length_phrase = ' in ' + customisations.length + ' pages ';
-		}
-	}
-
-	const prompt =
-		'Plase give me this LaTeX code, ' +
-		length_phrase +
-		highlight_phrase +
-		customisations.summary_format +
-		questions_phrase +
-		' :' +
-		transcript_code;
+	if (customisations.reading_list){
+		const prompt =
+		'Please give me this LaTeX code, with a relevant textbook reading list at the end:' +
+		code_in_progress;
 
 	const completion = await openai.chat.completions.create({
 		messages: [{ role: 'system', content: prompt }],
 		model: 'gpt-3.5-turbo'
 	});
 
-	const summary = completion.choices[0]['message']['content'];
+	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+	}
 
-	console.log('Prompt : ');
-	console.log(prompt);
-	console.log('Customised Code : ');
-	console.log(summary);
+	if (customisations.key_definitions_list){
+		const prompt =
+		'Please give me as LaTeX code with a list of key definitions at the end:' +
+		code_in_progress;
 
-	return summary;
+	const completion = await openai.chat.completions.create({
+		messages: [{ role: 'system', content: prompt }],
+		model: 'gpt-3.5-turbo'
+	});
+
+	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+	}
+
+	const prompt =
+		'Please give me this LaTeX code, ' +
+		customisations.summary_format + ' :' +
+		code_in_progress;
+
+	const completion = await openai.chat.completions.create({
+		messages: [{ role: 'system', content: prompt }],
+		model: 'gpt-3.5-turbo'
+	});
+
+	code_in_progress = completion.choices[0]['message']['content']??code_in_progress;
+
+	let latex_code: string = "";
+	if (code_in_progress != null && code_in_progress.includes("\\documentclass{article}")){
+		latex_code  = "\\documentclass{article}" + ((code_in_progress.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
+	} else if (code_in_progress != null && code_in_progress.includes("\\begin{document}")){
+		latex_code  = "\\begin{document}" + ((code_in_progress.split("\\documentclass{article}"))[1]).split("\\end{document}")[0] + "\\end{document}";
+	}
+
+	return latex_code;
 }
 
 export async function generateFlashCards(summary: string){

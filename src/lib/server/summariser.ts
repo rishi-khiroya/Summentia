@@ -11,7 +11,7 @@ export async function summarise(transcript: string, detail_level: number = 1) {
 			detail_phrase = ': ';
 			break;
 		case 2:
-			detail_phrase = ' in great detail: ';
+			detail_phrase = ' in great detail and also explain the key concepts: ';
 			break;
 		default:
 			break;
