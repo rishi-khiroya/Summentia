@@ -1,6 +1,6 @@
 import { PATH_TO_DATA } from '$env/static/private'
 import { upload } from '$lib/object_storage/upload';
-import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
+import { addToTemplate, getBodyKeyDefCode, getBodyLatexCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
 import prisma from '$lib/server/prisma';
 import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
@@ -53,7 +53,7 @@ export async function POST({ request, locals }) {
 	if (data.hasSlides) {
 		console.log("Data has slides");
 		const slidesData = JSON.parse(JSON.stringify(data.data)) as PrismaSlidesData[];
-		const latexBody = getBodyLatexCode(
+		latexCode = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
 				backupSummary += slideData.summaries.reduce((a, b) => a + " " + b, "");
@@ -62,16 +62,18 @@ export async function POST({ request, locals }) {
 			})
 		);
 		console.log("GET body")
-		latexCode = addToTemplate(data.title, session?.user.name ?? '', latexBody);
+		//latexCode = addToTemplate(data.title, session?.user.name ?? '', latexBody);
 		console.log("Add to template")
 		backupLatexCode = addToTemplate(data.title, session?.user.name ?? '', backupSummary);
 		
 	} else {
-		latexCode = addToTemplate(
-			data.title,
-			session?.user.name ?? '',
-			(JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary
-		);
+
+		latexCode = (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary
+		// latexCode = addToTemplate(
+		// 	data.title,
+		// 	session?.user.name ?? '',
+			
+		// );
 		backupLatexCode = latexCode;
 		console.log("Summary: " + (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary);
 	}
@@ -79,12 +81,19 @@ export async function POST({ request, locals }) {
 	// format the code according to the customisations
 	console.log("started formating")
 	
+
+	if(customisations.key_definitions_list){
+		const definitions: string[] = ["dsxzg", "serwer"]
+		latexCode += getBodyKeyDefCode(definitions)
+	}
+
+	const destination = `${uuid}/summaries/${filename}.${type}`;
+
+	latexCode = addToTemplate(data.title, session?.user.name ?? '', latexCode);
+
 	const formattedlatexCode = (await format(latexCode, customisations)) ?? latexCode;
 	console.log("NEW FILENAMEA; " + filename);
 	console.log("FORMATTED CODE: " + formattedlatexCode);
-
-
-	const destination = `${uuid}/summaries/${filename}.${type}`;
 
 	// do not check if it exists anymore as we always want to generate new documents in case the user does different customisations
 	const filepath = path.join(PATH_TO_DATA, filename);

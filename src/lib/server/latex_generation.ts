@@ -15,6 +15,26 @@ export function getBodyLatexCode(slides: string[], summaries: string[]): string 
     return body;
 }
 
+export function getBodyKeyDefCode(definitions: string[]): string {
+    let body = '';
+
+    body += `
+    \\section*{Key Definitions}
+    \\begin{itemize}
+    `
+
+    for (let i = 0; i < definitions.length; i++){
+        body += `
+            \\item ${definitions[i]}
+        `;
+    }
+
+    body += `
+    \\end{itemize}
+    `
+    return body;
+}
+
 export function addToTemplate(title: string, author: string, body: string): string {
     return `
     \\documentclass{article}
