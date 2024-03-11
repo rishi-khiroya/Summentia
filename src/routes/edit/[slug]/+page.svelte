@@ -88,7 +88,7 @@
 				form.append('data', JSON.stringify(data));
 			});
 		} else {
-			form.append('data', JSON.stringify(slidesData));
+			form.append('data', JSON.stringify(data.data));
 		}
 
 		form.append('id', data.id.toString());

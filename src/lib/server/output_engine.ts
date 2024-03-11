@@ -33,20 +33,22 @@ export async function output(
 
 ) {
 	const pandocFormat = createOuts(fileName)[outputType][0];
-	if (outputType === OutputType.PDF) {
+	try {
+		if (outputType === OutputType.PDF) {
 
-		writeFileSync(`${fileName}.tex`, latexCode);
-		const pandocCommand = `pdflatex ${fileName}.tex`;
-		try{
+			writeFileSync(`${fileName}.tex`, latexCode);
+			const pandocCommand = `pdflatex ${fileName}.tex`;
+
 			childProcess.execSync(pandocCommand);
-		} catch(err){
-			console.log("ouptut engine pdf error");
-			return false;
+
+			unlinkSync(`${fileName}.tex`);
+		} else {
+			const pandocInstance = new Pandoc('latex', [pandocFormat]);
+			await pandocInstance.convertAsync(latexCode);
 		}
-		unlinkSync(`${fileName}.tex`);
-	} else {
-		const pandocInstance = new Pandoc('latex', [pandocFormat]);
-		await pandocInstance.convertAsync(latexCode);
+	} catch (err) {
+		console.log("ouptut engine error: " + outputType);
+		return false;
 	}
 	return true;
 }
