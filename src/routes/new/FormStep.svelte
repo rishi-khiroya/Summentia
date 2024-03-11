@@ -36,7 +36,7 @@
 					</Badge>
 				{:else}
 					<Badge color="red" rounded class="px-2.5 py-0.5">
-						<Indicator color="red" size="xs" class="me-1" />Unavailable
+						<Indicator color="red" size="xs" class="me-1" />Busy
 					</Badge>
 				{/if}
 			</div>
