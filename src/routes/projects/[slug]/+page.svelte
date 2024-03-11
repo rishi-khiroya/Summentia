@@ -12,7 +12,6 @@
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 	import DownloadModal from '../../DownloadModal.svelte';
 	import type { Customisation } from '$lib/types/Customisation';
-	import { formResponseToJSON } from '$lib/utils';
 
 	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
 		let basicData: PrismaBasicData;
@@ -20,8 +19,8 @@
 		let transcripts: string[] = [];
 		let summaries: string[] = [];
 		slideData.forEach((element) => {
-			transcripts.concat(element.transcripts);
-			summaries.concat(element.summaries);
+			transcripts.push(element.transcripts.reduce((a, b) => a + ' ' + b, ''));
+			summaries.push(element.summaries.reduce((a, b) => a + ' ' + b, ''));
 		});
 
 		basicData = { transcript: transcripts.join(' '), summary: summaries.join(' ') };
@@ -37,16 +36,8 @@
 	let pages: { name: string; href: string }[];
 
 	let showDownloadModal: boolean = false;
-	let customisation: Customisation = data.project.customisation
-		? JSON.parse(JSON.stringify(data.project.customisation))
-		: {
-				highlight_keywords: false,
-				questions: false,
-				summary_format: '',
-				length: 1
-			};
 
-	$: displayButtonText = displaySlides ? 'Slides View' : 'Overview';
+	$: displayButtonText = (displaySlides: boolean) => (displaySlides ? 'Slides View' : 'Overview');
 
 	console.log(data.project);
 
@@ -57,7 +48,7 @@
 		overviewData = accumulateSlideData(slideData);
 		slideNo = data.pageNo - 1;
 
-		pages = slideData.map((slide, index) => {
+		pages = slideData.map((_, index) => {
 			return {
 				name: (index + 1).toString(),
 				href: `/projects/${data.project.id}?page=${index + 1}`,
@@ -111,7 +102,9 @@
 	<div class="flex-col px-10 pt-10">
 		<div class="flow-root">
 			<div class="float-left justify-start items-center flex">
-				<h1 class="text-4xl p-5 font-bold dark:text-white">{data.project.title}</h1>
+				<h1 class="text-4xl p-5 font-bold dark:text-white">
+					{`${displayButtonText(displaySlides)}: ${data.project.title}`}
+				</h1>
 				<ButtonGroup class="space-x-px">
 					<Button pill color="dark" on:click={edit}>
 						<EditSolid class="focus:!outline-none" />
@@ -129,7 +122,9 @@
 			</div>
 			{#if data.project.hasSlides}
 				<div class="float-right justify-end items-center flex">
-					<Button pill color="dark" on:click={changeView}>{displayButtonText}</Button>
+					<Button pill color="dark" on:click={changeView}
+						>{displayButtonText(!displaySlides)}</Button
+					>
 				</div>
 			{/if}
 		</div>
@@ -145,7 +140,7 @@
 					</div>
 					<InformationBox title="Transcript:" maxHeight="72" additionalAttributes="flex-1">
 						<!-- <p>{slideData[slideNo].transcripts.reduce((a, b) => a + ' ' + b, '')}</p> -->
-						<!-- <p>{slideData[slideNo].transcripts.reduce((a, b) => a + ' ' + b, '')}</p> -->
+						<p>{slideData[slideNo].transcripts.reduce((a, b) => a + ' ' + b, '')}</p>
 					</InformationBox>
 				</div>
 				<div class="flex">
