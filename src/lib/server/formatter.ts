@@ -90,7 +90,7 @@ export async function generateFlashCards(summary: string){
 }
 
 export async function generateDefs(summary: string){
-	const prompt: string = 'Can you generate a list of key definitions from this text, in the format keyword: def; keyword: def; ' + summary;
+	const prompt: string = 'Can you generate a list of key definitions from this text, in the format keyword: definition; keyword: definition; ' + summary;
 	const completion = await openai.chat.completions.create({
 		messages: [{ role: 'system', content: prompt }],
 		model: 'gpt-3.5-turbo'
