@@ -4,6 +4,7 @@
 	import { formResponseToJSON } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
 	import { onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	export let data;
 
@@ -36,7 +37,9 @@
 		if (response.ok) {
 			console.log(response);
 			const json = await response.json();
+			console.log(json);
 			if (json) {
+				if (json.type === "redirect") goto(json.location);
 				// console.log(json.data);
 				const data = formResponseToJSON(json.data);
 				console.log(data);
