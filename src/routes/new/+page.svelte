@@ -242,7 +242,7 @@
 			submit={() => handleSlides()}
 		>
 			<h1 class="text-2xl font-bold dark:text-white">Upload slides:</h1>
-			<FileUpload bind:upload={slidesUpload} name="Slides" allowedFileType=".pdf" />
+			<FileUpload bind:upload={slidesUpload} name="Slides" allowedFileType=".pdf" allowURL={false}/>
 		</FormStep>
 
 		<!-- Confirm title and date (guessed from lecture/slides) -->

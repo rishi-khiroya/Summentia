@@ -99,8 +99,11 @@
 			body: form
 		});
 
-		if (response.ok) saved = true;
-		alert("The change is saved")
+		if (response.ok) {
+			saved = true;
+			dirty = false;
+		}
+		alert('The change is saved');
 		// TODO: trigger toast
 	}
 
@@ -215,6 +218,10 @@
 								cols="100"
 								bind:value={slideData.summaries}
 								on:change={() => (saved = false)}
+								on:input={() => {
+									saved = false;
+									dirty = true;
+								}}
 							/>
 						</div>
 					</div>
@@ -239,8 +246,10 @@
 <div class="fixed bottom-0 left-0 p-5">
 	<Button color="red" size="xl" on:click={() => back()}>Back</Button>
 
-	<Button color="green" size="xl" on:click={() => {save()}}>
-		Save
-		<FileCheckSolid />
-	</Button>
+	{#if !saved || dirty}
+		<Button color="green" size="xl" on:click={() => save()}>
+			Save
+			<FileCheckSolid />
+		</Button>
+	{/if}
 </div>
