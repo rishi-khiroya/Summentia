@@ -90,7 +90,7 @@
 	{#key project}
 		<div class="flex-col text-center p-10 space-y-5">
 			<Spinner size="16" />
-			{#if fetched}
+			{#if data}
 				<h1 class="text-4xl animate-bounce pt-3 dark:text-white">{status()}</h1>
 			{/if}
 			<h1 class="italic font-semibold mt-10 pt-10 animate-pulse text-red-700">
