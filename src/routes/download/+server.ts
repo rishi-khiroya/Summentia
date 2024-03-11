@@ -9,7 +9,7 @@ import { error, json } from '@sveltejs/kit';
 import { OutputType } from '$lib/server/output_engine';
 import path from 'node:path';
 import { unlinkSync } from 'node:fs';
-import { format } from '$lib/server/formatter';
+import { format, generateDefs } from '$lib/server/formatter';
 import type { Customisation } from '$lib/types/Customisation.js';
 import { sanitise_filename } from '$lib/utils.js';
 
@@ -67,8 +67,8 @@ export async function POST({ request, locals }) {
 		backupLatexCode = addToTemplate(data.title, session?.user.name ?? '', backupSummary);
 		
 	} else {
-
-		latexCode = (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary
+		backupSummary = (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary
+		latexCode = backupSummary;
 		// latexCode = addToTemplate(
 		// 	data.title,
 		// 	session?.user.name ?? '',
@@ -83,7 +83,8 @@ export async function POST({ request, locals }) {
 	
 
 	if(customisations.key_definitions_list){
-		const definitions: string[] = ["dsxzg", "serwer"]
+		const defs: string = generateDefs(backupSummary);
+		const definitions: string[] = defs.split(";");
 		latexCode += getBodyKeyDefCode(definitions)
 	}
 
