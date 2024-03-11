@@ -96,7 +96,7 @@ export async function POST({ request, locals }) {
 	console.log(`Uploaded to S3.`);
 
 	// has to sleep as the link does not become available to use immediately
-	await new Promise((resolve) => setTimeout(resolve, 500));
+	await new Promise((resolve) => setTimeout(resolve, 1000));
 	console.log("Before unlink")
 	unlinkSync(`${filepath}.${type}`);
 	console.log("after unlink")
