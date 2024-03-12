@@ -147,7 +147,7 @@
 					<div class="flex justify-center">
 						<img
 							class="m-5 h-72 rounded-xl outline-1 outline-transparent shadow-md shadow-black"
-							src={slideData[slideNo].slide}
+							src={slideData[slideNo].url}
 							alt="Slide 1"
 						/>
 					</div>

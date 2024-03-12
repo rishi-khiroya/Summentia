@@ -32,13 +32,15 @@ const uploadSlides = async (
 		squashed: boolean;
 	}[]
 ): Promise<PrismaSlidesData[]> => {
-	const slidesFolder = path.join(PATH_TO_DATA, uuid, 'slides');
+	const slidesFolder = path.join(uuid, 'slides');
+	console.log(slidesFolder);
 	return await Promise.all(
 		data.map(async (slide) => {
 			const parsedPath = path.parse(slide.slide);
 			const filename = parsedPath.name + parsedPath.ext;
 			const destination = path.join(slidesFolder, filename);
 			await upload(slide.slide, destination);
+			console.log("dest: " + destination);
 
 			return {
 				slide: slide.slide,
