@@ -10,8 +10,8 @@ import path from 'path';
 import { PATH_TO_DATA } from '$env/static/private';
 import { removeFromDB } from '$lib/server/types/Project';
 import { sanitise_filename } from '$lib/utils';
-import { uploadForView } from '$lib/object_storage/upload';
 import { check_exists } from '$lib/object_storage/helper';
+import { uploadForView } from '$lib/object_storage/upload';
 
 const NO_PROJECTS: number = 5;
 
@@ -75,7 +75,8 @@ async function generateRecentPDF(project: any, filename: string) {
 	let backupLatexCode = '';
 
 	if (project.hasSlides) {
-		const slidesData = JSON.parse(JSON.stringify(project.data)) as PrismaSlidesData[];
+		let slidesData = JSON.parse(JSON.stringify(project.data)) as PrismaSlidesData[];
+		slidesData = slidesData.filter((slide) => !slide.squashed && slide.transcripts?.length);
 		const latexBody = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
@@ -104,6 +105,7 @@ async function generateRecentPDF(project: any, filename: string) {
 		console.log("latex: " + backupLatexCode);
 		await output(backupLatexCode, filepath, outputType);
 	}
+
 	const destination = `${project.uuid}/summaries/${filename}.pdf`;
 	const does_it_exist = check_exists(destination);
 	// const does_it_exist = false

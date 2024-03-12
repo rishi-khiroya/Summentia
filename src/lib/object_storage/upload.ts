@@ -58,7 +58,6 @@ export async function uploadForView(filePath: string, destPath: string) {
 	uploadForViewObject();
 }
 
-
 /* from linked in: https://www.linkedin.com/pulse/upload-images-video-files-using-aws-s3-sdknodejs-react-birendra-jha-fdqnc/?trk=article-ssr-frontend-pulse_more-articles_related-content-card
 
 router.post("/uploadfile",upload.single('file'), async (req, res) => { 
