@@ -309,7 +309,9 @@
 						<h1 class="text-lg text-clip">{lecture.info.date}</h1>
 					</div>
 					<h1 class="text-lg text-clip">Video: {parseFileName(lecture.video)}</h1>
-					<h1 class="text-lg text-clip">Slides: {parseFileName(lecture.slides) ?? 'None'}</h1>
+					<h1 class="text-lg text-clip">
+						Slides: {lecture.slides ? parseFileName(lecture.slides) : 'None'}
+					</h1>
 				</div>
 				<div class="flex flex-col w-full m-5 space-y-5">
 					<div class="flex flex-col shadow-md shadow-black outline-1 outline-black p-5 rounded-xl">
