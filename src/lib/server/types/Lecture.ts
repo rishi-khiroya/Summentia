@@ -63,7 +63,7 @@ export class Lecture {
 				throw new Error('Invalid URL');
 			}
 
-			video = VideoFromUrl.from(new URL(data.toString()));
+			video = await VideoFromUrl.from(new URL(data.toString()));
 		}
 
 		return new Lecture(video, form.get('userId')?.toString());
@@ -173,13 +173,23 @@ class VideoFromUrl extends Video {
 		return value;
 	}
 
-	static from(url: URL): VideoFromUrl {
+	static async from(url: URL): Promise<VideoFromUrl> {
 		const uuid: string = randomUUID();
-		return new VideoFromUrl(VideoURLHandler.create(url), uuid);
+		const folder: string = path.join(PATH_TO_DATA, uuid);
+		console.log(folder);
+		mkdirSync(folder);
+		console.log(`mkdir ${folder}`);
+		const video = new VideoFromUrl(VideoURLHandler.create(url), uuid);
+		await video.download();
+		return video;
+	}
+
+	private async download(): Promise<void> {
+		await this.handler.download(this.uuid);
 	}
 
 	private constructor(urlHandler: VideoURLHandler, uuid: string) {
-		super(urlHandler.download(uuid).name);
+		super(uuid);
 		this.handler = urlHandler;
 	}
 

@@ -41,6 +41,7 @@ class YoutubeHandler extends VideoURLHandler {
 		return {title, date}
 	}
 	public async download(uuid: string): Promise<void> {
+		console.log("Downloading from YouTube Handler.");
 		const info = await ytdl.getInfo(this.url.toString());
 		const options = ytdl.filterFormats(info.formats, 'audioandvideo');
 		if (options.length) {
@@ -50,6 +51,7 @@ class YoutubeHandler extends VideoURLHandler {
 					.pipe(createWriteStream(`${path.join(PATH_TO_DATA, uuid, 'video.mp4')}`))
 					.on('close', resolve);
 			});
+			console.log("Downloaded.");
 		}
 	}
 }
