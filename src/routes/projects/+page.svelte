@@ -21,7 +21,7 @@
 	export let data;
 
 	const MAX_NO_PAGES: number = 5;
-	const ITEMS_PER_PAGE: number = 10;
+	const ITEMS_PER_PAGE: number = 8;
 	let searchTerm: string = '';
 	$: filteredItems = data.projects.filter(
 		(project) => project.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
@@ -104,7 +104,6 @@
 		<TableHead>
 			<TableHeadCell>Title</TableHeadCell>
 			<TableHeadCell>Date</TableHeadCell>
-			<TableHeadCell>Created At</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
 			<TableHeadCell>Quick Actions</TableHeadCell>
 		</TableHead>
@@ -113,13 +112,12 @@
 				<TableBodyRow>
 					<TableBodyCell>{item.title}</TableBodyCell>
 					<TableBodyCell>{reformat_date(item.date)}</TableBodyCell>
-					<TableBodyCell>{reformat_date(item.createdAt)}</TableBodyCell>
 					<TableBodyCell>
 						{item.status[0].toUpperCase() + item.status.substring(1).toLowerCase()}
 					</TableBodyCell>
 
 					<TableBodyCell>
-						<div class="flex flex-row space-x-5 items-center justify-center">
+						<div class="flex flex-row space-x-5 items-center justify-start">
 							{#if isSummarised(item)}
 								<button class="hover:cursor-pointer" on:click={() => goto(`/projects/${item.id}`)}>
 									<EyeOutline size="lg" id="view" />

@@ -5,7 +5,7 @@ import prisma from '$lib/server/prisma';
 import { removeFromDB } from '$lib/server/types/Project';
 import type { Project } from '@prisma/client';
 
-const ITEMS_PER_PAGE: number = 10;
+const ITEMS_PER_PAGE: number = 8;
 
 export const load: PageServerLoad = async (event) => {
 	const session: Session | null = await event.locals.auth();
