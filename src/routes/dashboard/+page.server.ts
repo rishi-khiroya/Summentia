@@ -10,6 +10,8 @@ import path from 'path';
 import { PATH_TO_DATA } from '$env/static/private';
 import { removeFromDB } from '$lib/server/types/Project';
 import { sanitise_filename } from '$lib/utils';
+import { uploadForView } from '$lib/object_storage/upload';
+import { check_exists } from '$lib/object_storage/helper';
 
 const NO_PROJECTS: number = 5;
 
@@ -47,8 +49,10 @@ export const load: PageServerLoad = async (event) => {
 	let sanitised_filename = "Summary";
 	if (summarised_projects.length > 0) {
 		sanitised_filename = sanitise_filename(summarised_projects[0].title);
-		generateRecentPDF(summarised_projects[0], sanitised_filename);
+		sanitised_filename += "_View";
+		await generateRecentPDF(summarised_projects[0], sanitised_filename);
 	}
+
 	return { noProjects, pageNo, projects, sanitised_filename };
 };
 
@@ -97,8 +101,18 @@ async function generateRecentPDF(project: any, filename: string) {
 	const isOutputCorrect = await output(latexCode, filepath, outputType);
 	if(!isOutputCorrect){
 		backupLatexCode = addToTemplate(project.title, '', backupSummaryCode);
+		console.log("latex: " + backupLatexCode);
 		await output(backupLatexCode, filepath, outputType);
 	}
+	const destination = `${project.uuid}/summaries/${filename}.pdf`;
+	const does_it_exist = check_exists(destination);
+	// const does_it_exist = false
+	if(!does_it_exist){
+		await uploadForView(`${filepath}.pdf`, destination)
+		console.log("uploaded: " + destination);
+	} else {
+		"it exists "
+	}
 
-
+	await new Promise((resolve) => setTimeout(resolve, 1000));
 }
