@@ -26,10 +26,9 @@ export class Lecture {
 	}
 
 	public async withSlidesFromFile(slides: File): Promise<Lecture> {
-		
 		const filepath: string = path.join(PATH_TO_DATA, this.uuid, 'slides.pdf');
-		console.log("slides file path" + filepath);
-		console.log("uuid: " + this.uuid);
+		console.log('slides file path' + filepath);
+		console.log('uuid: ' + this.uuid);
 		await writeFile(filepath, Buffer.from(await slides.arrayBuffer()));
 		this.slides = filepath;
 		return this;
@@ -59,10 +58,10 @@ export class Lecture {
 			video = await VideoFromFile.from(form.get(`lectureFile`) as File);
 		} else {
 			const data = form.get('lectureURL');
-			const valid_url = await VideoFromUrl.check_url(data.toString())
+			const valid_url = await VideoFromUrl.check_url(data.toString());
 			if (!data || !valid_url) {
-				throw new Error('Invalid URL')
-			};
+				throw new Error('Invalid URL');
+			}
 
 			video = VideoFromUrl.from(new URL(data.toString()));
 		}
@@ -103,7 +102,7 @@ class Video {
 
 	public constructor(uuid: string) {
 		this.uuid = uuid;
-		console.log(`Init with uuid=${uuid}`)
+		console.log(`Init with uuid=${uuid}`);
 	}
 
 	public async getTitleDate(): Promise<{ title: string; date: string }> {
@@ -129,8 +128,8 @@ class VideoFromFile extends Video {
 		console.log(`mkdir ${folder}`);
 		const filepath: string = path.join(folder, 'video.mp4');
 		await writeFile(filepath, Buffer.from(await file.arrayBuffer()));
-		console.log(`Written file to ${path}`)
-		
+		console.log(`Written file to ${path}`);
+
 		const destination = `${uuid}/video.mp4`;
 		upload(filepath, destination);
 		return new VideoFromFile(uuid, file);
@@ -149,7 +148,7 @@ class VideoFromFile extends Video {
 				.parse(this.file.name)
 				.name.replaceAll(/[^a-zA-Z\d]/g, ' ')
 				.split(' ')
-				.map((word) => word.length > 0 ? word[0].toUpperCase(): "" + word.length > 1 ? word.substring(1) : "")
+				.map((word) => word[0].toUpperCase() + (word.length > 1 ? word.substring(1) : ''))
 				.join(' '),
 			date: formatDate(date)
 		};
@@ -166,12 +165,12 @@ class VideoFromUrl extends Video {
 
 	static async check_url(url: string) {
 		let value = true;
-		try{
-			await ytdl.getInfo(url.toString())
-		}catch {
-			value = false
+		try {
+			await ytdl.getInfo(url.toString());
+		} catch {
+			value = false;
 		}
-		return value
+		return value;
 	}
 
 	static from(url: URL): VideoFromUrl {
