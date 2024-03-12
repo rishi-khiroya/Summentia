@@ -30,7 +30,6 @@
 		"@types/node": "^20.11.25",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
-		"@unpic/svelte": "^0.0.51",
 		"autoprefixer": "^10.4.16",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
@@ -65,6 +64,7 @@
 	},
 	"dependencies": {
 		"@prisma/client": "^5.9.0",
+		"@unpic/svelte": "^0.0.51",
 		"next-auth": "^4.24.5",
 		"rollup": "^4.9.6",
 		"vercel": "^32.3.0"
