@@ -3,6 +3,7 @@
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 	import { Button, Modal, Textarea, Checkbox, Alert } from 'flowbite-svelte';
 	import { ExclamationCircleOutline, FileCheckSolid, PlusSolid } from 'flowbite-svelte-icons';
+	import { Image } from '@unpic/svelte';
 
 	export let data;
 
@@ -56,7 +57,8 @@
 					typeof slide.summaries == 'string'
 						? slide.summaries
 						: slide.summaries.reduce((a: string, b: string) => a + ' ' + b, ''),
-				transcripts: slide.transcripts
+				transcripts: slide.transcripts,
+				url: slide.url
 			};
 		});
 		console.log(`post: ${slidesData}`);
@@ -77,10 +79,10 @@
 
 	async function save() {
 		const form: FormData = new FormData();
-		console.log("saving data")
+		console.log('saving data');
 		// Add userId to the form
 		if (data.session) form.append('userId', data.session.user.id);
-		console.log("data", data.data)
+		console.log('data', data.data);
 
 		form.append('hasSlides', data.hasSlides.toString());
 		if (data.hasSlides) {
@@ -204,7 +206,8 @@
 							</h2>
 
 							<!-- svelte-ignore a11y-img-redundant-alt -->
-							<img class="flex-1" src={slideData.slide} alt="Slide {slideNo}" />
+							<!-- <img class="flex-1" src={slideData.slide} alt="Slide {slideNo}" /> -->
+							<Image src={slideData.url} layout="fullWidth" height={300} alt={`Slide ${slideNo}`} />
 						</div>
 
 						<div
