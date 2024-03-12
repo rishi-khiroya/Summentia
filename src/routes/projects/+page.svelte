@@ -81,11 +81,13 @@
 
 	let showDeleteModal: [boolean, any] = [false, null];
 	let showDownloadModal: boolean = false;
-	let currentProject: Project = data.projects[0];
+	let currentProject: Project | undefined;
 </script>
 
 <!--  the filename will be stored in the S3 storage with the format title_id -->
-<DownloadModal bind:open={showDownloadModal} bind:project={currentProject} />
+{#if currentProject}
+	<DownloadModal bind:open={showDownloadModal} bind:project={currentProject} />
+{/if}
 
 <Modal bind:open={showDeleteModal[0]} size="xs" autoclose>
 	<div class="text-center" id="deletemodal">
