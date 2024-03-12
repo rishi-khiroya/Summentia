@@ -52,7 +52,8 @@ export async function POST({ request, locals }) {
 	let backupSummary = '';
 	if (data.hasSlides) {
 		console.log("Data has slides");
-		const slidesData = JSON.parse(JSON.stringify(data.data)) as PrismaSlidesData[];
+		let slidesData = JSON.parse(JSON.stringify(data.data)) as PrismaSlidesData[];
+		slidesData = slidesData.filter((slide) => !slide.squashed && slide.transcripts?.length);
 		latexCode = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
@@ -64,7 +65,8 @@ export async function POST({ request, locals }) {
 		console.log("GET body")
 		//latexCode = addToTemplate(data.title, session?.user.name ?? '', latexBody);
 		console.log("Add to template")
-		backupLatexCode = addToTemplate(data.title, session?.user.name ?? '', backupSummary);
+		//backupLatexCode = addToTemplate(data.title, session?.user.name ?? '', backupSummary);
+		backupLatexCode = latexCode;
 		
 	} else {
 		backupSummary = (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary
@@ -113,7 +115,7 @@ export async function POST({ request, locals }) {
 	const correctOutput = await output(formattedlatexCode, filepath, outputType);
 	
 	if(!correctOutput){
-		await output(backupLatexCode, filepath, outputType);
+		await output(latexCode, filepath, outputType);
 	}
 
 	console.log(`Output to ${filepath}`);

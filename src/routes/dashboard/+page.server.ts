@@ -74,7 +74,8 @@ async function generateRecentPDF(project: any, filename: string) {
 	let backupLatexCode = '';
 
 	if (project.hasSlides) {
-		const slidesData = JSON.parse(JSON.stringify(project.data)) as PrismaSlidesData[];
+		let slidesData = JSON.parse(JSON.stringify(project.data)) as PrismaSlidesData[];
+		slidesData = slidesData.filter((slide) => !slide.squashed && slide.transcripts?.length);
 		const latexBody = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
