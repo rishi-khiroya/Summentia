@@ -45,6 +45,8 @@
 	if (displaySlides) {
 		slideData = JSON.parse(JSON.stringify(data.project.data));
 
+		slideData = slideData.filter((slide) => !slide.squashed && slide.transcripts?.length);
+
 		console.log(slideData);
 		overviewData = accumulateSlideData(slideData);
 		slideNo = data.pageNo - 1;
