@@ -12,6 +12,8 @@ import { redirect } from '@sveltejs/kit';
 import { process_genslides, process_noslides, process_slides } from '$lib/server/python';
 import path from 'node:path';
 import { PATH_TO_DATA } from '$env/static/private';
+import { upload } from '$lib/object_storage/upload';
+import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
 
 const setWaiting = async (id: number) =>
 	await prisma.project.update({
@@ -20,6 +22,34 @@ const setWaiting = async (id: number) =>
 			waiting: false
 		}
 	});
+
+const uploadSlides = async (
+	uuid: string,
+	data: {
+		slide: string;
+		transcripts: string[];
+		summaries: string[];
+		squashed: boolean;
+	}[]
+): Promise<PrismaSlidesData[]> => {
+	const slidesFolder = path.join(PATH_TO_DATA, uuid, 'slides');
+	return await Promise.all(
+		data.map(async (slide) => {
+			const parsedPath = path.parse(slide.slide);
+			const filename = parsedPath.name + parsedPath.ext;
+			const destination = path.join(slidesFolder, filename);
+			await upload(slide.slide, destination);
+
+			return {
+				slide: slide.slide,
+				transcripts: slide.transcripts,
+				summaries: slide.summaries,
+				squashed: slide.squashed,
+				url: path.join(DIGITAL_OCEAN_ENDPOINT, destination)
+			};
+		})
+	);
+};
 
 export const load: PageServerLoad = async ({ params }) => {
 	const data = await prisma.project.findUnique({
@@ -99,10 +129,13 @@ export const actions = {
 
 				if (response.success && data) {
 					console.log('Updating db...');
+
+					const newData = await uploadSlides(project.uuid, Object.values(data));
+
 					record = await prisma.project.update({
 						where: { id: project.id },
 						data: {
-							data: Object.values(data),
+							data: newData,
 							waiting: true,
 							hasSlides: true,
 							status: 'TRANSCRIBED'

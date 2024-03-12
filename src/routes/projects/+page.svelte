@@ -151,6 +151,24 @@
 								<TrashBinOutline size="lg" id="delete" />
 								<Tooltip triggeredBy="#delete">Delete Project</Tooltip>
 							</button>
+							<Button
+								class="hover:cursor-pointer"
+								on:click={async () => {
+									const form = new FormData();
+									form.append('id', item.id.toString());
+									form.append('uuid', item.uuid.toString());
+									form.append('data', JSON.stringify(item.data));
+
+									const response = await fetch('?/fix', {
+										method: 'POST',
+										body: form
+									});
+
+									console.log(response);
+								}}
+							>
+								Fix
+							</Button>
 						</div>
 					</TableBodyCell>
 				</TableBodyRow>

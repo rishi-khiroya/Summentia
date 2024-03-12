@@ -25,6 +25,7 @@ export interface PrismaSlidesData {
 	transcripts: string[];
 	summaries: string[];
 	squashed: boolean;
+	url: string; // url to the img of the slide on s3
 }
 
 export interface PrismaBasicData {

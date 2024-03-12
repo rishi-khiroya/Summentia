@@ -9,7 +9,6 @@ import { mkdirSync } from 'node:fs';
 import { upload } from '$lib/object_storage/upload';
 import ytdl from 'ytdl-core';
 
-// TODO: complete definition
 export class Lecture {
 	readonly userId: string | undefined;
 	uuid: string;
