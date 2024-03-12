@@ -81,7 +81,7 @@
 		</div>
 		<div>
 			<Label for="extra-features" class="mb-2">Extra Features:</Label>
-			<Checkbox bind:checked={customisation.highlight_keywords}>Highlight Key Words</Checkbox>
+			<Checkbox bind:checked={customisation.highlight_keywords}>Underline Key Words</Checkbox>
 			<Checkbox bind:checked={customisation.questions}>Generate Questions and Answers</Checkbox>
 			<Checkbox bind:checked={customisation.reading_list}>Generate Reading List</Checkbox>
 			<Checkbox bind:checked={customisation.key_definitions_list}>Generate Key Definitions List</Checkbox>

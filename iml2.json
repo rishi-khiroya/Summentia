@@ -1,0 +1,28 @@
+[
+	{
+		"slide": "root/data/c3891fae-7fa6-4ad5-b448-ddaf68916bab/slides/slide_0.png",
+		"squashed": false,
+		"summaries": ["The lecture discussed the concept of continuous nibble odd reason."],
+		"transcripts": [" part of the lecture, the continuous nibble odd reason."]
+	},
+	{
+		"slide": "root/data/c3891fae-7fa6-4ad5-b448-ddaf68916bab/slides/slide_1.png",
+		"squashed": false,
+		"summaries": [
+			"The text discusses the ID3 algorithm, which is used to train or generate decision trees."
+		],
+		"transcripts": [
+			" And then we will cover an algorithm used to train or to generate decision trees, which is called the ID-free algorithm."
+		]
+	},
+	{
+		"slide": "root/data/c3891fae-7fa6-4ad5-b448-ddaf68916bab/slides/slide_2.png",
+		"squashed": false,
+		"summaries": [
+			"Two different classes of algorithms are being discussed: lazy learners and ego learners. Lazy learners, like the K Nearest Neighbors algorithm, store all training examples and only process them when explicitly requested during testing. Ego learners, like decision trees, learn an explicit representation of the target function before any queries are made. They then discard the training data and use the learned function to make predictions when needed."
+		],
+		"transcripts": [
+			" The reason why we are covering this two algorithm is because they're actually belonging to two different bigger class of algorithm. That's what I call the lazy learners and the ego learners. More specifically, the KNS neighbor is part of the lazy learner while the decision tree is part of the ego learner. The idea behind the lazy learner here is that the lazy learner will actually just store all the training examples in a data set. And just postpone any type of processing on those data until an explicit request is made at test time. So typically when the user requests the model or the machine learning algorithm to make a prediction, then it's only there that the algorithm will actually do something and do some work. It's lazy in a sense that it's waiting a very last moment to do any type of work. On the other hand, the ego learner, so here, we'll actually try to learn before and an explicit representation of the target function. So the target function is what you can find some see here. And it will learn this prior any query. So then after learning this explicit function, it can actually discard and get rid of all the training data sets and training examples and just maintain memory this target decision function and use this later when the user makes some queries or wants some prediction to be done."
+		]
+	}
+]

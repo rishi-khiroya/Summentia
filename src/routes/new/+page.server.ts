@@ -33,13 +33,7 @@ export const actions = {
 		if (!data) return { success: false, error: 'Invalid Form: No lecture found.' };
 
 		const lecture: Lecture = Lecture.fromJSON(data);
-		if (form.get('slidesFromFile') === 'true') {
-			await lecture.withSlidesFromFile(form.get(`slidesFile`) as File);
-		} else {
-			const url = form.get('lectureURL');
-			if (!url) return { success: false, error: 'Invalid Form: No url provided for slides.' };
-			lecture.withSlidesFromURL(url.toString());
-		}
+		await lecture.withSlidesFromFile(form.get(`slidesFile`) as File);
 
 		// TODO: update db
 

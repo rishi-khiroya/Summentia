@@ -13,7 +13,7 @@
 	import { reformat_date } from '$lib/utils.js';
 	import { DownloadOutline, EditOutline, EyeOutline, TrashBinOutline } from 'flowbite-svelte-icons';
 	import type { Project } from '@prisma/client';
-	import { Button, Modal} from 'flowbite-svelte';
+	import { Button, Modal } from 'flowbite-svelte';
 	import DownloadModal from '../DownloadModal.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
@@ -21,14 +21,14 @@
 	export let data;
 
 	const MAX_NO_PAGES: number = 5;
-	const ITEMS_PER_PAGE: number = 10;
+	const ITEMS_PER_PAGE: number = 8;
 	let searchTerm: string = '';
 	$: filteredItems = data.projects.filter(
 		(project) => project.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
 	);
 
-	function isSummarised(project): boolean{
-		return project.status == "SUMMARISED"
+	function isSummarised(project): boolean {
+		return project.status == 'SUMMARISED';
 	}
 
 	let startPoint: number = Math.max(data.pageNo - 2, 1);
@@ -47,11 +47,11 @@
 				active: id === data.pageNo
 			};
 		});
-	
+
 	const previous = () => {
 		const params = new URLSearchParams(window.location.search);
-		if (parseInt(params.get('page')) == 1){
-			return
+		if (parseInt(params.get('page')) == 1) {
+			return;
 		}
 		const page = Math.max(parseInt(params.get('page') ?? '1') - 1, 1);
 		params.set('page', page.toString());
@@ -60,38 +60,36 @@
 	const next = () => {
 		const params = new URLSearchParams(window.location.search);
 		const pageNo = parseInt(params.get('page') ?? '1');
-		const page = Math.min(
-			pageNo + 1,
-			Math.ceil(data.noProjects / ITEMS_PER_PAGE)
-		);
-		if (pageNo == page){
-			return
+		const page = Math.min(pageNo + 1, Math.ceil(data.noProjects / ITEMS_PER_PAGE));
+		if (pageNo == page) {
+			return;
 		}
 		params.set('page', page.toString());
 		window.location.search = params.toString();
 	};
 
-	async function deleteProject(item){
+	async function deleteProject(item) {
 		const form = new FormData();
-		console.log(item.id)
-		form.append('id', item.id)
+		console.log(item.id);
+		form.append('id', item.id);
 		await fetch('?/delete', {
 			method: 'POST',
 			body: form
-		})
-		invalidateAll()
+		});
+		invalidateAll();
 	}
 
 	let showDeleteModal: [boolean, any] = [false, null];
 	let showDownloadModal: boolean = false;
-	let currentProject: Project = data.projects[0];
-
+	let currentProject: Project | undefined;
 </script>
 
 <!--  the filename will be stored in the S3 storage with the format title_id -->
-<DownloadModal bind:open={showDownloadModal} bind:project={currentProject} />
+{#if currentProject}
+	<DownloadModal bind:open={showDownloadModal} bind:project={currentProject} />
+{/if}
 
-<Modal bind:open={showDeleteModal[0]} size="xs"  autoclose>
+<Modal bind:open={showDeleteModal[0]} size="xs" autoclose>
 	<div class="text-center" id="deletemodal">
 		<ExclamationCircleOutline class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" />
 		<h3 class="mb-5 text-lg text-gray-500 dark:text-gray-400">
@@ -108,7 +106,6 @@
 		<TableHead>
 			<TableHeadCell>Title</TableHeadCell>
 			<TableHeadCell>Date</TableHeadCell>
-			<TableHeadCell>Created At</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
 			<TableHeadCell>Quick Actions</TableHeadCell>
 		</TableHead>
@@ -117,40 +114,63 @@
 				<TableBodyRow>
 					<TableBodyCell>{item.title}</TableBodyCell>
 					<TableBodyCell>{reformat_date(item.date)}</TableBodyCell>
-					<TableBodyCell>{reformat_date(item.createdAt)}</TableBodyCell>
 					<TableBodyCell>
 						{item.status[0].toUpperCase() + item.status.substring(1).toLowerCase()}
 					</TableBodyCell>
-					
+
 					<TableBodyCell>
-						{#if isSummarised(item)}
-						<div class="flex flex-row space-x-5">
-							<button class="hover:cursor-pointer" on:click={() => goto(`/projects/${item.id}`)}>
-								<EyeOutline size="lg" id="view" />
-								<Tooltip triggeredBy="#view">View Project</Tooltip>
-							</button>
-							<button class="hover:cursor-pointer" on:click={() => goto(`/edit/${item.id}`)}>
-								<EditOutline size="lg" id="edit" />
-								<Tooltip triggeredBy="#edit">Edit Project</Tooltip>
-							</button>
+						<div class="flex flex-row space-x-5 items-center justify-start">
+							{#if isSummarised(item)}
+								<button class="hover:cursor-pointer" on:click={() => goto(`/projects/${item.id}`)}>
+									<EyeOutline size="lg" id="view" />
+									<Tooltip triggeredBy="#view">View Project</Tooltip>
+								</button>
+								<button class="hover:cursor-pointer" on:click={() => goto(`/edit/${item.id}`)}>
+									<EditOutline size="lg" id="edit" />
+									<Tooltip triggeredBy="#edit">Edit Project</Tooltip>
+								</button>
+								<button
+									class="hover:cursor-pointer"
+									on:click={() => {
+										currentProject = item;
+										showDownloadModal = true;
+									}}
+								>
+									<DownloadOutline size="lg" id="download" />
+									<Tooltip triggeredBy="#download">Download Project</Tooltip>
+								</button>
+							{:else}
+								<h1 class="px-4 font-semibold">Unavailable</h1>
+							{/if}
 							<button
 								class="hover:cursor-pointer"
 								on:click={() => {
-									currentProject = item;
-									showDownloadModal = true;
+									showDeleteModal = [true, item];
 								}}
 							>
-								<DownloadOutline size="lg" id="download" />
-								<Tooltip triggeredBy="#download">Download Project</Tooltip>
-							</button>
-							<button class="hover:cursor-pointer" on:click={() => {showDeleteModal = [true, item]}}>
 								<TrashBinOutline size="lg" id="delete" />
 								<Tooltip triggeredBy="#delete">Delete Project</Tooltip>
 							</button>
+							<Button
+								class="hover:cursor-pointer"
+								on:click={async () => {
+									const form = new FormData();
+									form.append('id', item.id.toString());
+									form.append('uuid', item.uuid.toString());
+									form.append('data', JSON.stringify(item.data));
+
+									const response = await fetch('?/fix', {
+										method: 'POST',
+										body: form
+									});
+
+									console.log(response);
+								}}
+							>
+								Fix
+							</Button>
 						</div>
-						{/if}
 					</TableBodyCell>
-					
 				</TableBodyRow>
 			{/each}
 		</TableBody>

@@ -1,6 +1,6 @@
 import { PATH_TO_DATA } from '$env/static/private'
 import { upload } from '$lib/object_storage/upload';
-import { addToTemplate, getBodyLatexCode } from '$lib/server/latex_generation';
+import { addToTemplate, getBodyKeyDefCode, getBodyLatexCode, getBodyReadingList, getBodyRevQuestionsCode } from '$lib/server/latex_generation';
 import { output } from '$lib/server/output_engine';
 import prisma from '$lib/server/prisma';
 import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
@@ -9,7 +9,7 @@ import { error, json } from '@sveltejs/kit';
 import { OutputType } from '$lib/server/output_engine';
 import path from 'node:path';
 import { unlinkSync } from 'node:fs';
-import { format } from '$lib/server/formatter';
+import { format, generateDefs, generateQuestions, generateReadingList } from '$lib/server/formatter';
 import type { Customisation } from '$lib/types/Customisation.js';
 import { sanitise_filename } from '$lib/utils.js';
 
@@ -48,35 +48,63 @@ export async function POST({ request, locals }) {
 	const customisations: Customisation = JSON.parse(customisation);
 
 	let latexCode = '';
-
+	let backupLatexCode = '';
+	let backupSummary = '';
 	if (data.hasSlides) {
 		console.log("Data has slides");
 		const slidesData = JSON.parse(JSON.stringify(data.data)) as PrismaSlidesData[];
-		const latexBody = getBodyLatexCode(
+		latexCode = getBodyLatexCode(
 			slidesData.map((slideData) => slideData.slide),
 			slidesData.map((slideData) => {
-
+				backupSummary += slideData.summaries.reduce((a, b) => a + " " + b, "");
 				return slideData.summaries.reduce((a, b) => a + " " + b, "");
 
 			})
 		);
 		console.log("GET body")
-		latexCode = addToTemplate(data.title, session?.user.name ?? '', latexBody);
+		//latexCode = addToTemplate(data.title, session?.user.name ?? '', latexBody);
 		console.log("Add to template")
+		backupLatexCode = addToTemplate(data.title, session?.user.name ?? '', backupSummary);
+		
 	} else {
-		latexCode = addToTemplate(
-			data.title,
-			session?.user.name ?? '',
-			(JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary
-		);
+		backupSummary = (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary
+		latexCode = backupSummary;
+		// latexCode = addToTemplate(
+		// 	data.title,
+		// 	session?.user.name ?? '',
+			
+		// );
+		backupLatexCode = latexCode;
+		console.log("Summary: " + (JSON.parse(JSON.stringify(data.data)) as PrismaBasicData).summary);
 	}
 
 	// format the code according to the customisations
 	console.log("started formating")
-	const formattedlatexCode = (await format(latexCode, customisations)) ?? latexCode;
-	console.log("NEW FILENAMEA; " + filename);
+	
+
+	if(customisations.key_definitions_list){
+		const defs: string = await generateDefs(backupSummary)??"";
+		const definitions: string[] = defs.split(";");
+		latexCode += getBodyKeyDefCode(definitions)
+	}
+	if(customisations.questions){
+		const questionsString: string = await generateQuestions(backupSummary)??"";
+		const questions: string[] = questionsString.split(";");
+		latexCode += getBodyRevQuestionsCode(questions);
+	}
+	if(customisations.reading_list){
+		const readingListString: string = await generateReadingList(backupSummary)??"";
+		const readingList: string[] = readingListString.split(";");
+		latexCode += getBodyReadingList(readingList);
+	}
 
 	const destination = `${uuid}/summaries/${filename}.${type}`;
+
+	latexCode = addToTemplate(data.title, session?.user.name ?? '', latexCode);
+
+	const formattedlatexCode = (await format(latexCode, customisations)) ?? latexCode;
+	console.log("NEW FILENAMEA; " + filename);
+	console.log("FORMATTED CODE: " + formattedlatexCode);
 
 	// do not check if it exists anymore as we always want to generate new documents in case the user does different customisations
 	const filepath = path.join(PATH_TO_DATA, filename);
@@ -85,7 +113,7 @@ export async function POST({ request, locals }) {
 	const correctOutput = await output(formattedlatexCode, filepath, outputType);
 	
 	if(!correctOutput){
-		await output(latexCode, filepath, outputType);
+		await output(backupLatexCode, filepath, outputType);
 	}
 
 	console.log(`Output to ${filepath}`);

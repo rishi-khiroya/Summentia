@@ -2,7 +2,7 @@
 	import FormStep from './FormStep.svelte';
 	import { StepStatus, type Step } from './(types)/Step';
 	import ProgressIndicator from './ProgressIndicator.svelte';
-	import { Input, Label, Spinner, Range, Toggle } from 'flowbite-svelte';
+	import { Input, Label, Spinner, Range, Toggle, Video } from 'flowbite-svelte';
 	import FileUpload from './FileUpload.svelte';
 	import type { Upload } from './(types)/Upload';
 	import { goto } from '$app/navigation';
@@ -52,7 +52,11 @@
 		customisation: { summaryLevel: number; questions: boolean };
 	};
 
-	let slidesUpload: Upload;
+	let slidesUpload: Upload = {
+		fromFile: true,
+		url: '',
+		fileList: undefined
+	};
 	let generateSlides: boolean = false;
 
 	// Stop the page from refreshing without confirmation of losing data.
@@ -60,6 +64,11 @@
 		event.preventDefault();
 		event.returnValue = '';
 		return '';
+	}
+
+	function parseFileName(filename: string): string {
+		console.log('Parse file name: ' + filename);
+		return filename.split('/').pop() ?? '';
 	}
 
 	async function handleLecture(): Promise<{ success: boolean; msg: string | undefined }> {
@@ -107,12 +116,12 @@
 			return { success: true, msg: undefined };
 		} else {
 			alert(responseData.error);
-			return { success: false, msg: responseData.error }
-		};
+			return { success: false, msg: responseData.error };
+		}
 	}
 
 	async function handleSlides(): Promise<{ success: boolean; msg: string | undefined }> {
-		if (slidesUpload.fromFile ? !slidesUpload.fileList : !slidesUpload.url){
+		if (!slidesUpload.fileList) {
 			alert("Error: 'submit' should not have been called for a skip.");
 			return { success: false, msg: "Error: 'submit' should not have been called for a skip." };
 		}
@@ -122,10 +131,7 @@
 		form.append('lecture', JSON.stringify(lecture));
 
 		// Add slides to the form
-		form.append('slidesFromFile', slidesUpload.fromFile.toString());
-		if (slidesUpload.fromFile && slidesUpload.fileList?.length)
-			form.append('slidesFile', slidesUpload.fileList[0]);
-		else form.append('slidesURL', slidesUpload.url);
+		if (slidesUpload.fileList?.length) form.append('slidesFile', slidesUpload.fileList[0]);
 
 		waiting = true;
 
@@ -160,8 +166,8 @@
 			return { success: true, msg: undefined };
 		} else {
 			alert(responseData.error);
-			return { success: false, msg: responseData.error }
-		};
+			return { success: false, msg: responseData.error };
+		}
 	}
 
 	async function handleSubmit(): Promise<{ success: boolean; msg: string | undefined }> {
@@ -204,13 +210,12 @@
 			}
 		} else {
 			alert(responseData.error);
-			return { success: false, msg: responseData.error }
-		};
+			return { success: false, msg: responseData.error };
+		}
 	}
 </script>
 
 <svelte:window on:beforeunload={beforeUnload} />
-
 
 <div class="flex flex-col w-full p-5 m-10 bg-white dark:bg-slate-800 shadow-xl rounded-2xl">
 	<ProgressIndicator bind:currentStep bind:steps bind:waiting />
@@ -238,11 +243,16 @@
 			step={steps[1]}
 			bind:currentStep
 			backStatus={data.backStatus}
-			isPopulated={() => (slidesUpload.fromFile ? !!slidesUpload.fileList : !!slidesUpload.url)}
+			isPopulated={() => !!slidesUpload.fileList}
 			submit={() => handleSlides()}
 		>
 			<h1 class="text-2xl font-bold dark:text-white">Upload slides:</h1>
-			<FileUpload bind:upload={slidesUpload} name="Slides" allowedFileType=".pdf" allowURL={false}/>
+			<FileUpload
+				bind:upload={slidesUpload}
+				name="Slides"
+				allowedFileType=".pdf"
+				allowURL={false}
+			/>
 		</FormStep>
 
 		<!-- Confirm title and date (guessed from lecture/slides) -->
@@ -283,6 +293,13 @@
 			submit={() => handleSubmit()}
 		>
 			<h1 class="text-2xl font-bold dark:text-white">Review & Submit:</h1>
+			<!-- <div class="">
+				<Video
+					src={lecture.video}
+					controls
+					class="m-5 rounded-xl h-72 outline-1 outline-transparent shadow-md shadow-black"
+				/>
+			</div> -->
 			<div class="flex flex-row justify-between w-full space-x-5">
 				<div
 					class="flex flex-col w-full shadow-md shadow-black outline-1 outline-black p-5 m-5 rounded-xl space-y-5"
@@ -291,9 +308,10 @@
 						<h1 class="font-bold text-xl text-clip">{lecture.info.title}</h1>
 						<h1 class="text-lg text-clip">{lecture.info.date}</h1>
 					</div>
-					<!-- TODO: remove full path and only show stem -->
-					<h1 class="text-lg text-clip">Video: {lecture.video}</h1>
-					<h1 class="text-lg text-clip">Slides: {lecture.slides ?? 'None'}</h1>
+					<h1 class="text-lg text-clip">Video: {parseFileName(lecture.video)}</h1>
+					<h1 class="text-lg text-clip">
+						Slides: {lecture.slides ? parseFileName(lecture.slides) : 'None'}
+					</h1>
 				</div>
 				<div class="flex flex-col w-full m-5 space-y-5">
 					<div class="flex flex-col shadow-md shadow-black outline-1 outline-black p-5 rounded-xl">

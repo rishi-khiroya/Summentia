@@ -11,7 +11,8 @@
 	import { ButtonGroup, Button, Pagination, Video } from 'flowbite-svelte';
 	import type { PrismaBasicData, PrismaSlidesData } from '$lib/types/prisma';
 	import DownloadModal from '../../DownloadModal.svelte';
-	import type { Customisation } from '$lib/types/Customisation';
+
+	import { Image } from '@unpic/svelte';
 
 	const accumulateSlideData = (slideData: PrismaSlidesData[]): PrismaBasicData => {
 		let basicData: PrismaBasicData;
@@ -43,6 +44,8 @@
 
 	if (displaySlides) {
 		slideData = JSON.parse(JSON.stringify(data.project.data));
+
+		slideData = slideData.filter((slide) => !slide.squashed && slide.transcripts?.length);
 
 		console.log(slideData);
 		overviewData = accumulateSlideData(slideData);
@@ -129,45 +132,58 @@
 			{/if}
 		</div>
 		{#if displaySlides}
-			<div class="flex flex-col">
-				<div class="flex">
-					<div class="flex justify-center">
+			<div class="flex w-full flex-col">
+				<div class="flex flex-row w-full justify-between space-x-3">
+					<div class="flex flex-col w-full">
 						<Video
 							src={data.project.video}
 							controls
 							class="m-5 rounded-xl h-72 outline-1 outline-transparent shadow-md shadow-black"
 						/>
+						<InformationBox title="Transcript:" maxHeight="72" additionalAttributes="flex-1">
+							<!-- <p>{slideData[slideNo].transcripts.reduce((a, b) => a + ' ' + b, '')}</p> -->
+							<p>{slideData[slideNo].transcripts.reduce((a, b) => a + ' ' + b, '')}</p>
+						</InformationBox>
 					</div>
-					<InformationBox title="Transcript:" maxHeight="72" additionalAttributes="flex-1">
-						<!-- <p>{slideData[slideNo].transcripts.reduce((a, b) => a + ' ' + b, '')}</p> -->
-						<p>{slideData[slideNo].transcripts.reduce((a, b) => a + ' ' + b, '')}</p>
-					</InformationBox>
-				</div>
-				<div class="flex">
-					<div class="flex justify-center">
-						<img
+					<div class="flex flex-col w-full">
+						<div class="flex justify-center">
+							<!-- <img
 							class="m-5 h-72 rounded-xl outline-1 outline-transparent shadow-md shadow-black"
-							src={slideData[slideNo].slide}
+							src={slideData[slideNo].url}
 							alt="Slide 1"
-						/>
+						/> -->
+							<Image
+								src={slideData[slideNo].url}
+								layout="fullWidth"
+								height={350}
+								alt={`Slide ${slideNo}`}
+							/>
+						</div>
+						<InformationBox title="Summary:" maxHeight="72" additionalAttributes="flex-1">
+							<!-- <p>{slideData[slideNo].summaries.reduce((a, b) => a + ' ' + b, '')}</p> -->
+							<p>{slideData[slideNo].summaries}</p>
+						</InformationBox>
 					</div>
-					<InformationBox title="Summary:" maxHeight="72" additionalAttributes="flex-1">
-						<!-- <p>{slideData[slideNo].summaries.reduce((a, b) => a + ' ' + b, '')}</p> -->
-						<p>{slideData[slideNo].summaries}</p>
-					</InformationBox>
 				</div>
-			</div>
-			<div class="flex justify-center">
-				<Pagination {pages} large on:previous={previous} on:next={next} on:click={pageClicked} icon>
-					<svelte:fragment slot="prev">
-						<span class="sr-only">Previous</span>
-						<ChevronLeftOutline class="w-7 h-7" />
-					</svelte:fragment>
-					<svelte:fragment slot="next">
-						<span class="sr-only">Next</span>
-						<ChevronRightOutline class="w-7 h-7" />
-					</svelte:fragment>
-				</Pagination>
+				<div class="flex justify-center">
+					<Pagination
+						{pages}
+						large
+						on:previous={previous}
+						on:next={next}
+						on:click={pageClicked}
+						icon
+					>
+						<svelte:fragment slot="prev">
+							<span class="sr-only">Previous</span>
+							<ChevronLeftOutline class="w-7 h-7" />
+						</svelte:fragment>
+						<svelte:fragment slot="next">
+							<span class="sr-only">Next</span>
+							<ChevronRightOutline class="w-7 h-7" />
+						</svelte:fragment>
+					</Pagination>
+				</div>
 			</div>
 		{:else}
 			<div class="flex">
