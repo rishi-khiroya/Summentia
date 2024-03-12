@@ -32,6 +32,31 @@ export async function upload(filePath: string, destPath: string) {
 	uploadObject();
 }
 
+export async function uploadForView(filePath: string, destPath: string) {
+	const params = {
+		Bucket: 'summentia-storage', // The path to the directory you want to upload the object to, starting with your Space name.
+		Key: destPath, // Object key, referenced whenever you want to access this file later.
+		Body: fs.createReadStream(filePath), // The object's contents. This variable is an object, not a string.
+		ACL: ObjectCannedACL.public_read,
+    ContentType: "application/pdf",
+		Metadata: {
+			// Defines metadata tags.
+			'x-amz-meta-my-key': 'DO00LTWRAXLVDGZTFZ2W'
+		}
+	};
+
+	const uploadForViewObject = async () => {
+		try {
+			const data = await s3Client.send(new PutObjectCommand(params));
+			console.log('Successfully uploaded for view object: ' + params.Bucket + '/' + params.Key);
+			return data;
+		} catch (err) {
+			console.log('Error', err);
+		}
+	};
+
+	uploadForViewObject();
+}
 
 /* from linked in: https://www.linkedin.com/pulse/upload-images-video-files-using-aws-s3-sdknodejs-react-birendra-jha-fdqnc/?trk=article-ssr-frontend-pulse_more-articles_related-content-card
 

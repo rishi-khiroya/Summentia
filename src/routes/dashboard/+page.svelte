@@ -25,6 +25,7 @@
 	import DownloadModal from '../DownloadModal.svelte';
 	import { onMount, onDestroy } from "svelte";
 	import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
+	import { DIGITAL_OCEAN_ENDPOINT } from '$lib/object_storage/static';
 
   	let PdfViewer;
 
@@ -38,7 +39,10 @@
 
 	let filename = data.sanitised_filename;
 
-	let previewURL = currentProject?( `./${filename}.pdf`):"";
+	// let previewURL = currentProject?( `./root/data/${filename}.pdf`):"";
+	const previewURL = `${DIGITAL_OCEAN_ENDPOINT}/${currentProject.uuid}/summaries/${filename}.pdf`;
+	console.log("Prieview URL " + previewURL);
+	// let previewURL = currentProject?( `https://summentia-storage.fra1.cdn.digitaloceanspaces.com/d7ab5e9a-e61a-48e6-b51c-bd7a14cb5cce/summaries/IDB_Serial_Execution.pdf`):"";
 
 	function isSummarised(project): boolean{
 		return project.status == "SUMMARISED"
