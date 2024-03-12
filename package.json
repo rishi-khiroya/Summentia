@@ -30,6 +30,7 @@
 		"@types/node": "^20.11.25",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
+		"@unpic/svelte": "^0.0.51",
 		"autoprefixer": "^10.4.16",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
