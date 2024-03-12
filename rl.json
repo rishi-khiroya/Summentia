@@ -1,0 +1,335 @@
+[
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_1.png",
+        "transcripts": [
+            " And welcome to the last video for this week where we will be looking at Markov decision processes. And Markov decision processes or MDPs is really at the heart of reinforcement learning. So this is a very important topic for us to get right."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_2.png",
+        "transcripts": [
+            " Let's start off by defining the MDP. So similar to Markov reward processes, we have the state space, which is the collection of all possible states you can be in the system. We have the action space, and this defines all the possible actions you can take. We have the transition probability matrix, and this defines what is the probability of you ending up in a new state, as a time t plus 1, given your current state at time t, s t, and the action that you've taken. So what's new is the probability of you ending up in different states is now not only dependent on your current state, but also on the action that you have taken. Again, we have the discount factor gamma, which will be between 0 and 1, and we have the new reward function. And again, this reward function is now also dependent on the action A that you've taken. So the immediate reward is dependent on your current state, the action you've taken in that state, and the resulting state you've ended up in. And another element of a Markov decision process is the policy. And the policy defines what action you should take given the state you're in. The policy can be stochastic, where there is a probability distribution of you taking different actions given the state you're in, or you could have a deterministic policy. In this case, whenever you're in a state s, you always decide to take the same action A."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_3.png",
+        "transcripts": [
+            " And this is a graphical model or representation of an MDP. You can see here that we have the state you're in at the current time step T. And the state you'll maybe end up in at time T plus 1. We also have the reward at time T plus 1. And you can see here that the reward is dependent on the current state, the next state, the action you end, the action you have taken. Below here we can see also that the action is only dependent on the current state you're in. And if you take both the current state you're in plus the action, we can determine the next possible states."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_4.png",
+        "transcripts": [
+            " The actual element, not to define, is how good is it to be in a given state? And we call this the value function, which represents how much value is there of me being in a particular state. And ultimately, what we want to do is determine what kind of actions we should take to end up in states that really have high values where we see potential for either high rewards or low costs. So the definition of the value function is presented here. And we can see that the value function is defined as the expected reward given the current policy, given the current state you're in. That is, the sum over all future time steps until infinity of the discounted immediate reward given your current state. And as I find here where RT is a discounted total return and R at time t plus k plus 1 are the immediate rewards from the future time steps given the current time step and the state. In later slides, we will see how the value function is self-consistent. That is, that we can define linear equations that we can solve the value functions for, similarly to what we did with MRPs. So let's look at how the value function is self-consistent. As we have defined in the previous slide, the value of a state S given a current policy is equal to the expected return value over the policy given my current state."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_5.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_6.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_7.png",
+        "transcripts": [
+            " And we can write this out as we've seen in the previous slide as over the next infinite number of time steps that this counted immediate rewards given my current state S. We can now take this and separate it into two different situations. We can look at what is the expected, the expected immediate reward I'm going to get during the next time step. So given my current state, what can I expect to happen in the next time step? What reward will I get? And also given wherever I end up in the next time step, what are the rewards from there on, which is represented here, which are discounted. So my immediate reward is usually not discounted because in this case, gamma is elevated to 0 because k is 0 for the first time set. So we can just look at the immediate reward and then the discounted future rewards. And we can also write this then as the expected reward given my state S and the expected future, this counter rewards given my state S. Let's unpack the meaning of these two separate expectation terms, let's start off with the first expectation.",
+            " And useful tool in calculating value functions is what we call a backup diagram, like the one seen here. S represents the current state S that I'm in. A represents the different possible actions A I can take and state S. If it is a non-deterministic policy, there will likely be multiple actions A that you can take with an associated probability. If it is a deterministic policy, there will only be one link as you'll always take a particular action A in a state S. And after taking action A in state S, there are multiple possible S primes or next states that you can end up in. And each of those has an associated or value. If we look at this S prime, that will also have an associated value function with it. And instead of trying to calculate this infinitely, we can use these as backup values of the values of the state S prime to calculate the value of our state S. And this is a trick commonly using reinforcement learning to learn what the value of my current state is. In other words, to be able to calculate the value of a current state S, I only need to average all the possible resulting S prime that could end up in. And the probability of me ending up in each of these possible states S prime. To do is calculate the probability of me ending up in each of these possible different S prime states for me to calculate the value of my current state S. So let's start off by looking at the first step. What is a probability of me taking action A in state S? Well, that is given by our policy. So the probability of taking action A in state S is the policy of the probability of A in S. Next, we need to find out what is the probability of me ending up in state S prime. Well, that is dependent on my current state S and the action I've taken. So the probability of S prime given S and A, well, that is simply our probability transition matrix. So we can just grab the value from in there and use that. Lastly, we want to measure what is a reward of each of those possible S prime states. And that is given by a reward function. So the immediate reward of state S, action A and the resulting S prime can be taken out of our reward matrix. And what is the value of state S prime? Well, this is simply the value of S prime. It is a recursive definition. But using that, we can now derive the probabilities and the values of the paths in the diagram. So we can take each of these different paths in the diagram and measure what our current value is for state S given all our possible resulting states S prime."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_8.png",
+        "transcripts": [
+            " So what's not looking at, how can we unpack this value function so we can calculate what the value of our current state is? And remember that we have separated our value function and do two different elements. The first is looking at the immediate reward of being state S plus the discounted future meter rewards, also given them that I'm in state S, but what happens after the current time step. So let's focus a little bit more on our immediate reward for this current time step. Well, we have seen in the back of diagram that we can look at all possible future states I can end up in all the possible S primes that I can get to from state S and there are associated immediate rewards. Well, what is the probability of me ending up in each of those possible states S prime? Well, first of all, I need to look at all the possible actions I can take in my current state. So I look at the sum of all possible actions and the probability of me taking each of the different actions in state S. Given that I've taken the action A in state S, what are the possible different states S prime I can end up in?"
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_9.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_10.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_11.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_12.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_13.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_14.png",
+        "transcripts": [
+            " Well, I can look at the transition matrix for that. So the probability of the ending up in S prime get is given S and A. So I can look at what are the possible different states I can end up in and what are the probability associated with each of those? And I can multiply that times the reward of me taking action A in state S and ending up in state S prime. And that will give me my immediate expected reward for state S. So have from the definition of the value function that the value under a current policy of S prime is equal to the expected reward at time t plus 1, given my state S prime. And that is equal to the sum of all this counted rewards at time t plus k plus 2, given S prime. And if you look closely, you will see that this over here and here are very similar. So we can use this information to substitute the value of S prime in the previous equation. So let's look into how we now put all of this together to calculate the value of state S under a policy."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_15.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_16.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_17.png",
+        "transcripts": [
+            " Well, this is just copying over what we seen previously, but we can see that ultimately we end up here with the sum of over all the possible actions a times the probability of me taking that action a given my current state s, the probability of me ending up in the state s prime. And the reward of the state s prime given my state s and my action a plus the discounted expected value of my future immediate rewards given that I'm in state s prime. Well, we can just substitute into this set of the equation here. The value of s prime. And this is the resulting equation we end up in. And this is what we call one of the versions of Bellman's equations and this is a fundamental property of value functions. And you can see that this satisfies the recursive consistency equations, we can build a set of linear equations to solve this, so it is self consistent. And more crucially, this value under Paul under this policy has one unique solution."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_18.png",
+        "transcripts": [
+            " This step of computing the value function for each state S in the system, under a specific or arbitrary policy, is called the policy evaluation step, and it is also frequently referred to as the prediction problem. We have seen how to solve or get the values for each state S using Bellman's equations. And you can apply Bellman's equations over and over again to get better estimates for each state S in the system. And by doing this over and over again, you are guaranteed to converge to the true values for each state S. And it is guaranteed to do so, but we'll go more about more into this later in the course. And this algorithm in general of applying Bellman's equation over and over again is called the iterative policy evaluation, where each iteration for each time step K provides better approximations to the true solution. And then we need to determine what is a stepping point, a stopping point whenever determined that we are close enough to a true solution. Well, a frequent way of doing this is by measuring how little the largest change in the value function was between two iteration steps and set a specific threshold value."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_19.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_20.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_21.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_22.png",
+        "transcripts": [
+            " The algorithm to solve for the values of a function, so we call it the iterative policy evaluation algorithm, where it takes us input a specific policy, which is the policy to be evaluated, and you initialize the value for every state in the system to zero, and then you loop over the following. You start off by setting a delta to zero, and then for each state in the system, you first save the current value of that state, and then you update the value of the state using the Bellman equation we have just seen in the previous slide. And then you check, and then you update delta by seeing whether the previous delta or another delta was bigger than the difference between the previous value of the state and the updated value of the state, and you do this until the largest change in the value function was smaller than a set could of threshold. So you see whether there comes a point where the value changes are smaller than a threshold, and that is probably the right time to stop the algorithm. And as an output, then you have the estimated values of the system under a specific policy. The iterative policy evaluation step, we sweep through all possible differences sets of states as prime, and that is what we call a full backup operation because we look at all possible different as primes we can end up in. But what do we use as is s prime. Well, there are two different possibilities. We can either create an old and new array version of this s prime, where we look at this old value function and use that as prime, or we can just use the one from the current time step if we already have it available. And this turns to be preferential because it converges faster, and we'll see later on why this is the case."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_23.png",
+        "transcripts": [
+            " Let's do a simple example so that we get this intuition of how this actually works. What does this look like? So let's consider the stair climbing Markov decision process, where you can either go up the stairs, which has a cost of minus one for each step, or you can go down the stairs, which is easier and has a positive reward of one. However, when we are all the way at the bottom of the stairs, we have a cost of minus ten, and when we have finally achieved our goal of getting to the top of the stairs, we have a positive reward of ten. And both the top and the bottom of the stairs are absorbing states. They are terminal states. So there are two different actions going up or going down, or going left and going right in this case. Let us assume that we are using a discount gamma of 0.9, and let us also assume that we have an unbiased policy, where there is an equal probability of me going up the stairs and of me going down the stairs. So what we want to find is what is the value of being in each of these different steps? What is our goal for this example?"
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_24.png",
+        "transcripts": [
+            " So, using our policy evaluation algorithm, we can iteratively update the value of each step to get our true values. So let's go through this. Initially we set the value of each different state to zero. That is a common way to just set everything to zero to start. All right, so let's do our first update using the Bellman equation. And left to right."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_25.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_26.png",
+        "transcripts": [
+            " All right, well, we can update the state of S1 by looking at all possible successor states. And what are the possible states we can end up in? Well, we can end up in one to the left at the bottom of the stairs and by going one step up. These are the only possible states we can end up in. So we calculated from there, so there is a 50% chance of me going to the left and having a cost of minus 10 and a 50% chance of me going to the right, having a cost of minus one. So if we add that together, we get minus 5.5. Well, we can continue doing this for all states in this step. And if we look at state two, we actually don't have enough information yet. There is not anything new to calculate because the probability is we still look at the left and right probabilities. We have an equal distribution of a cost of minus one and plus one, so that ends up at zero."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_27.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_28.png",
+        "transcripts": [
+            " and so on. And similarly here for state five, there is a 50% chance I'll have a reward of 10, a 50% chance I'll have a reward of one and I ended up we get 5.5. So we will continue doing this for every step and each time we will use the previous, the previous states or the previous value of states to update our current value of states, all the point until we converge and this is the true value of our states."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_29.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_30.png",
+        "transcripts": [
+            " Another different way to think about this is not only looking at the values of each state, but by thinking of what is the value of me taking each action? So what is the state action value? And using this in future lessons, we will see how we can decide what is the optimal action I can take given each state. Right now, let's think about how we calculate what the value is of each state action pair. So what is the value which we call Q? A Q value under a specific policy of meeting in a particular state and taking action A. Well, it is the expected reward given that I'm in state S and that I take action A. And that is, again, the expected sum of the immediate rewards for this and all successor states, discounted by gamma given that I'm in state S and for this particular state S, I take action A. This can also be rewritten using the value function we've seen earlier. And this is pretty straightforward, where the value under a particular policy of state S is the sum over all possible actions, the probability of me taking each of those actions given I'm in state S times this state action value function, this Q function."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_31.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_32.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_33.png",
+        "transcripts": [
+            " Now we know how to calculate the value of a certain state for a given policy, but often we don't want just any policy. We want to find what is the optimal policy and what are the values of each state under this optimal policy. So here we have defined that the value of each state under the optimal policy is choosing the best policy at each state and their values. The policy that maximizes the value function is the optimal policy and there is always at least one optimal policy for each system. There may be more than one optimal policy though. So for a certain state, there may be actions that are equally good that can be taken. We also want to define what is the optimal state action value function or for the Q function. So here we have that the optimal state action value function is the best policy for the state action Q function. We also have biology that the optimal Q function is the expected reward plus the discounted optimal value function for a given state and action."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_34.png",
+        "transcripts": [
+            " And this can be represented best in these Bellman equation backups. So if I'm trying to find out for the value function, what is the best policy? I can look at what is the best action I can take and what is a reward from the best action I can take from each state. Similarly, for the queue function, once I have the optimal state action pairing, I can take that action, see what successor states as prime I can end up in, and what are the optimal state action pairs, where the optimal state action pairs for the subsequent S prime."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_35.png",
+        "transcripts": [
+            " And here we have the Bellman optimality equation derivation. So similarly for the value equation, we can derive what is the optimal value function, how we can compute that. So this will look very similarly to what we've seen before, but we've added this optimal action selection at the start. So we look at what is the best possible action we can take and what are the probabilities of me taking that action, times the value, the Q value of the state action pairing. Well, at this point, we don't need this probability of this policy anymore, right? Because we are choosing the best action. So we're simply maximizing over the possible actions, the Q value, the state action pairing. And this is equal to the max action of the total reward we can have for the state action pairing and so on, as we've seen similarly. And so we get to the derivation, which we'll look quite similar to before, where we choose the best action, the best possible action, the possible different states we can end up in by having taken that action. The reward for the state action as preparing and it discounted that this kind of Q value for the optimal state I can end up in."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_36.png",
+        "transcripts": [
+            " And here we have a copy it over a bit more clearly, the bellman optimality equation for V. And there's a couple of things to note. The first is that this self consistency condition can be rewritten in a form without any reference to a specific policy. And this can be useful for several different reasons. Since the policy is very difficult to express and there are other cases where we might not even know what the policy is. So it is quite convenient here that it does not make any reference to a policy. We can also see that the bellman optimality equation expresses the fact that the value of the state under an optimal policy must be equal to the expected return for the best action from that state. So this is expressed using the best action for each state. So for every given state we can decide what is the best action, calculate the probability of me ending up in subsequent states with the rewards for all the possible subsequent states, and then the optimal value for the next state."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_37.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_38.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_39.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": true
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_40.png",
+        "transcripts": [
+            " We can look at this similarly for the optimal Q function, which is expressed both in terms of the current state and the action. So for a given state and action pairing, it is the expected value of the meter return plus the optimal Q value discounted for future state and action pairings while discounting. So this is expressed as the sum of all possible states that we can end up in with their associative probabilities of me ending up in the next state, the reward for the state action and S-prime pairing, and this counted the discounted Q value where we again select the best action for the next state S-prime. Then we see that this is not, we don't explicitly have the policy or the optimal policy in this equation, and this is useful again because the policy sometimes can be very difficult to know or to express. This results in a set of n nonlinear equations where n is a number of states, and this is nonlinear due to this max action over here. However, we can still solve the system of equations using contraction, and we will see a sketch for this in a couple of slides."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_41.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_42.png",
+        "transcripts": [
+            " So it's placidly solving the development optimality equations provides one route to finding the optimal policy and thus solving the reinforcement learning problem. However, this solution is often not feasible if not impossible because there can be so many different states in a usual problem that if we look ahead at all possible traces, this becomes too computationally expensive. And it also relies on three different assumptions that in practice are very rarely true. The first is that we need to accurately know and represent the dynamics of the environment. We need to know what the probability transitions are. We need to know what the rewards are and so on. And in general, this can often be very hard to represent for real life problems. We also need to have the computational resources to find a solution. And even simple gains such as go or test, they have so many possible states that they very quickly become non-tractable. So often we can't represent all of this and compute it the normal way. The last thing that it assumes is a mark of property. And if you remember, that says that the next state is only dependent on my current state that I'm not looking at the history of the states that have been in the past. And in real life problems, again, this is often not necessarily the case. So in real-force-malurning, often we have to look towards approximate solutions instead of exact solutions."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_43.png",
+        "transcripts": [
+            " The last thing we will do throughout this week is we will look at the Bellman optimality equation convergence. That is, we are trying to prove two things with this theorem. First is that the Bellman optimality equations have a unique solution and second that the values produce by the value and iteration converged to the solution of the Bellman equations. A complete proof of this is beyond the scope of this course. However, it will rest on a very useful lemma from analysis called the Banach fixed point or the contraction mapping theorem. And if you are interested, I do encourage you to look a little bit more in depth into this outside of this course. Before the purpose of this course, we are only going to look at some intuition of this proof."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_44.png",
+        "transcripts": [
+            " So let's look at intuition. So the first thing that we know is that the Bellman optimality equation is a so-called fixed point equation. Now what does this mean? This means that if we apply the Bellman optimality equation to this optimal policy, the values of the optimal policy under S, this will be equal to the values under the optimal policy. So both of these will be equal. Now, to get some intuition into this proof, suppose that we start with arbitrary policy, arbitrary value function v, and that we apply to the right hand side of using the Bellman equation to v, then we get a new value function v prime. So that we apply the Bellman optimality equation to v, and we get v prime. And let's suppose that we call this operation on the right hand side k. And then we can yield this function. So if we keep on applying k to the right hand side, we get this fixed point function that the optimal policy of v is equal to the optimal policy under k. And that no matter how many times we continue applying k, that we achieve the same v under the optimal policy. So a simple process to find the fixed point of v is as follows. So let's initialize the values of v0 or the initial values of v to 0 for every state in this function. And then we keep on applying k to update our values of v. So v1 is equal to v0 under this this function k."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_45.png",
+        "transcripts": [
+            " And we continue doing this to get the value of v2 and v3 and so on. And this is actually what value iteration does, right? We continue applying the Bellman equation over and over again, updating the values of v, until hopefully we converge to the optimal value. So this process of iterating k converges to a limit, and the limit is unique. It's a fixed point. And what is this? Well, k has a special property. It is a contraction. This means the given only two value functions v1 and v2. Applying them to k brings them closer. So in our case, applying the Bellman optimality equation to them brings them closer. So every time we apply this value k to v1 and v2, in subsequent steps, we bring them closer. And this must strictly be smaller than gamma of the original v values. And this over here is the max norm, which is the norm which is the max over all possible states of the values of s. But this gamma over here is not just any gamma."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_46.png",
+        "transcripts": [
+            " This gamma is the same concept factor, the same in the MDP that we call the discount factor, where gamma must be less than 1. And the norm between the two distinct points decrease strictly. So intuitively, if we have a process that keeps bringing two different points closer and closer to each other, if we iterate sufficiently, we will converge to one single fixed point. The contraction mapping theory says that under a proper conditions, which are satisfied by our Bellman optimality equations in our NDPs, this is in fact the case that if we keep on applying the Bellman optimality equation over and over to our values, that we ultimately get to this unique fixed point, and this unique fixed point is the optimal value, as the optimal V under the optimal policy."
+        ],
+        "summaries": [],
+        "squashed": false
+    },
+    {
+        "slide": "/root/data/4bba147d-d5e9-44d0-af8b-fcdb5423f39c/slides/_page_47.png",
+        "transcripts": [],
+        "summaries": [],
+        "squashed": false
+    }
+]
