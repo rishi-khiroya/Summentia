@@ -78,7 +78,7 @@ export const actions = {
 						transcripts: slide.transcripts,
 						summaries: slide.summaries,
 						squashed: slide.squashed,
-						url: path.join(DIGITAL_OCEAN_ENDPOINT, destination)
+						url: path.join(DIGITAL_OCEAN_ENDPOINT, path.join(uuid, 'slides', filename))
 					};
 				})
 			);
