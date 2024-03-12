@@ -24,10 +24,18 @@
 {#if currentStep == step.id}
 	<div class="flex-1 flex-col items-center">
 		<slot />
-		<p class="italic text-gray-600 dark:text-gray-400 pt-5">* Required</p>
+		<div class="flex flex-row justify-between pt-5 text-gray-600 dark:text-gray-400">
+			<p class="italic">* Required</p>
+			<p class="italic font-light mr-5">
+				Due to limitations of the available hardware, we are currently limiting this tool to ONE
+				project being processed at a time.
+			</p>
+		</div>
 		<div class="flex flex-row justify-between space-x-3 pt-2">
-			<Button color="alternative" disabled={currentStep == 0 || !backStatus} on:click={() => currentStep--}
-				>Previous</Button
+			<Button
+				color="alternative"
+				disabled={currentStep == 0 || !backStatus}
+				on:click={() => currentStep--}>Previous</Button
 			>
 			<div class="flex flex-row p-1 m-1">
 				{#if backStatus}
